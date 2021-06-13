@@ -1,6 +1,6 @@
-﻿using FormsGame.Forms;
-using FormsGame.Sound;
-using FormsGame.TextProcessing;
+﻿using InformationTree.Forms;
+using InformationTree.Sound;
+using InformationTree.TextProcessing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,7 +13,7 @@ using System.Web;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace FormsGame.Tree
+namespace InformationTree.Tree
 {
     public static class TreeNodeHelper
     {

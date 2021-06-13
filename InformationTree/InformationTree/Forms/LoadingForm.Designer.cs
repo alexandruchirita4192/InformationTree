@@ -1,4 +1,4 @@
-﻿namespace FormsGame.Forms
+﻿namespace InformationTree.Forms
 {
     partial class LoadingForm
     {

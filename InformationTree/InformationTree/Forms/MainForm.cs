@@ -3,12 +3,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using FormsGame.TextProcessing;
-using FormsGame.Tree;
-using FormsGame.Graphics;
-using FormsGame.Sound;
+using InformationTree.TextProcessing;
+using InformationTree.Tree;
+using InformationTree.Graphics;
+using InformationTree.Sound;
 
-namespace FormsGame.Forms
+namespace InformationTree.Forms
 {
     public partial class MainForm : Form
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Media;
 using System.Text;
 
-namespace FormsGame.Sound
+namespace InformationTree.Sound
 {
     public static class SoundHelper
     {

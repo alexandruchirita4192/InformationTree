@@ -1,6 +1,6 @@
 ﻿using RicherTextBox.Controls;
 
-namespace FormsGame.Forms
+namespace InformationTree.Forms
 {
     partial class PopUpEditForm
     {

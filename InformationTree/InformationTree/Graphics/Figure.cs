@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using D = System.Drawing;
 
-namespace FormsGame.Graphics
+namespace InformationTree.Graphics
 {
     public enum FigureType { None, Circle, Point, Line, Polygon, Text, Arc };
 

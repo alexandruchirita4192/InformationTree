@@ -1,6 +1,6 @@
-﻿using FormsGame.PgpEncryption;
-using FormsGame.TextProcessing;
-using FormsGame.Tree;
+﻿using InformationTree.PgpEncryption;
+using InformationTree.TextProcessing;
+using InformationTree.Tree;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace FormsGame.Forms
+namespace InformationTree.Forms
 {
     public partial class PopUpEditForm : Form
     {

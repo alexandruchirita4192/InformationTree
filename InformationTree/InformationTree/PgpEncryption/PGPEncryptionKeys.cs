@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 
-namespace FormsGame.PgpEncryption
+namespace InformationTree.PgpEncryption
 {
     public class PGPEncryptionKeys
     {

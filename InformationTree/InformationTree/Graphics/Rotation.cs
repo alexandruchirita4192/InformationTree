@@ -1,4 +1,4 @@
-﻿namespace FormsGame.Graphics
+﻿namespace InformationTree.Graphics
 {
     public class Rotation
     {

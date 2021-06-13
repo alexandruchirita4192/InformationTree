@@ -7,7 +7,7 @@ using Org.BouncyCastle.Utilities.IO;
 using System.Windows.Forms;
 using System.Text;
 
-namespace FormsGame.PgpEncryption
+namespace InformationTree.PgpEncryption
 {
     public static class PGPEncryptDecrypt
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using D = System.Drawing;
 
-namespace FormsGame.Graphics
+namespace InformationTree.Graphics
 {
     public static class GraphicsExtensions
     {

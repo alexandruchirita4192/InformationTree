@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using D = System.Drawing;
 
-namespace FormsGame.Graphics
+namespace InformationTree.Graphics
 {
     public class Frame
     {

@@ -2,7 +2,7 @@
 using System.Linq;
 using D = System.Drawing;
 
-namespace FormsGame.Graphics
+namespace InformationTree.Graphics
 {
     public class Figures // keep? or remove and add pointer to next figure @ Figure?
     {

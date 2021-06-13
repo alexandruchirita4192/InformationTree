@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FormsGame.Tree
+namespace InformationTree.Tree
 {
     public class TreeNodeData
     {

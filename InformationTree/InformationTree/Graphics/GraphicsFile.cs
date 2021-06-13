@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using D = System.Drawing;
 
-namespace FormsGame.Graphics
+namespace InformationTree.Graphics
 {
     public class GraphicsFile : IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using D = System.Drawing;
 
-namespace FormsGame.Graphics
+namespace InformationTree.Graphics
 {
     public class Txt
     {

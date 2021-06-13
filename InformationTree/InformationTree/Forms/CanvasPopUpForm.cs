@@ -1,4 +1,4 @@
-﻿using FormsGame.Graphics;
+﻿using InformationTree.Graphics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 
-namespace FormsGame.Forms
+namespace InformationTree.Forms
 {
     public partial class CanvasPopUpForm : Form
     {

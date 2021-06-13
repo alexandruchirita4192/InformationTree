@@ -1,11 +1,11 @@
-﻿using FormsGame.Graphics;
+﻿using InformationTree.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace FormsGame.Forms
+namespace InformationTree.Forms
 {
     public partial class LoadingForm : Form
     {

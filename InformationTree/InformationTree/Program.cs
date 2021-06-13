@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Windows.Forms;
-using FormsGame.Forms;
-using FormsGame.Tree;
+using InformationTree.Forms;
+using InformationTree.Tree;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using FormsGame.Sound;
+using InformationTree.Sound;
 using System.IO;
 
-namespace FormsGame
+namespace InformationTree
 {
     static class Program
     {
