@@ -115,7 +115,6 @@ namespace RicherTextBox.Controls
             this.rtbDocument.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.rtbDocument.BackColor = System.Drawing.Color.White;
             this.rtbDocument.ContextMenuStrip = this.contextMenu;
             this.rtbDocument.EnableAutoDragDrop = true;
             this.rtbDocument.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -159,7 +158,6 @@ namespace RicherTextBox.Controls
             // cutToolStripMenuItem
             // 
             this.cutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolStripMenuItem.Image")));
-            this.cutToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
             this.cutToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.cutToolStripMenuItem.Text = "Cut";
@@ -168,7 +166,6 @@ namespace RicherTextBox.Controls
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("copyToolStripMenuItem.Image")));
-            this.copyToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.copyToolStripMenuItem.Text = "Copy";
@@ -177,7 +174,6 @@ namespace RicherTextBox.Controls
             // pasteToolStripMenuItem
             // 
             this.pasteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolStripMenuItem.Image")));
-            this.pasteToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
@@ -186,7 +182,6 @@ namespace RicherTextBox.Controls
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteToolStripMenuItem.Image")));
-            this.deleteToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.deleteToolStripMenuItem.Text = "Clear";
@@ -195,7 +190,6 @@ namespace RicherTextBox.Controls
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("selectAllToolStripMenuItem.Image")));
-            this.selectAllToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
             this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.selectAllToolStripMenuItem.Text = "Select All";
@@ -209,7 +203,6 @@ namespace RicherTextBox.Controls
             // undoToolStripMenuItem
             // 
             this.undoToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("undoToolStripMenuItem.Image")));
-            this.undoToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             this.undoToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.undoToolStripMenuItem.Text = "Undo";
@@ -218,7 +211,6 @@ namespace RicherTextBox.Controls
             // redoToolStripMenuItem
             // 
             this.redoToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("redoToolStripMenuItem.Image")));
-            this.redoToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.redoToolStripMenuItem.Text = "Redo";
@@ -236,7 +228,6 @@ namespace RicherTextBox.Controls
             this.centerToolStripMenuItem,
             this.rightToolStripMenuItem});
             this.alignmentToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.AlignTableCellMiddleCenterHS;
-            this.alignmentToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
             this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.alignmentToolStripMenuItem.Text = "Alignment";
@@ -245,7 +236,6 @@ namespace RicherTextBox.Controls
             // 
             this.leftToolStripMenuItem.CheckOnClick = true;
             this.leftToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.AlignTableCellMiddleLeftJustHS;
-            this.leftToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.leftToolStripMenuItem.Name = "leftToolStripMenuItem";
             this.leftToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.leftToolStripMenuItem.Text = "Left";
@@ -255,7 +245,6 @@ namespace RicherTextBox.Controls
             // 
             this.centerToolStripMenuItem.CheckOnClick = true;
             this.centerToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.AlignTableCellMiddleCenterHS;
-            this.centerToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.centerToolStripMenuItem.Name = "centerToolStripMenuItem";
             this.centerToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.centerToolStripMenuItem.Text = "Center";
@@ -265,7 +254,6 @@ namespace RicherTextBox.Controls
             // 
             this.rightToolStripMenuItem.CheckOnClick = true;
             this.rightToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.AlignTableCellMiddleRightHS;
-            this.rightToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.rightToolStripMenuItem.Name = "rightToolStripMenuItem";
             this.rightToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.rightToolStripMenuItem.Text = "Right";
@@ -278,7 +266,6 @@ namespace RicherTextBox.Controls
             this.italicToolStripMenuItem,
             this.underlineToolStripMenuItem,
             this.strikeoutToolStripMenuItem});
-            this.styleToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.styleToolStripMenuItem.Name = "styleToolStripMenuItem";
             this.styleToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.styleToolStripMenuItem.Text = "Style";
@@ -322,7 +309,6 @@ namespace RicherTextBox.Controls
             this.decreaseToolStripMenuItem,
             this.bulletsToolStripMenuItem});
             this.indentationToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.List_BulletsHS;
-            this.indentationToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.indentationToolStripMenuItem.Name = "indentationToolStripMenuItem";
             this.indentationToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.indentationToolStripMenuItem.Text = "Indentation";
@@ -330,7 +316,6 @@ namespace RicherTextBox.Controls
             // increaseToolStripMenuItem
             // 
             this.increaseToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.IndentHS;
-            this.increaseToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.increaseToolStripMenuItem.Name = "increaseToolStripMenuItem";
             this.increaseToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.increaseToolStripMenuItem.Text = "Increase";
@@ -339,7 +324,6 @@ namespace RicherTextBox.Controls
             // decreaseToolStripMenuItem
             // 
             this.decreaseToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.OutdentHS;
-            this.decreaseToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.decreaseToolStripMenuItem.Name = "decreaseToolStripMenuItem";
             this.decreaseToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.decreaseToolStripMenuItem.Text = "Decrease";
@@ -349,7 +333,6 @@ namespace RicherTextBox.Controls
             // 
             this.bulletsToolStripMenuItem.CheckOnClick = true;
             this.bulletsToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.List_BulletsHS;
-            this.bulletsToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.bulletsToolStripMenuItem.Name = "bulletsToolStripMenuItem";
             this.bulletsToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.bulletsToolStripMenuItem.Text = "Bullets";
@@ -363,7 +346,6 @@ namespace RicherTextBox.Controls
             // insertPictureToolStripMenuItem
             // 
             this.insertPictureToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.InsertPictureHS;
-            this.insertPictureToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.insertPictureToolStripMenuItem.Name = "insertPictureToolStripMenuItem";
             this.insertPictureToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.insertPictureToolStripMenuItem.Text = "Insert Picture";
@@ -377,7 +359,6 @@ namespace RicherTextBox.Controls
             // zoomInToolStripMenuItem
             // 
             this.zoomInToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.ZoomIn;
-            this.zoomInToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.zoomInToolStripMenuItem.Name = "zoomInToolStripMenuItem";
             this.zoomInToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.zoomInToolStripMenuItem.Text = "Zoom In";
@@ -386,7 +367,6 @@ namespace RicherTextBox.Controls
             // zoomOuToolStripMenuItem
             // 
             this.zoomOuToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.ZoomOut;
-            this.zoomOuToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.zoomOuToolStripMenuItem.Name = "zoomOuToolStripMenuItem";
             this.zoomOuToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.zoomOuToolStripMenuItem.Text = "Zoom Out";
@@ -437,7 +417,6 @@ namespace RicherTextBox.Controls
             // toolStripMenu
             // 
             this.toolStripMenu.AutoSize = false;
-            this.toolStripMenu.BackColor = System.Drawing.Color.White;
             this.toolStripMenu.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStripMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbtnSave,
@@ -481,7 +460,6 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnSave.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnSave.Image")));
-            this.tsbtnSave.ImageTransparentColor = System.Drawing.Color.White;
             this.tsbtnSave.Name = "tsbtnSave";
             this.tsbtnSave.Size = new System.Drawing.Size(23, 22);
             this.tsbtnSave.Text = "toolStripButton1";
@@ -492,7 +470,6 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnOpen.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOpen.Image")));
-            this.tsbtnOpen.ImageTransparentColor = System.Drawing.Color.White;
             this.tsbtnOpen.Name = "tsbtnOpen";
             this.tsbtnOpen.Size = new System.Drawing.Size(23, 22);
             this.tsbtnOpen.Text = "toolStripButton2";
@@ -506,9 +483,7 @@ namespace RicherTextBox.Controls
             // 
             // tscmbFont
             // 
-            this.tscmbFont.BackColor = System.Drawing.Color.White;
             this.tscmbFont.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.tscmbFont.ForeColor = System.Drawing.Color.LimeGreen;
             this.tscmbFont.Name = "tscmbFont";
             this.tscmbFont.Size = new System.Drawing.Size(150, 25);
             this.tscmbFont.SelectedIndexChanged += new System.EventHandler(this.tscmbFont_Click);
@@ -516,9 +491,7 @@ namespace RicherTextBox.Controls
             // tscmbFontSize
             // 
             this.tscmbFontSize.AutoSize = false;
-            this.tscmbFontSize.BackColor = System.Drawing.Color.White;
             this.tscmbFontSize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.tscmbFontSize.ForeColor = System.Drawing.Color.LimeGreen;
             this.tscmbFontSize.Items.AddRange(new object[] {
             "8",
             "9",
@@ -545,7 +518,6 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnChooseFont.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnChooseFont.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnChooseFont.Image")));
-            this.tsbtnChooseFont.ImageTransparentColor = System.Drawing.Color.White;
             this.tsbtnChooseFont.Name = "tsbtnChooseFont";
             this.tsbtnChooseFont.Size = new System.Drawing.Size(23, 22);
             this.tsbtnChooseFont.Text = "toolStripButton1";
@@ -615,7 +587,7 @@ namespace RicherTextBox.Controls
             this.tsbtnAlignLeft.CheckOnClick = true;
             this.tsbtnAlignLeft.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnAlignLeft.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnAlignLeft.Image")));
-            this.tsbtnAlignLeft.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnAlignLeft.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnAlignLeft.Name = "tsbtnAlignLeft";
             this.tsbtnAlignLeft.Size = new System.Drawing.Size(23, 22);
             this.tsbtnAlignLeft.Text = "toolStripButton1";
@@ -627,7 +599,7 @@ namespace RicherTextBox.Controls
             this.tsbtnAlignCenter.CheckOnClick = true;
             this.tsbtnAlignCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnAlignCenter.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnAlignCenter.Image")));
-            this.tsbtnAlignCenter.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnAlignCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnAlignCenter.Name = "tsbtnAlignCenter";
             this.tsbtnAlignCenter.Size = new System.Drawing.Size(23, 22);
             this.tsbtnAlignCenter.Text = "toolStripButton2";
@@ -639,7 +611,7 @@ namespace RicherTextBox.Controls
             this.tsbtnAlignRight.CheckOnClick = true;
             this.tsbtnAlignRight.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnAlignRight.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnAlignRight.Image")));
-            this.tsbtnAlignRight.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnAlignRight.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnAlignRight.Name = "tsbtnAlignRight";
             this.tsbtnAlignRight.Size = new System.Drawing.Size(23, 22);
             this.tsbtnAlignRight.Text = "toolStripButton3";
@@ -655,7 +627,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnFontColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnFontColor.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnFontColor.Image")));
-            this.tsbtnFontColor.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnFontColor.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnFontColor.Name = "tsbtnFontColor";
             this.tsbtnFontColor.Size = new System.Drawing.Size(23, 22);
             this.tsbtnFontColor.Text = "toolStripButton4";
@@ -667,7 +639,7 @@ namespace RicherTextBox.Controls
             this.tsbtnWordWrap.CheckOnClick = true;
             this.tsbtnWordWrap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnWordWrap.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnWordWrap.Image")));
-            this.tsbtnWordWrap.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnWordWrap.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnWordWrap.Name = "tsbtnWordWrap";
             this.tsbtnWordWrap.Size = new System.Drawing.Size(23, 22);
             this.tsbtnWordWrap.Text = "toolStripButton1";
@@ -683,7 +655,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnIndent.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnIndent.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnIndent.Image")));
-            this.tsbtnIndent.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnIndent.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnIndent.Name = "tsbtnIndent";
             this.tsbtnIndent.Size = new System.Drawing.Size(23, 22);
             this.tsbtnIndent.Text = "toolStripButton1";
@@ -694,7 +666,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnOutdent.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnOutdent.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOutdent.Image")));
-            this.tsbtnOutdent.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnOutdent.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnOutdent.Name = "tsbtnOutdent";
             this.tsbtnOutdent.Size = new System.Drawing.Size(23, 22);
             this.tsbtnOutdent.Text = "toolStripButton3";
@@ -706,7 +678,7 @@ namespace RicherTextBox.Controls
             this.tsbtnBullets.CheckOnClick = true;
             this.tsbtnBullets.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnBullets.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnBullets.Image")));
-            this.tsbtnBullets.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnBullets.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnBullets.Name = "tsbtnBullets";
             this.tsbtnBullets.Size = new System.Drawing.Size(23, 22);
             this.tsbtnBullets.Text = "toolStripButton2";
@@ -722,7 +694,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnInsertPicture.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnInsertPicture.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnInsertPicture.Image")));
-            this.tsbtnInsertPicture.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnInsertPicture.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnInsertPicture.Name = "tsbtnInsertPicture";
             this.tsbtnInsertPicture.Size = new System.Drawing.Size(23, 22);
             this.tsbtnInsertPicture.Text = "toolStripButton1";
@@ -738,7 +710,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnZoomIn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnZoomIn.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnZoomIn.Image")));
-            this.tsbtnZoomIn.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnZoomIn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnZoomIn.Name = "tsbtnZoomIn";
             this.tsbtnZoomIn.Size = new System.Drawing.Size(23, 22);
             this.tsbtnZoomIn.Text = "toolStripButton1";
@@ -749,7 +721,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnZoomOut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnZoomOut.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnZoomOut.Image")));
-            this.tsbtnZoomOut.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnZoomOut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnZoomOut.Name = "tsbtnZoomOut";
             this.tsbtnZoomOut.Size = new System.Drawing.Size(23, 22);
             this.tsbtnZoomOut.Text = "toolStripButton2";
@@ -758,8 +730,6 @@ namespace RicherTextBox.Controls
             // 
             // tstxtZoomFactor
             // 
-            this.tstxtZoomFactor.BackColor = System.Drawing.Color.White;
-            this.tstxtZoomFactor.ForeColor = System.Drawing.Color.LimeGreen;
             this.tstxtZoomFactor.Name = "tstxtZoomFactor";
             this.tstxtZoomFactor.Size = new System.Drawing.Size(30, 25);
             this.tstxtZoomFactor.Leave += new System.EventHandler(this.tstxtZoomFactor_Leave);
@@ -819,8 +789,6 @@ namespace RicherTextBox.Controls
             // 
             // tstxtSearchText
             // 
-            this.tstxtSearchText.BackColor = System.Drawing.Color.White;
-            this.tstxtSearchText.ForeColor = System.Drawing.Color.LimeGreen;
             this.tstxtSearchText.Name = "tstxtSearchText";
             this.tstxtSearchText.Size = new System.Drawing.Size(500, 25);
             // 
@@ -828,7 +796,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnFind.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnFind.Image = global::RicherTextBox.Properties.Resources.FindHS;
-            this.tsbtnFind.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnFind.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnFind.Name = "tsbtnFind";
             this.tsbtnFind.Size = new System.Drawing.Size(23, 20);
             this.tsbtnFind.Text = "toolStripButton1";
@@ -839,7 +807,7 @@ namespace RicherTextBox.Controls
             // 
             this.tsbtnReplace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsbtnReplace.Image = global::RicherTextBox.Properties.Resources.FindNextHS;
-            this.tsbtnReplace.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsbtnReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnReplace.Name = "tsbtnReplace";
             this.tsbtnReplace.Size = new System.Drawing.Size(23, 20);
             this.tsbtnReplace.Text = "toolStripButton2";
@@ -851,11 +819,9 @@ namespace RicherTextBox.Controls
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.rtbDocument);
             this.Controls.Add(this.toolStripFindReplace);
             this.Controls.Add(this.toolStripMenu);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.Name = "RicherTextBox";
             this.Size = new System.Drawing.Size(670, 362);
             this.Load += new System.EventHandler(this.RicherTextBox_Load);

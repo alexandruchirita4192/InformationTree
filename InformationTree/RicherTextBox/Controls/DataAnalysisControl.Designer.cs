@@ -40,7 +40,6 @@
             this.dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView.BackgroundColor = System.Drawing.Color.DimGray;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView.Location = new System.Drawing.Point(0, 4);
             this.dataGridView.Name = "dataGridView";
@@ -75,11 +74,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.btnAddColumn);
             this.Controls.Add(this.btnSaveTableData);
             this.Controls.Add(this.dataGridView);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.Name = "DataAnalysisControl";
             this.Size = new System.Drawing.Size(519, 281);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
