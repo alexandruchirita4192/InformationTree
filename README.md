@@ -4,6 +4,9 @@ InformationTree is a program used to organize tasks into a tree (breaking a task
 
 ![Information Tree program](https://i.imgur.com/QHKTfnD.png)
 
+Adding detail window (subject to change because it is still a work in progress starting from RicherTextBox):
+![RicherTextBox detail window](https://i.imgur.com/xKxcVW3.png)
+
 InformationTree has a lot of features:
  - Searching for tasks
  - Adding details by double-clicking on task text upper right in "Selected task" group box (data is RTF format - can see images or tables; data can also be compressed if compressed info size is lower than uncompressed info size); data can also be encrypted using a public key and decrypted using a private key (it lets you choose a task with public/private key in details)
