@@ -2,7 +2,7 @@
 
 InformationTree is a program used to organize tasks into a tree (breaking a task into subtasks).
 
-[Information Tree program](https://i.imgur.com/QHKTfnD.png)
+![Information Tree program](https://i.imgur.com/QHKTfnD.png)
 
 InformationTree has a lot of features:
  - Searching for tasks
