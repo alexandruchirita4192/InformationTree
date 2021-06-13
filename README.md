@@ -6,7 +6,7 @@ InformationTree is a program used to organize tasks into a tree (breaking a task
 
 InformationTree has a lot of features:
  - Searching for tasks
- - Adding details by double-clicking on task upper right (RTF format - can see images or tables)
+ - Adding details by double-clicking on task text upper right in "Selected task" group box (data is RTF format - can see images or tables; data can also be compressed if compressed info size is lower than uncompressed info size); data can also be encrypted using a public key and decrypted using a private key (it lets you choose a task with public/private key in details)
  - Choose tasks font, color (foreground and background), size
  - Adding tasks completion percent (0-100 %)
  - Adding tasks category, urgency number, link text
@@ -18,6 +18,7 @@ InformationTree has a lot of features:
  - Calculating completion percentage from leaf nodes up to root node or setting completion percentage from root node to leafs
  - Collapse/Expand all tree
  - Moving to next unfinished task
+ 
  
 License information:
  - A component part of InformationTree is RicherTextBox that was taken from https://www.codeproject.com/Articles/24443/RicherTextBox with license The Code Project Open License (CPOL) 1.02.
