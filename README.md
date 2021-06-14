@@ -21,7 +21,7 @@ InformationTree has a lot of features:
  - Calculating completion percentage from leaf nodes up to root node or setting completion percentage from root node to leafs
  - Collapse/Expand all tree
  - Moving to next unfinished task
- 
- 
+ - A drawing mechanism using elementary figures like: circle, equilateral triangle, square, and others drawn by dividing a circle into n parts and connecting the points (equilateral triangle, square)
+
 License information:
  - A component part of InformationTree is RicherTextBox that was taken from https://www.codeproject.com/Articles/24443/RicherTextBox with license The Code Project Open License (CPOL) 1.02.
