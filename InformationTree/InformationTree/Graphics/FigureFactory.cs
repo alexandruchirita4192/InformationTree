@@ -7,6 +7,7 @@
             BaseFigure ret = null;
             int _x, _y, _r, _g, _b, _level, Points;
             double X, Y, R, Rotation;
+            float ThetaFrom, ThetaTo;
 
             var words = _line.Split(' ');
             switch (words.Length)
@@ -60,7 +61,17 @@
 
                     ret = new TextFigure(words[0], _x, _y, _r, _g, _b);
                     break;
+                case 7: // X, Y, Radius, ThetaFrom, ThetaTo, 0, 0
+                    if (isTextOnly)
+                        return null;
+                    X = double.Parse(words[0]);
+                    Y = double.Parse(words[1]);
+                    R = double.Parse(words[2]);
+                    ThetaFrom = float.Parse(words[4]);
+                    ThetaTo = float.Parse(words[4]);
 
+                    ret = new ArcFigure(X, Y, R, ThetaFrom, ThetaTo);
+                    break;
                 case 8: //Figure(string _text, int _x, int _y, string _font, int _size, int _foregroundRed, int _foregroundBlue, int _foregroundGreen)
                     // Text = words[0]
                     _x = int.Parse(words[1]);
