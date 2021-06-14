@@ -44,8 +44,6 @@
             // 
             // txtReplace
             // 
-            this.txtReplace.BackColor = System.Drawing.Color.White;
-            this.txtReplace.ForeColor = System.Drawing.Color.LimeGreen;
             this.txtReplace.Location = new System.Drawing.Point(87, 113);
             this.txtReplace.Name = "txtReplace";
             this.txtReplace.Size = new System.Drawing.Size(166, 20);
@@ -65,12 +63,10 @@
             // ReplaceForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(274, 179);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtReplace);
             this.Controls.Add(this.btnReplace);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.Name = "ReplaceForm";
             this.Controls.SetChildIndex(this.btnReplace, 0);
             this.Controls.SetChildIndex(this.txtReplace, 0);

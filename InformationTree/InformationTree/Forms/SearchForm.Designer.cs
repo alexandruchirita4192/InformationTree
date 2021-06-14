@@ -38,9 +38,7 @@
             this.tbFind.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbFind.BackColor = System.Drawing.Color.White;
             this.tbFind.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.tbFind.ForeColor = System.Drawing.Color.LimeGreen;
             this.tbFind.Location = new System.Drawing.Point(12, 12);
             this.tbFind.MaximumSize = new System.Drawing.Size(772, 25);
             this.tbFind.MinimumSize = new System.Drawing.Size(772, 25);
@@ -55,10 +53,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(796, 49);
             this.Controls.Add(this.tbFind);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(812, 88);
             this.MinimumSize = new System.Drawing.Size(812, 88);

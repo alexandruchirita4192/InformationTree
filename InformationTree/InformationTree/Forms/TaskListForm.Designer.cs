@@ -33,10 +33,8 @@
             // 
             // clbTasks
             // 
-            this.clbTasks.BackColor = System.Drawing.Color.White;
             this.clbTasks.CheckOnClick = true;
             this.clbTasks.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.clbTasks.ForeColor = System.Drawing.Color.Lime;
             this.clbTasks.FormattingEnabled = true;
             this.clbTasks.Location = new System.Drawing.Point(0, 0);
             this.clbTasks.Name = "clbTasks";
@@ -47,7 +45,6 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(520, 275);
             this.Controls.Add(this.clbTasks);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

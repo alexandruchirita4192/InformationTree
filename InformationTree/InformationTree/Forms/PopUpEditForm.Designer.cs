@@ -46,7 +46,6 @@ namespace InformationTree.Forms
             // 
             this.tbExitPopUpAndSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.tbExitPopUpAndSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.tbExitPopUpAndSave.ForeColor = System.Drawing.Color.LimeGreen;
             this.tbExitPopUpAndSave.Location = new System.Drawing.Point(667, 483);
             this.tbExitPopUpAndSave.Name = "tbExitPopUpAndSave";
             this.tbExitPopUpAndSave.Size = new System.Drawing.Size(144, 23);
@@ -59,7 +58,6 @@ namespace InformationTree.Forms
             // 
             this.btnPgpEncryptData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnPgpEncryptData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPgpEncryptData.ForeColor = System.Drawing.Color.LimeGreen;
             this.btnPgpEncryptData.Location = new System.Drawing.Point(423, 483);
             this.btnPgpEncryptData.Name = "btnPgpEncryptData";
             this.btnPgpEncryptData.Size = new System.Drawing.Size(116, 23);
@@ -72,7 +70,6 @@ namespace InformationTree.Forms
             // 
             this.btnPgpDecryptData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnPgpDecryptData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPgpDecryptData.ForeColor = System.Drawing.Color.LimeGreen;
             this.btnPgpDecryptData.Location = new System.Drawing.Point(545, 483);
             this.btnPgpDecryptData.Name = "btnPgpDecryptData";
             this.btnPgpDecryptData.Size = new System.Drawing.Size(116, 23);
@@ -85,8 +82,6 @@ namespace InformationTree.Forms
             // 
             this.lblEncryption.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblEncryption.AutoSize = true;
-            this.lblEncryption.BackColor = System.Drawing.Color.White;
-            this.lblEncryption.ForeColor = System.Drawing.Color.LimeGreen;
             this.lblEncryption.Location = new System.Drawing.Point(32, 488);
             this.lblEncryption.Name = "lblEncryption";
             this.lblEncryption.Size = new System.Drawing.Size(73, 13);
@@ -98,7 +93,6 @@ namespace InformationTree.Forms
             this.cbFromFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cbFromFile.AutoSize = true;
             this.cbFromFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbFromFile.ForeColor = System.Drawing.Color.LimeGreen;
             this.cbFromFile.Location = new System.Drawing.Point(352, 487);
             this.cbFromFile.Name = "cbFromFile";
             this.cbFromFile.Size = new System.Drawing.Size(62, 17);
@@ -113,7 +107,6 @@ namespace InformationTree.Forms
             this.cbKeepCrypt.Checked = true;
             this.cbKeepCrypt.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbKeepCrypt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbKeepCrypt.ForeColor = System.Drawing.Color.LimeGreen;
             this.cbKeepCrypt.Location = new System.Drawing.Point(272, 487);
             this.cbKeepCrypt.Name = "cbKeepCrypt";
             this.cbKeepCrypt.Size = new System.Drawing.Size(74, 17);
@@ -125,7 +118,6 @@ namespace InformationTree.Forms
             // 
             this.btnCalculate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCalculate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCalculate.ForeColor = System.Drawing.Color.LimeGreen;
             this.btnCalculate.Location = new System.Drawing.Point(10, 451);
             this.btnCalculate.Name = "btnCalculate";
             this.btnCalculate.Size = new System.Drawing.Size(116, 23);
@@ -138,7 +130,6 @@ namespace InformationTree.Forms
             // 
             this.btnShowGraphics.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnShowGraphics.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnShowGraphics.ForeColor = System.Drawing.Color.LimeGreen;
             this.btnShowGraphics.Location = new System.Drawing.Point(132, 451);
             this.btnShowGraphics.Name = "btnShowGraphics";
             this.btnShowGraphics.Size = new System.Drawing.Size(148, 23);
@@ -159,7 +150,6 @@ namespace InformationTree.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbData.AutoScroll = true;
             this.tbData.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tbData.BackColor = System.Drawing.Color.White;
             this.tbData.BoldVisible = true;
             this.tbData.BulletsVisible = true;
             this.tbData.CalculateVisible = true;
@@ -172,7 +162,6 @@ namespace InformationTree.Forms
             this.tbData.FontColorVisible = true;
             this.tbData.FontFamilyVisible = true;
             this.tbData.FontSizeVisible = true;
-            this.tbData.ForeColor = System.Drawing.Color.LimeGreen;
             this.tbData.GlobalVisibility = true;
             this.tbData.GroupAlignmentVisible = true;
             this.tbData.GroupBoldUnderlineItalicVisible = true;
@@ -220,7 +209,6 @@ namespace InformationTree.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(823, 518);
             this.Controls.Add(this.btnShowGraphics);
             this.Controls.Add(this.btnCalculate);

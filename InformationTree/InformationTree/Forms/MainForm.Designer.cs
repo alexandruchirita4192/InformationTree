@@ -238,8 +238,6 @@
             // tbSearchBox
             // 
             this.tbSearchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbSearchBox.BackColor = System.Drawing.Color.White;
-            this.tbSearchBox.ForeColor = System.Drawing.Color.Black;
             this.tbSearchBox.Location = new System.Drawing.Point(720, 28);
             this.tbSearchBox.Name = "tbSearchBox";
             this.tbSearchBox.Size = new System.Drawing.Size(215, 20);
@@ -249,9 +247,7 @@
             // 
             // btnAddTask
             // 
-            this.btnAddTask.BackColor = System.Drawing.Color.White;
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddTask.ForeColor = System.Drawing.Color.Black;
             this.btnAddTask.Location = new System.Drawing.Point(10, 19);
             this.btnAddTask.Name = "btnAddTask";
             this.btnAddTask.Size = new System.Drawing.Size(100, 23);
@@ -272,8 +268,6 @@
             // 
             // tbTaskName
             // 
-            this.tbTaskName.BackColor = System.Drawing.Color.White;
-            this.tbTaskName.ForeColor = System.Drawing.Color.LimeGreen;
             this.tbTaskName.Location = new System.Drawing.Point(6, 19);
             this.tbTaskName.Multiline = true;
             this.tbTaskName.Name = "tbTaskName";
@@ -284,9 +278,7 @@
             // 
             // btnUpdateText
             // 
-            this.btnUpdateText.BackColor = System.Drawing.Color.White;
             this.btnUpdateText.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpdateText.ForeColor = System.Drawing.Color.Black;
             this.btnUpdateText.Location = new System.Drawing.Point(10, 46);
             this.btnUpdateText.Name = "btnUpdateText";
             this.btnUpdateText.Size = new System.Drawing.Size(184, 23);
@@ -305,9 +297,7 @@
             // 
             // btnDelete
             // 
-            this.btnDelete.BackColor = System.Drawing.Color.White;
             this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelete.ForeColor = System.Drawing.Color.Black;
             this.btnDelete.Location = new System.Drawing.Point(112, 19);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(82, 23);
@@ -329,8 +319,6 @@
             // nudCompleteProgress
             // 
             this.nudCompleteProgress.AllowDrop = true;
-            this.nudCompleteProgress.BackColor = System.Drawing.Color.White;
-            this.nudCompleteProgress.ForeColor = System.Drawing.Color.Black;
             this.nudCompleteProgress.Location = new System.Drawing.Point(93, 17);
             this.nudCompleteProgress.Name = "nudCompleteProgress";
             this.nudCompleteProgress.Size = new System.Drawing.Size(100, 20);
@@ -361,8 +349,6 @@
             // nudMilliseconds
             // 
             this.nudMilliseconds.AllowDrop = true;
-            this.nudMilliseconds.BackColor = System.Drawing.Color.White;
-            this.nudMilliseconds.ForeColor = System.Drawing.Color.Black;
             this.nudMilliseconds.Location = new System.Drawing.Point(94, 94);
             this.nudMilliseconds.Name = "nudMilliseconds";
             this.nudMilliseconds.Size = new System.Drawing.Size(100, 20);
@@ -372,8 +358,6 @@
             // nudSeconds
             // 
             this.nudSeconds.AllowDrop = true;
-            this.nudSeconds.BackColor = System.Drawing.Color.White;
-            this.nudSeconds.ForeColor = System.Drawing.Color.Black;
             this.nudSeconds.Location = new System.Drawing.Point(94, 68);
             this.nudSeconds.Name = "nudSeconds";
             this.nudSeconds.Size = new System.Drawing.Size(100, 20);
@@ -383,8 +367,6 @@
             // nudMinutes
             // 
             this.nudMinutes.AllowDrop = true;
-            this.nudMinutes.BackColor = System.Drawing.Color.White;
-            this.nudMinutes.ForeColor = System.Drawing.Color.Black;
             this.nudMinutes.Location = new System.Drawing.Point(94, 43);
             this.nudMinutes.Name = "nudMinutes";
             this.nudMinutes.Size = new System.Drawing.Size(100, 20);
@@ -394,8 +376,6 @@
             // nudHours
             // 
             this.nudHours.AllowDrop = true;
-            this.nudHours.BackColor = System.Drawing.Color.White;
-            this.nudHours.ForeColor = System.Drawing.Color.Black;
             this.nudHours.Location = new System.Drawing.Point(94, 18);
             this.nudHours.Name = "nudHours";
             this.nudHours.Size = new System.Drawing.Size(100, 20);
@@ -646,8 +626,6 @@
             // 
             // tbTextColor
             // 
-            this.tbTextColor.BackColor = System.Drawing.Color.White;
-            this.tbTextColor.ForeColor = System.Drawing.Color.Black;
             this.tbTextColor.Location = new System.Drawing.Point(107, 153);
             this.tbTextColor.Name = "tbTextColor";
             this.tbTextColor.Size = new System.Drawing.Size(87, 20);
@@ -655,8 +633,6 @@
             // 
             // tbBackgroundColor
             // 
-            this.tbBackgroundColor.BackColor = System.Drawing.Color.White;
-            this.tbBackgroundColor.ForeColor = System.Drawing.Color.Black;
             this.tbBackgroundColor.Location = new System.Drawing.Point(107, 179);
             this.tbBackgroundColor.Name = "tbBackgroundColor";
             this.tbBackgroundColor.Size = new System.Drawing.Size(87, 20);
@@ -684,9 +660,7 @@
             // 
             // clbStyle
             // 
-            this.clbStyle.BackColor = System.Drawing.Color.White;
             this.clbStyle.CheckOnClick = true;
-            this.clbStyle.ForeColor = System.Drawing.Color.Black;
             this.clbStyle.FormattingEnabled = true;
             this.clbStyle.Location = new System.Drawing.Point(10, 68);
             this.clbStyle.Name = "clbStyle";
@@ -696,9 +670,7 @@
             // 
             // cbFontFamily
             // 
-            this.cbFontFamily.BackColor = System.Drawing.Color.White;
             this.cbFontFamily.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbFontFamily.ForeColor = System.Drawing.Color.Black;
             this.cbFontFamily.FormattingEnabled = true;
             this.cbFontFamily.Location = new System.Drawing.Point(70, 15);
             this.cbFontFamily.Name = "cbFontFamily";
@@ -729,8 +701,6 @@
             // nudFontSize
             // 
             this.nudFontSize.AllowDrop = true;
-            this.nudFontSize.BackColor = System.Drawing.Color.White;
-            this.nudFontSize.ForeColor = System.Drawing.Color.Black;
             this.nudFontSize.Location = new System.Drawing.Point(70, 42);
             this.nudFontSize.Name = "nudFontSize";
             this.nudFontSize.Size = new System.Drawing.Size(124, 20);

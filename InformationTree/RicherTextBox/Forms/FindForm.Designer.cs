@@ -47,8 +47,6 @@
             // 
             // txtSearchText
             // 
-            this.txtSearchText.BackColor = System.Drawing.Color.White;
-            this.txtSearchText.ForeColor = System.Drawing.Color.LimeGreen;
             this.txtSearchText.Location = new System.Drawing.Point(87, 13);
             this.txtSearchText.Name = "txtSearchText";
             this.txtSearchText.Size = new System.Drawing.Size(166, 20);
@@ -105,7 +103,6 @@
             this.AcceptButton = this.btnFindNext;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.CancelButton = this.btnDone;
             this.ClientSize = new System.Drawing.Size(274, 114);
             this.Controls.Add(this.chkWholeWord);
@@ -114,7 +111,6 @@
             this.Controls.Add(this.btnFindNext);
             this.Controls.Add(this.txtSearchText);
             this.Controls.Add(this.label1);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FindForm";

@@ -22,7 +22,7 @@ namespace InformationTree.Tree
         #region Colors
 
         public static Color DefaultBackGroundColor = Color.White;
-        public static Color DefaultForeGroundColor = Color.LimeGreen;
+        public static Color DefaultForeGroundColor = Color.Black;
 
         public static Color BackGroundColorSearch = Color.SlateGray;
         public static Color ForeGroundColorSearch = Color.LightBlue;

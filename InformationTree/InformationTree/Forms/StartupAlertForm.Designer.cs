@@ -38,9 +38,6 @@
             this.tvAlertCategoryAndTasks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tvAlertCategoryAndTasks.BackColor = System.Drawing.Color.White;
-            this.tvAlertCategoryAndTasks.ForeColor = System.Drawing.Color.LimeGreen;
-            this.tvAlertCategoryAndTasks.LineColor = System.Drawing.Color.LimeGreen;
             this.tvAlertCategoryAndTasks.Location = new System.Drawing.Point(13, 13);
             this.tvAlertCategoryAndTasks.Name = "tvAlertCategoryAndTasks";
             this.tvAlertCategoryAndTasks.Size = new System.Drawing.Size(490, 191);
@@ -62,11 +59,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(515, 245);
             this.Controls.Add(this.btnSelectTaskOrCategory);
             this.Controls.Add(this.tvAlertCategoryAndTasks);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "StartupAlertForm";
             this.Text = "Startup alert window";

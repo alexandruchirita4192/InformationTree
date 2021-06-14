@@ -118,7 +118,6 @@ namespace RicherTextBox.Controls
             this.rtbDocument.ContextMenuStrip = this.contextMenu;
             this.rtbDocument.EnableAutoDragDrop = true;
             this.rtbDocument.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.rtbDocument.ForeColor = System.Drawing.SystemColors.WindowText;
             this.rtbDocument.HideSelection = false;
             this.rtbDocument.Location = new System.Drawing.Point(0, 53);
             this.rtbDocument.Name = "rtbDocument";
@@ -153,13 +152,13 @@ namespace RicherTextBox.Controls
             this.calculateToolStripMenuItem,
             this.encryptDecryptToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(167, 386);
+            this.contextMenu.Size = new System.Drawing.Size(246, 408);
             // 
             // cutToolStripMenuItem
             // 
             this.cutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolStripMenuItem.Image")));
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-            this.cutToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.cutToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.cutToolStripMenuItem.Text = "Cut";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
             // 
@@ -167,7 +166,7 @@ namespace RicherTextBox.Controls
             // 
             this.copyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("copyToolStripMenuItem.Image")));
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
@@ -175,7 +174,7 @@ namespace RicherTextBox.Controls
             // 
             this.pasteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolStripMenuItem.Image")));
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
@@ -183,7 +182,7 @@ namespace RicherTextBox.Controls
             // 
             this.deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteToolStripMenuItem.Image")));
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.deleteToolStripMenuItem.Text = "Clear";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -191,20 +190,20 @@ namespace RicherTextBox.Controls
             // 
             this.selectAllToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("selectAllToolStripMenuItem.Image")));
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.selectAllToolStripMenuItem.Text = "Select All";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(163, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(242, 6);
             // 
             // undoToolStripMenuItem
             // 
             this.undoToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("undoToolStripMenuItem.Image")));
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.undoToolStripMenuItem.Text = "Undo";
             this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
             // 
@@ -212,14 +211,14 @@ namespace RicherTextBox.Controls
             // 
             this.redoToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("redoToolStripMenuItem.Image")));
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.redoToolStripMenuItem.Text = "Redo";
             this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(163, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(242, 6);
             // 
             // alignmentToolStripMenuItem
             // 
@@ -229,7 +228,7 @@ namespace RicherTextBox.Controls
             this.rightToolStripMenuItem});
             this.alignmentToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.AlignTableCellMiddleCenterHS;
             this.alignmentToolStripMenuItem.Name = "alignmentToolStripMenuItem";
-            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.alignmentToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.alignmentToolStripMenuItem.Text = "Alignment";
             // 
             // leftToolStripMenuItem
@@ -267,7 +266,7 @@ namespace RicherTextBox.Controls
             this.underlineToolStripMenuItem,
             this.strikeoutToolStripMenuItem});
             this.styleToolStripMenuItem.Name = "styleToolStripMenuItem";
-            this.styleToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.styleToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.styleToolStripMenuItem.Text = "Style";
             // 
             // boldToolStripMenuItem
@@ -310,7 +309,7 @@ namespace RicherTextBox.Controls
             this.bulletsToolStripMenuItem});
             this.indentationToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.List_BulletsHS;
             this.indentationToolStripMenuItem.Name = "indentationToolStripMenuItem";
-            this.indentationToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.indentationToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.indentationToolStripMenuItem.Text = "Indentation";
             // 
             // increaseToolStripMenuItem
@@ -341,26 +340,26 @@ namespace RicherTextBox.Controls
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(163, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(242, 6);
             // 
             // insertPictureToolStripMenuItem
             // 
             this.insertPictureToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.InsertPictureHS;
             this.insertPictureToolStripMenuItem.Name = "insertPictureToolStripMenuItem";
-            this.insertPictureToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.insertPictureToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.insertPictureToolStripMenuItem.Text = "Insert Picture";
             this.insertPictureToolStripMenuItem.Click += new System.EventHandler(this.insertPictureToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(163, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(242, 6);
             // 
             // zoomInToolStripMenuItem
             // 
             this.zoomInToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.ZoomIn;
             this.zoomInToolStripMenuItem.Name = "zoomInToolStripMenuItem";
-            this.zoomInToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.zoomInToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.zoomInToolStripMenuItem.Text = "Zoom In";
             this.zoomInToolStripMenuItem.Click += new System.EventHandler(this.zoomInToolStripMenuItem_Click);
             // 
@@ -368,27 +367,27 @@ namespace RicherTextBox.Controls
             // 
             this.zoomOuToolStripMenuItem.Image = global::RicherTextBox.Properties.Resources.ZoomOut;
             this.zoomOuToolStripMenuItem.Name = "zoomOuToolStripMenuItem";
-            this.zoomOuToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.zoomOuToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.zoomOuToolStripMenuItem.Text = "Zoom Out";
             this.zoomOuToolStripMenuItem.Click += new System.EventHandler(this.zoomOuToolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(163, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(242, 6);
             // 
             // analysisToolStripMenuItem
             // 
             this.analysisToolStripMenuItem.Name = "analysisToolStripMenuItem";
-            this.analysisToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.analysisToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.analysisToolStripMenuItem.Text = "Analysis";
             this.analysisToolStripMenuItem.Click += new System.EventHandler(this.analysisToolStripMenuItem_Click);
             // 
             // calculateToolStripMenuItem
             // 
             this.calculateToolStripMenuItem.Name = "calculateToolStripMenuItem";
-            this.calculateToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.calculateToolStripMenuItem.Text = "Calculate";
+            this.calculateToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+            this.calculateToolStripMenuItem.Text = "Calculate (not implemented yet)";
             this.calculateToolStripMenuItem.Click += new System.EventHandler(this.calculateToolStripMenuItem_Click);
             // 
             // encryptDecryptToolStripMenuItem
@@ -397,7 +396,7 @@ namespace RicherTextBox.Controls
             this.encryptToolStripMenuItem,
             this.decryptToolStripMenuItem});
             this.encryptDecryptToolStripMenuItem.Name = "encryptDecryptToolStripMenuItem";
-            this.encryptDecryptToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.encryptDecryptToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.encryptDecryptToolStripMenuItem.Text = "Encrypt / Decrypt";
             // 
             // encryptToolStripMenuItem
@@ -730,8 +729,9 @@ namespace RicherTextBox.Controls
             // 
             // tstxtZoomFactor
             // 
+            this.tstxtZoomFactor.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtZoomFactor.Name = "tstxtZoomFactor";
-            this.tstxtZoomFactor.Size = new System.Drawing.Size(30, 25);
+            this.tstxtZoomFactor.Size = new System.Drawing.Size(30, 23);
             this.tstxtZoomFactor.Leave += new System.EventHandler(this.tstxtZoomFactor_Leave);
             // 
             // tsbtnCalculate
@@ -789,6 +789,7 @@ namespace RicherTextBox.Controls
             // 
             // tstxtSearchText
             // 
+            this.tstxtSearchText.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtSearchText.Name = "tstxtSearchText";
             this.tstxtSearchText.Size = new System.Drawing.Size(500, 25);
             // 
@@ -798,7 +799,7 @@ namespace RicherTextBox.Controls
             this.tsbtnFind.Image = global::RicherTextBox.Properties.Resources.FindHS;
             this.tsbtnFind.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnFind.Name = "tsbtnFind";
-            this.tsbtnFind.Size = new System.Drawing.Size(23, 20);
+            this.tsbtnFind.Size = new System.Drawing.Size(23, 22);
             this.tsbtnFind.Text = "toolStripButton1";
             this.tsbtnFind.ToolTipText = "Find";
             this.tsbtnFind.Click += new System.EventHandler(this.tsbtnFind_Click);
@@ -809,7 +810,7 @@ namespace RicherTextBox.Controls
             this.tsbtnReplace.Image = global::RicherTextBox.Properties.Resources.FindNextHS;
             this.tsbtnReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnReplace.Name = "tsbtnReplace";
-            this.tsbtnReplace.Size = new System.Drawing.Size(23, 20);
+            this.tsbtnReplace.Size = new System.Drawing.Size(23, 22);
             this.tsbtnReplace.Text = "toolStripButton2";
             this.tsbtnReplace.ToolTipText = "Replace";
             this.tsbtnReplace.Click += new System.EventHandler(this.tsbtnReplace_Click);

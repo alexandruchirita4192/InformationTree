@@ -35,8 +35,6 @@
             // 
             // mtbPgpDecrypt
             // 
-            this.mtbPgpDecrypt.BackColor = System.Drawing.Color.White;
-            this.mtbPgpDecrypt.ForeColor = System.Drawing.Color.Green;
             this.mtbPgpDecrypt.Location = new System.Drawing.Point(12, 32);
             this.mtbPgpDecrypt.Name = "mtbPgpDecrypt";
             this.mtbPgpDecrypt.Size = new System.Drawing.Size(277, 20);
@@ -58,11 +56,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(308, 59);
             this.Controls.Add(this.lblDecryptingPassword);
             this.Controls.Add(this.mtbPgpDecrypt);
-            this.ForeColor = System.Drawing.Color.LimeGreen;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(324, 98);
             this.MinimizeBox = false;

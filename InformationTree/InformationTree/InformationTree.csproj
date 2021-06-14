@@ -35,9 +35,8 @@
     <ApplicationIcon>xt3.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>DevPath\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="RicherTextBox">
       <HintPath>..\RicherTextBox\bin\Debug\RicherTextBox.dll</HintPath>
@@ -172,8 +171,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DevPath\BouncyCastle.Crypto.dll" />
     <Content Include="xt3.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -53,7 +53,6 @@
             // 
             this.lblTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblTitle.ForeColor = System.Drawing.Color.Lime;
             this.lblTitle.Location = new System.Drawing.Point(12, 441);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(394, 13);
@@ -77,7 +76,6 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(416, 492);
             this.Controls.Add(this.pbLoadingGraphics);
             this.Controls.Add(this.lblTitle);
