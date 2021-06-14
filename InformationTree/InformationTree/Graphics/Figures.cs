@@ -8,7 +8,7 @@ namespace InformationTree.Graphics
     {
         #region Properties
 
-        public List<Figure> FigureList { get; private set; }
+        public List<BaseFigure> FigureList { get; private set; }
         public D.Point CenterPoint { get; private set; }
         public D.Point RealCenterPoint { get; private set; }
 
@@ -18,10 +18,10 @@ namespace InformationTree.Graphics
 
         public Figures()
         {
-            FigureList = new List<Figure>();
+            FigureList = new List<BaseFigure>();
         }
 
-        public Figures(Figure figure) : this()
+        public Figures(BaseFigure figure) : this()
         {
             AddFigure(figure);
         }
@@ -30,7 +30,7 @@ namespace InformationTree.Graphics
 
         #region Methods
 
-        public void AddFigure(Figure figure)
+        public void AddFigure(BaseFigure figure)
         {
             if (FigureList != null)
                 FigureList.Add(figure);
@@ -38,30 +38,30 @@ namespace InformationTree.Graphics
 
         public void AddFigure(string s)
         {
-            AddFigure(new Figure(s));
+            AddFigure(FigureFactory.GetFigure(s));
         }
 
         public void AddText(string s)
         {
-            AddFigure(new Figure(s, true));
+            AddFigure(FigureFactory.GetFigure(s, true));
         }
 
-        public void AddFigureOnce(Figure figure)
+        public void AddFigureOnce(BaseFigure figure)
         {
-            if (FigureList != null && FigureList.FirstOrDefault(f => f.Points == figure.Points && f.R == figure.R && f.Text == figure.Text && f.X == figure.X && f.Y == figure.Y) == default(Figure))
+            if (FigureList != null && FigureList.FirstOrDefault(f => f.Points == figure.Points && f.X == figure.X && f.Y == figure.Y) == default(BaseFigure))
                 FigureList.Add(figure);
         }
 
         public void AddFigureOnce(string s)
         {
-            AddFigureOnce(new Figure(s));
+            AddFigureOnce(FigureFactory.GetFigure(s));
         }
 
         // GoToNr(int nr) { iterates figures and gets figures with position "nr" }
 
         #region Individual methods
 
-        public Figure GetFigureAt(int _position)
+        public BaseFigure GetFigureAt(int _position)
         {
             if (FigureList != null && FigureList.Count > _position && _position >= 0)
                 return FigureList.ElementAt(_position);
@@ -180,7 +180,12 @@ namespace InformationTree.Graphics
         public void Move(int _position, double _x, double _y, double _r)
         {
             if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).Move(_x, _y, _r);
+            {
+                var f = FigureList.ElementAt(_position);
+                var ff = f as Figure;
+                if (ff != null)
+                    ff.Move(_x, _y, _r);
+            }
         }
 
         public void Move(string s)
@@ -282,13 +287,18 @@ namespace InformationTree.Graphics
         public void MoveAll(double _x, double _y, double _r)
         {
             if (FigureList != null)
-                FigureList.ForEach(f => f.Move(_x, _y, _r));
+                FigureList.ForEach(f =>
+                {
+                    // only Figure has a Radius (_r)
+                    var ff = f as Figure;
+                    if (ff != null)
+                        ff.Move(_x, _y, _r);
+                });
         }
 
         public void SetPointsAll(int _points)
         {
-            if (FigureList != null)
-                FigureList.ForEach(f => f.Points = _points);
+            FigureList.ForEach(f => f.Points = _points);
         }
 
         public void SetColorAll(double _r, double _g, double _b)

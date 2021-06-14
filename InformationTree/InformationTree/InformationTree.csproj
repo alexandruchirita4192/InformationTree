@@ -105,7 +105,10 @@
     <Compile Include="Forms\TaskListForm.Designer.cs">
       <DependentUpon>TaskListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Graphics\ArcFigure.cs" />
+    <Compile Include="Graphics\BaseFigure.cs" />
     <Compile Include="Graphics\Figure.cs" />
+    <Compile Include="Graphics\FigureFactory.cs" />
     <Compile Include="Graphics\Figures.cs" />
     <Compile Include="Graphics\Frame.cs" />
     <Compile Include="Graphics\Graphics.cs" />
@@ -113,7 +116,7 @@
     <Compile Include="Graphics\GraphicsGenerator.cs" />
     <Compile Include="Graphics\GraphicsFile.cs" />
     <Compile Include="Graphics\Rotation.cs" />
-    <Compile Include="Graphics\Txt.cs" />
+    <Compile Include="Graphics\TextFigure.cs" />
     <Compile Include="PgpEncryption\PGPEncryptDecrypt.cs" />
     <Compile Include="PgpEncryption\PGPEncryptionKeys.cs" />
     <Compile Include="Program.cs" />

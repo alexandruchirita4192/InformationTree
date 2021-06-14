@@ -357,7 +357,7 @@ namespace InformationTree.Graphics
         {
             if (string.IsNullOrEmpty(s))
                 return;
-            Frame.GetActiveFrameOrThis().Figures.AddFigure(new Figure(s));
+            Frame.GetActiveFrameOrThis().Figures.AddFigure(FigureFactory.GetFigure(s));
         }
 
         public void AddText(string s)
@@ -381,7 +381,7 @@ namespace InformationTree.Graphics
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.AddFigureOnce(new Figure(s));
+            figures.AddFigureOnce(FigureFactory.GetFigure(s));
         }
 
         #endregion Add figure methods

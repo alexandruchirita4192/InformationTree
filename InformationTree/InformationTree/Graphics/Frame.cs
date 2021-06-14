@@ -133,7 +133,7 @@ namespace InformationTree.Graphics
         {
             Frame frame = GetActiveFrameOrThis();
 
-            graphics.Clear(D.Color.White);
+            graphics.Clear(D.Color.Black);
 
             if (frame.Figures != null)
                 frame.Figures.ShowAll(graphics);
