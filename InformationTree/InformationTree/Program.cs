@@ -116,10 +116,10 @@ namespace InformationTree
                 if (SplashForm.HasInstance())
                     return;
 
+                var notSafeToChangeCaption = !TreeNodeHelper.IsSafeToSave ? "[HadException]" : "";
                 var notSavingData = TreeNodeHelper.TreeUnchanged || !TreeNodeHelper.IsSafeToSave;
                 if (notSavingData)
                 {
-                    var notSafeToChangeCaption = !TreeNodeHelper.IsSafeToSave ? "[HadException]" : "";
                     var message = "Really close without saving?";
                     var caption = "Do you want to close without saving?" + notSafeToChangeCaption;
 
@@ -134,7 +134,6 @@ namespace InformationTree
                 }
                 else
                 {
-                    var notSafeToChangeCaption = !TreeNodeHelper.IsSafeToSave ? "[HadException]" : "";
                     var caption = "Do you want to close saving data?" + notSafeToChangeCaption;
                     var message = "Really close saving data?";
 
