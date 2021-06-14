@@ -5,7 +5,7 @@ InformationTree is a program used to organize tasks into a tree (breaking a task
 ![Information Tree program](https://i.imgur.com/GXAbH7x.png)
 
 Adding detail window (subject to change because it is still a work in progress starting from RicherTextBox):
-![RicherTextBox detail window](https://i.imgur.com/xKxcVW3.png)
+![RicherTextBox detail window](https://i.imgur.com/rspPVTq.png)
 
 InformationTree has a lot of features:
  - Searching for tasks
