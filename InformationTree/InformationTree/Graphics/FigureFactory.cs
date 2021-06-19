@@ -4,7 +4,7 @@ namespace InformationTree.Graphics
 {
     public static class FigureFactory
     {
-        public static BaseFigure GetFigure(string _line, bool isTextOnly = false)
+        public static BaseFigure GetFigure(string _line)
         {
             BaseFigure ret = null;
 
@@ -16,18 +16,9 @@ namespace InformationTree.Graphics
 
             FigureType figureType = (FigureType)Enum.Parse(typeof(FigureType), words[0]);
 
-            // TODO: use figure type (do not decide figure type by arguments number!!!)
             switch (figureType)
             {
                 case FigureType.None:
-                    break;
-                case FigureType.Circle:
-                    break;
-                case FigureType.Point:
-                    break;
-                case FigureType.Line:
-                    break;
-                case FigureType.Polygon:
                     break;
                 case FigureType.Text:
                     switch (words.Length)
@@ -72,15 +63,58 @@ namespace InformationTree.Graphics
                             break;
                     }
                     break;
+                case FigureType.Point:
+                    switch (words.Length)
+                    {
+                        case 4:
+                            // Point X Y Radius
+                            ret = new Figure(1, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
+                            break;
+                        case 5:
+                            // Point X Y Radius Rotation
+                            ret = new Figure(1, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
+                            break;
+                    }
+                    break;
+                case FigureType.Line:
+                    switch (words.Length)
+                    {
+                        case 4:
+                            // Line X Y Radius
+                            ret = new Figure(2, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
+                            break;
+                        case 5:
+                            // Line X Y Radius Rotation
+                            ret = new Figure(2, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
+                            break;
+                    }
+                    break;
+                    break;
+                case FigureType.Circle:
+                    switch (words.Length)
+                    {
+                        case 4:
+                            // Circle X Y Radius
+                            ret = new Figure(0, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
+                            break;
+                        case 5:
+                            // Circle X Y Radius Rotation
+                            ret = new Figure(0, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
+                            break;
+                    }
+                    break;
+                case FigureType.Polygon:
                 case FigureType.Figure:
                     switch (words.Length)
                     {
                         case 5:
                             // Figure Points X Y Radius
+                            // Polygon Points X Y Radius
                             ret = new Figure(int.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
                             break;
                         case 6:
                             // Figure Points X Y Radius Rotation
+                            // Polygon Points X Y Radius Rotation
                             ret = new Figure(int.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]), double.Parse(words[5]));
                             break;
                     }

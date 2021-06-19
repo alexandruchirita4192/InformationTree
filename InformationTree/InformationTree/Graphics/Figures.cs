@@ -43,7 +43,7 @@ namespace InformationTree.Graphics
 
         public void AddText(string s)
         {
-            AddFigure(FigureFactory.GetFigure(s, true));
+            AddFigure(FigureFactory.GetFigure(s));
         }
 
         public void AddFigureOnce(BaseFigure figure)
