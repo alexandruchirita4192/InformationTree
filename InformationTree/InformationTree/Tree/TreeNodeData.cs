@@ -1,29 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace InformationTree.Tree
 {
     public class TreeNodeData
     {
-        #region Constants
-        #endregion Constants
-
         #region Properties
 
-        public string Data;
-        public int AddedNumber;
-        public int Urgency;
-        public string Link;
-        public string Category;
-        public bool IsStartupAlert;
-        public decimal PercentCompleted;
-        
+        public string Data { get; set; }
+        public int AddedNumber { get; set; }
+        public int Urgency { get; set; }
+        public string Link { get; set; }
+        public string Category { get; set; }
+        public bool IsStartupAlert { get; set; }
+        public decimal PercentCompleted { get; set; }
+
         public DateTime? AddedDate;
 
         #region LastChangeDate
+
         private DateTime? lastChangeDate;
+
         public DateTime? LastChangeDate
         {
             get
@@ -35,6 +31,7 @@ namespace InformationTree.Tree
                 lastChangeDate = value;
             }
         }
+
         #endregion LastChangeDate
 
         #endregion Properties
@@ -53,7 +50,9 @@ namespace InformationTree.Tree
             PercentCompleted = percentCompleted;
         }
 
-        public TreeNodeData(TreeNodeData copy) : this(copy.Data, copy.AddedNumber, copy.AddedDate, copy.LastChangeDate, copy.Urgency, copy.Link, copy.Category, copy.IsStartupAlert, copy.PercentCompleted) { }
+        public TreeNodeData(TreeNodeData copy) : this(copy.Data, copy.AddedNumber, copy.AddedDate, copy.LastChangeDate, copy.Urgency, copy.Link, copy.Category, copy.IsStartupAlert, copy.PercentCompleted)
+        {
+        }
 
         #endregion Constructors
 
