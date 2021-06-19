@@ -2,8 +2,6 @@
 
 namespace InformationTree.Graphics
 {
-    public enum FigureType { None, Circle, Point, Line, Polygon, Text, Arc };
-
     public abstract class BaseFigure
     {
         #region Properties

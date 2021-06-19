@@ -110,6 +110,7 @@
     <Compile Include="Graphics\Figure.cs" />
     <Compile Include="Graphics\FigureFactory.cs" />
     <Compile Include="Graphics\Figures.cs" />
+    <Compile Include="Graphics\FigureType.cs" />
     <Compile Include="Graphics\Frame.cs" />
     <Compile Include="Graphics\Graphics.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />

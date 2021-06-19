@@ -1,92 +1,93 @@
-﻿namespace InformationTree.Graphics
+﻿using System;
+
+namespace InformationTree.Graphics
 {
-    public static class FigureFactory // TODO: Should this be a builder instead of "factory"?
+    public static class FigureFactory
     {
         public static BaseFigure GetFigure(string _line, bool isTextOnly = false)
         {
             BaseFigure ret = null;
-            int _x, _y, _r, _g, _b, _level, Points;
-            double X, Y, R, Rotation;
-            float ThetaFrom, ThetaTo;
 
             var words = _line.Split(' ');
-            switch (words.Length)
+
+            if (words.Length < 3
+            || !Enum.IsDefined(typeof(FigureType), words[0]))
+                return ret;
+
+            FigureType figureType = (FigureType)Enum.Parse(typeof(FigureType), words[0]);
+
+            // TODO: use figure type (do not decide figure type by arguments number!!!)
+            switch (figureType)
             {
-                case 2: //Figure(string _text, int _level)
-                    // Text = words[0]
-                    _level = int.Parse(words[1]);
-
-                    ret = new TextFigure(words[0], _level);
+                case FigureType.None:
                     break;
-
-                case 3: //Figure(string _text, int _x, int _y)
-                    // Text = words[0]
-                    _x = int.Parse(words[1]);
-                    _y = int.Parse(words[2]);
-
-                    ret = new TextFigure(words[0], _x, _y);
+                case FigureType.Circle:
                     break;
-
-                case 4: //Figure(int _points, double _x, double _y, double _r)
-                    if (isTextOnly)
-                        return null;
-
-                    Points = int.Parse(words[0]);
-                    X = double.Parse(words[1]);
-                    Y = double.Parse(words[2]);
-                    R = double.Parse(words[3]);
-
-                    ret = new Figure(Points, X, Y, R);
+                case FigureType.Point:
                     break;
-
-                case 5: //Figure(int _points, double _x, double _y, double _r, double _rotation)
-                    if (isTextOnly)
-                        return null;
-                    Points = int.Parse(words[0]);
-                    X = double.Parse(words[1]);
-                    Y = double.Parse(words[2]);
-                    R = double.Parse(words[3]);
-                    Rotation = double.Parse(words[4]);
-
-                    ret = new Figure(Points, X, Y, R, Rotation);
+                case FigureType.Line:
                     break;
-
-                case 6: //Figure(string _text, int _x, int _y, int _foregroundRed, int _foregroundBlue, int _foregroundGreen)
-                    // Text = words[0]
-                    _x = int.Parse(words[1]);
-                    _y = int.Parse(words[2]);
-                    _r = int.Parse(words[3]);
-                    _g = int.Parse(words[4]);
-                    _b = int.Parse(words[5]);
-
-                    ret = new TextFigure(words[0], _x, _y, _r, _g, _b);
+                case FigureType.Polygon:
                     break;
-                case 7: // X, Y, Radius, ThetaFrom, ThetaTo, 0, 0
-                    if (isTextOnly)
-                        return null;
-                    X = double.Parse(words[0]);
-                    Y = double.Parse(words[1]);
-                    R = double.Parse(words[2]);
-                    ThetaFrom = float.Parse(words[4]);
-                    ThetaTo = float.Parse(words[4]);
-
-                    ret = new ArcFigure(X, Y, R, ThetaFrom, ThetaTo);
+                case FigureType.Text:
+                    switch (words.Length)
+                    {
+                        case 4:
+                            // TextFigure Text X Y
+                            ret = new TextFigure(words[1], int.Parse(words[2]), int.Parse(words[3]));
+                            break;
+                        case 7:
+                            // TextFigure Text X Y R G B
+                            ret = new TextFigure(words[1], int.Parse(words[2]),
+                                int.Parse(words[3]), int.Parse(words[4]), int.Parse(words[5]), int.Parse(words[6]));
+                            break;
+                        case 9:
+                            // TextFigure Text X Y Font Size R G B
+                            ret = new TextFigure(
+                                words[1], int.Parse(words[2]), int.Parse(words[3]),
+                                words[4], int.Parse(words[5]), int.Parse(words[6]), int.Parse(words[7]), int.Parse(words[8]));
+                            break;
+                    }
                     break;
-                case 8: //Figure(string _text, int _x, int _y, string _font, int _size, int _foregroundRed, int _foregroundBlue, int _foregroundGreen)
-                    // Text = words[0]
-                    _x = int.Parse(words[1]);
-                    _y = int.Parse(words[2]);
-                    // font = words[3]
-                    var _size = int.Parse(words[4]);
-                    _r = int.Parse(words[5]);
-                    _g = int.Parse(words[6]);
-                    _b = int.Parse(words[7]);
-
-                    ret = new TextFigure(words[0], _x, _y, words[3], _size, _r, _g, _b);
+                case FigureType.Arc:
+                    switch (words.Length)
+                    {
+                        case 3:
+                            // ArcFigure X Y R ThetaFrom=0f ThetaTo=0.5f
+                            ret = new ArcFigure(
+                                double.Parse(words[1]),
+                                double.Parse(words[2]),
+                                double.Parse(words[3]),
+                                0f,
+                                0.5f);
+                            break;
+                        case 6:
+                            // ArcFigure X Y R ThetaFrom ThetaTo
+                            ret = new ArcFigure(
+                                double.Parse(words[1]),
+                                double.Parse(words[2]),
+                                double.Parse(words[3]),
+                                float.Parse(words[4]),
+                                float.Parse(words[5]));
+                            break;
+                    }
+                    break;
+                case FigureType.Figure:
+                    switch (words.Length)
+                    {
+                        case 5:
+                            // Figure Points X Y Radius
+                            ret = new Figure(int.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
+                            break;
+                        case 6:
+                            // Figure Points X Y Radius Rotation
+                            ret = new Figure(int.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]), double.Parse(words[5]));
+                            break;
+                    }
                     break;
             }
 
             return ret;
         }
-    }
+}
 }

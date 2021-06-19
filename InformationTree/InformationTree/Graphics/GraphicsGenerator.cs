@@ -28,9 +28,9 @@ namespace InformationTree.Graphics
             {
                 int i;
                 if(computeType == 0)
-                    lines.Add("AddFigureOnce " + points + " " + x + " " + y + " " + radius);
+                    lines.Add("AddFigureOnce Figure " + points + " " + x + " " + y + " " + radius);
                 else if(computeType == 1)
-                    lines.Add("AddFigureOnce 0 " + x + " " + y + " " + radius);
+                    lines.Add("AddFigureOnce Figure 0 " + x + " " + y + " " + radius);
 
                 if (iterations != -1)
                     for (i = 0; i < number; i++)
@@ -38,7 +38,7 @@ namespace InformationTree.Graphics
                     double cpx0 = (Math.Abs(Graphics.ComputeX(radius, theta, i, number)) > 0.01) ? x + Graphics.ComputeX(radius, theta, i, number) : x;
                     double cpy0 = (Math.Abs(Graphics.ComputeY(radius, theta, i, number)) > 0.01) ? y + Graphics.ComputeY(radius, theta, i, number) : y;
 
-                    lines.Add("AddFigureOnce " + points + " " + cpx0 + " " + cpy0 + " " + radius);
+                    lines.Add("AddFigureOnce Figure " + points + " " + cpx0 + " " + cpy0 + " " + radius);
                 }
 
                 for (i = 0; i < number; i++)
