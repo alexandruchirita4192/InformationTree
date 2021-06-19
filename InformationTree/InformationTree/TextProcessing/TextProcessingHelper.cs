@@ -14,11 +14,15 @@ namespace InformationTree.TextProcessing
     {
         public static string GetTextAndProcentCompleted(string attrText, ref decimal attrPercentCompleted, bool getTextWithoutProgress = false)
         {
+            // The format of text is:
+            // 1. Text [X% completed]
+            // 2. Text text2 text3 ][[ [X% completed]
+            // Where X is attrPercentCompleted
             var words = attrText.Trim().Split('[');
             if (words.Length < 2)
             {
             }
-            else if (words.Length == 2)
+            else if (words.Length == 2) // 1. Text [X% completed]
             {
                 attrText = words[0].TrimEnd(); // fix attrText to be simple
                 try
@@ -30,7 +34,7 @@ namespace InformationTree.TextProcessing
                     attrText = string.Join("[", words); // fix it
                 }
             }
-            else if (words.Length > 2)
+            else if (words.Length > 2) // 2. Text text2 text3 ][[ [X% completed]
             {
                 try
                 {
