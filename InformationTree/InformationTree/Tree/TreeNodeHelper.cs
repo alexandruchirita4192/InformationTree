@@ -31,7 +31,7 @@ namespace InformationTree.Tree
 
         public static Color LinkBackGroundColor = Color.DarkCyan;
 
-        public static Color DataBackGroundColor = Color.FromArgb(70, 70, 70);
+        public static Color DataBackGroundColor = Color.FromArgb(200, 200, 200);
 
         #endregion Colors
 
