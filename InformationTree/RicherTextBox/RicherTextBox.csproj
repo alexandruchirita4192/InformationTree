@@ -44,11 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\DataAnalysisControl.cs">
+    <Compile Include="Controls\TableControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\DataAnalysisControl.Designer.cs">
-      <DependentUpon>DataAnalysisControl.cs</DependentUpon>
+    <Compile Include="Controls\TableControl.Designer.cs">
+      <DependentUpon>TableControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FindForm.cs">
       <SubType>Form</SubType>
@@ -77,8 +77,8 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controls\DataAnalysisControl.resx">
-      <DependentUpon>DataAnalysisControl.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\TableControl.resx">
+      <DependentUpon>TableControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FindForm.resx">
       <DependentUpon>FindForm.cs</DependentUpon>

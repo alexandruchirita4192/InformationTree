@@ -144,7 +144,7 @@ namespace InformationTree.Forms
             this.tbData.AlignLeftVisible = true;
             this.tbData.AlignRightVisible = true;
             this.tbData.AllowDrop = true;
-            this.tbData.AnalysisVisible = false;
+            this.tbData.TableVisible = false;
             this.tbData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -171,7 +171,7 @@ namespace InformationTree.Forms
             this.tbData.GroupInsertVisible = true;
             this.tbData.GroupSaveAndLoadVisible = true;
             this.tbData.GroupZoomVisible = true;
-            this.tbData.AnalysisVisible = true;
+            this.tbData.TableVisible = true;
             this.tbData.CalculateVisible = true;
             this.tbData.INDENT = 10;
             this.tbData.IndentVisible = true;

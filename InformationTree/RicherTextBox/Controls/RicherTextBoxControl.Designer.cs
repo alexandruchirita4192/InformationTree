@@ -62,7 +62,7 @@ namespace RicherTextBox.Controls
             this.zoomInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomOuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
-            this.analysisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.calculateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.encryptDecryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,7 +97,7 @@ namespace RicherTextBox.Controls
             this.tsbtnZoomOut = new System.Windows.Forms.ToolStripButton();
             this.tstxtZoomFactor = new System.Windows.Forms.ToolStripTextBox();
             this.tsbtnCalculate = new System.Windows.Forms.ToolStripButton();
-            this.tsbtnAnalysis = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnTable = new System.Windows.Forms.ToolStripButton();
             this.tsbtnEncrypt = new System.Windows.Forms.ToolStripButton();
             this.tsbtnDecrypt = new System.Windows.Forms.ToolStripButton();
             this.toolStripFindReplace = new System.Windows.Forms.ToolStrip();
@@ -148,7 +148,7 @@ namespace RicherTextBox.Controls
             this.zoomInToolStripMenuItem,
             this.zoomOuToolStripMenuItem,
             this.toolStripMenuItem5,
-            this.analysisToolStripMenuItem,
+            this.tableToolStripMenuItem,
             this.calculateToolStripMenuItem,
             this.encryptDecryptToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
@@ -378,10 +378,10 @@ namespace RicherTextBox.Controls
             // 
             // analysisToolStripMenuItem
             // 
-            this.analysisToolStripMenuItem.Name = "analysisToolStripMenuItem";
-            this.analysisToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
-            this.analysisToolStripMenuItem.Text = "Analysis";
-            this.analysisToolStripMenuItem.Click += new System.EventHandler(this.analysisToolStripMenuItem_Click);
+            this.tableToolStripMenuItem.Name = "analysisToolStripMenuItem";
+            this.tableToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+            this.tableToolStripMenuItem.Text = "Table";
+            this.tableToolStripMenuItem.Click += new System.EventHandler(this.tableToolStripMenuItem_Click);
             // 
             // calculateToolStripMenuItem
             // 
@@ -745,12 +745,12 @@ namespace RicherTextBox.Controls
             // 
             // tsbtnAnalysis
             // 
-            this.tsbtnAnalysis.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.tsbtnAnalysis.Name = "tsbtnAnalysis";
-            this.tsbtnAnalysis.Size = new System.Drawing.Size(54, 19);
-            this.tsbtnAnalysis.Text = "Analysis";
-            this.tsbtnAnalysis.ToolTipText = "Analysis";
-            this.tsbtnAnalysis.Click += new System.EventHandler(this.tsbtnAnalysis_Click);
+            this.tsbtnTable.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsbtnTable.Name = "tsbtnTable";
+            this.tsbtnTable.Size = new System.Drawing.Size(54, 19);
+            this.tsbtnTable.Text = "Table";
+            this.tsbtnTable.ToolTipText = "Table";
+            this.tsbtnTable.Click += new System.EventHandler(this.tsbtnTable_Click);
             // 
             // tsbtnEncrypt
             // 
@@ -858,7 +858,7 @@ namespace RicherTextBox.Controls
         private System.Windows.Forms.ToolStripButton tsbtnChooseFont;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripButton tsbtnInsertPicture;
-        private System.Windows.Forms.ToolStripButton tsbtnAnalysis;
+        private System.Windows.Forms.ToolStripButton tsbtnTable;
         private System.Windows.Forms.ToolStripButton tsbtnCalculate;
         private System.Windows.Forms.ToolStripButton tsbtnEncrypt;
         private System.Windows.Forms.ToolStripButton tsbtnDecrypt;
@@ -903,7 +903,7 @@ namespace RicherTextBox.Controls
         private System.Windows.Forms.ToolStripButton tsbtnFind;
         private System.Windows.Forms.ToolStripButton tsbtnReplace;
         private System.Windows.Forms.ToolStripButton tsbtnStrikeout;
-        private System.Windows.Forms.ToolStripMenuItem analysisToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tableToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem calculateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encryptDecryptToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encryptToolStripMenuItem;

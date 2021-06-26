@@ -329,10 +329,10 @@ namespace RicherTextBox.Controls
             set { toolStripMenuItem5.Visible = value; }
         }
         [Category("Toolstrip single items visibility")]
-        public bool AnalysisVisible
+        public bool TableVisible
         {
-            get { return tsbtnAnalysis.Visible; }
-            set { tsbtnAnalysis.Visible = value; }
+            get { return tsbtnTable.Visible; }
+            set { tsbtnTable.Visible = value; }
         }
         [Category("Toolstrip single items visibility")]
         public bool CalculateVisible
@@ -426,9 +426,9 @@ namespace RicherTextBox.Controls
         {
             InitializeComponent();
 
-            AnalysisFunction = (target) =>
+            TableFunction = (target) =>
             {
-                var analysisTableControl = new DataAnalysisControl(target, this);
+                var tableControl = new TableControl(target, this);
 
                 ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // to do something here
                 return target;
@@ -841,20 +841,20 @@ namespace RicherTextBox.Controls
             rtbDocument.Rtf = CalculateFunction(rtbDocument.Rtf);
         }
 
-        private void tsbtnAnalysis_Click(object sender, EventArgs e)
+        private void tsbtnTable_Click(object sender, EventArgs e)
         {
-            if (AnalysisFunction == null)
+            if (TableFunction == null)
                 return;// throw new NotImplementedException();
 
             //var selectedString = IsRichText(rtbDocument.SelectedRtf) ? rtbDocument.SelectedRtf : rtbDocument.SelectedText;
-            AnalysisFunction(rtbDocument.SelectedText);
+            TableFunction(rtbDocument.SelectedText);
         }
 
         #endregion
 
         #region Public methods for accessing the functionality of the RicherTextBox
 
-        public Func<string, string> EncryptFunction, DecryptFunction, CalculateFunction, AnalysisFunction;
+        public Func<string, string> EncryptFunction, DecryptFunction, CalculateFunction, TableFunction;
 
         public static bool IsRichText(string testString)
         {
@@ -1163,9 +1163,9 @@ namespace RicherTextBox.Controls
             tsbtnInsertPicture.PerformClick();
         }
 
-        private void analysisToolStripMenuItem_Click(object sender, EventArgs e)
+        private void tableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tsbtnAnalysis.PerformClick();
+            tsbtnTable.PerformClick();
         }
 
         private void calculateToolStripMenuItem_Click(object sender, EventArgs e)
