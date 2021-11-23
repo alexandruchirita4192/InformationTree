@@ -1,12 +1,12 @@
-﻿using System;
+﻿using InformationTree.Graphics;
+using InformationTree.Sound;
+using InformationTree.TextProcessing;
+using InformationTree.Tree;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using InformationTree.TextProcessing;
-using InformationTree.Tree;
-using InformationTree.Graphics;
-using InformationTree.Sound;
 
 namespace InformationTree.Forms
 {
@@ -18,7 +18,7 @@ namespace InformationTree.Forms
         {
             InitializeComponent();
 
-           // SetStyleTo(this, Color.Black, Color.White);
+            // SetStyleTo(this, Color.Black, Color.White);
 
             nudMilliseconds.Maximum = 999;
             nudSeconds.Maximum = 59;
@@ -96,7 +96,7 @@ namespace InformationTree.Forms
         private void StartupAlertForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             var form = sender as StartupAlertForm;
-            if(form != null)
+            if (form != null)
             {
                 var selectedNode = form.SelectedItemOrCategory;
                 var textToFind = selectedNode.Text;
@@ -117,14 +117,16 @@ namespace InformationTree.Forms
         #endregion ctor
 
         #region Constants
-        static readonly new Font DefaultFont = new Font(FontFamily.GenericSansSerif, 8.5F, FontStyle.Regular);
+
+        private new static readonly Font DefaultFont = new Font(FontFamily.GenericSansSerif, 8.5F, FontStyle.Regular);
+
         #endregion Constants
 
         #region Properties
 
         public bool clbStyle_ItemCheckEntered { get; set; }
 
-        CanvasPopUpForm CanvasForm;
+        private CanvasPopUpForm CanvasForm;
 
         private static Stopwatch timer = new Stopwatch();
         private static Timer randomTimer = new Timer();
@@ -140,13 +142,14 @@ namespace InformationTree.Forms
 
         private int oldX = 0, oldY = 0;
 
-        bool IsControlPressed;
+        private bool IsControlPressed;
 
         #endregion Properties
 
         #region Methods
 
         #region Public methods
+
         public void SaveTree()
         {
             TreeNodeHelper.SaveTree(tvTaskList);
@@ -203,7 +206,6 @@ namespace InformationTree.Forms
             else
                 foreach (TreeNode node in tvTaskList.Nodes)
                 {
-
                     if (node != null && node.Text.Equals(taskName /*StartsWith + " [" */))
                     {
                         node.Nodes.Clear();
@@ -784,7 +786,6 @@ namespace InformationTree.Forms
             gbTask.Enabled = false;
             gbStyleChange.Enabled = false;
             gbTimeSpent.Enabled = false;
-
         }
 
         private void btnShowFromToUrgencyNumber_Click(object sender, EventArgs e)
@@ -853,7 +854,7 @@ namespace InformationTree.Forms
 
         private void tbTaskName_DoubleClick(object sender, EventArgs e)
         {
-                var selectedNode = tvTaskList.SelectedNode;
+            var selectedNode = tvTaskList.SelectedNode;
             if (selectedNode != null)
             {
                 var tagData = selectedNode.Tag as TreeNodeData;
@@ -895,7 +896,7 @@ namespace InformationTree.Forms
                 form.ShowDialog();
             }
         }
-        
+
         private void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
@@ -1026,7 +1027,7 @@ namespace InformationTree.Forms
                 CanvasForm = new CanvasPopUpForm();
             CanvasForm.Show();
         }
-        
+
         private void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
         {
             TreeNodeHelper.TreeUnchanged = false;
@@ -1092,7 +1093,6 @@ namespace InformationTree.Forms
 
             var cbUseDefaultsChecked = cbUseDefaults.Checked;
             var computeType = (int)nudComputeType.Value;
-
 
             var cbLogChecked = cbLog.Checked;
             var node = tvTaskList.SelectedNode;
@@ -1181,7 +1181,7 @@ namespace InformationTree.Forms
 
         private void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
-            if(IsControlPressed && tvTaskList != null)
+            if (IsControlPressed && tvTaskList != null)
             {
                 TreeNodeHelper.UpdateSizeOfTreeNodes(tvTaskList.Nodes, (e.Delta / 120));
                 //var fontIsNotNull = tvTaskList.Font != null;
@@ -1212,7 +1212,7 @@ namespace InformationTree.Forms
             if (randomTimer == null)
                 return;
 
-            if(!randomTimer.Enabled)
+            if (!randomTimer.Enabled)
             {
                 randomTimer.Tick += RandomTimer_Tick;
                 RandomTimer_ChangeIntervalAndSound();
@@ -1241,11 +1241,10 @@ namespace InformationTree.Forms
 
             systemSoundNumber = -1;
 
-            while(systemSoundNumber < 1 || systemSoundNumber > 4)
+            while (systemSoundNumber < 1 || systemSoundNumber > 4)
                 systemSoundNumber = (new Random(ticksSeedAsInt).Next() % 4) + 1;
-
-
         }
+
         private void RandomTimer_Tick(object sender, EventArgs e)
         {
             SoundHelper.PlaySystemSound(systemSoundNumber);
@@ -1266,14 +1265,11 @@ namespace InformationTree.Forms
 
         private void encryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
         }
 
         private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
         }
-
 
         //private void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         //{
@@ -1290,7 +1286,6 @@ namespace InformationTree.Forms
         //{
         //    if(e.Delta != 0)
         //    {
-
         //    }
         //}
 
@@ -1302,6 +1297,5 @@ namespace InformationTree.Forms
         #endregion Handlers
 
         #endregion Methods
-
     }
 }

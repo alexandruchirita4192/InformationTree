@@ -1,5 +1,4 @@
-﻿using System;
-using D = System.Drawing;
+﻿using D = System.Drawing;
 
 namespace InformationTree.Graphics
 {
@@ -23,8 +22,8 @@ namespace InformationTree.Graphics
         {
             get { return FigureType.Text; }
         }
-        public string Text { get; set; }
 
+        public string Text { get; set; }
 
         #endregion Public
 
@@ -32,8 +31,14 @@ namespace InformationTree.Graphics
 
         #region Constructors
 
-        public TextFigure(string _text, int _x, int _y) : this(_text, _x, _y, 255, 255, 255) { }
-        public TextFigure(string _text, int _x, int _y, int _r, int _g, int _b) : this(_text, _x, _y, "AngelicWar.ttf", 12, _r, _g, _b) { }
+        public TextFigure(string _text, int _x, int _y) : this(_text, _x, _y, 255, 255, 255)
+        {
+        }
+
+        public TextFigure(string _text, int _x, int _y, int _r, int _g, int _b) : this(_text, _x, _y, "AngelicWar.ttf", 12, _r, _g, _b)
+        {
+        }
+
         public TextFigure(string _text, int _x, int _y, string _fontFamilyName, double _size, int _r, int _g, int _b)
         {
             SetText(_text);

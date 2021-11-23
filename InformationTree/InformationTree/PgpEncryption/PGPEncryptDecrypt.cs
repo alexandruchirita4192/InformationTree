@@ -1,21 +1,24 @@
-﻿using System;
-using System.IO;
-using Org.BouncyCastle.Bcpg;
+﻿using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities.IO;
-using System.Windows.Forms;
+using System;
+using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace InformationTree.PgpEncryption
 {
     public static class PGPEncryptDecrypt
     {
         #region Constants
+
         private const int BufferSize = 0x10000; // should always be power of 2
+
         #endregion Constants
 
         #region GenerateStreamFromString
+
         public static Stream GenerateStreamFromString(string s)
         {
             MemoryStream stream = new MemoryStream();
@@ -25,9 +28,11 @@ namespace InformationTree.PgpEncryption
             stream.Position = 0;
             return stream;
         }
+
         #endregion GenerateStreamFromString
 
         #region Keys from file dialog
+
         public static string GetKeyFile(string fileType)
         {
             var lowerFileType = fileType.ToLower();
@@ -77,7 +82,7 @@ namespace InformationTree.PgpEncryption
                 using (Stream privateKeyStream = File.OpenRead(privateKeyFile))
                 {
                     return GetDecryptedStringFromStream(encryptedText, privateKeyStream, pgpPassword);
-                }   
+                }
             }
             catch (Exception ex)
             {
@@ -94,7 +99,6 @@ namespace InformationTree.PgpEncryption
                 {
                     using (var outputStream = new MemoryStream())
                     {
-
                         PGPEncryptDecrypt.Decrypt(inputStream,
                             privateKeyStream,
                             pgpPassword,
@@ -248,9 +252,11 @@ namespace InformationTree.PgpEncryption
                 throw ex;
             }
         }
-        #endregion
+
+        #endregion Decrypt
 
         #region Test for existing key
+
         public static bool IsPgpSecretKey(string privateKeyFile)
         {
             var privateKeyStream = File.OpenRead(privateKeyFile);
@@ -276,7 +282,6 @@ namespace InformationTree.PgpEncryption
             return true;
         }
 
-
         public static bool ExistsPassword(PgpSecretKeyRingBundle pgpSec, char[] password)
         {
             foreach (PgpSecretKeyRing keyRing in pgpSec.GetKeyRings())
@@ -291,6 +296,7 @@ namespace InformationTree.PgpEncryption
 
             return false;
         }
+
         public static bool ExistsPasswordFromString(string privateKeyString, char[] password)
         {
             using (var privateKeyStream = new MemoryStream(Encoding.UTF8.GetBytes(privateKeyString)))
@@ -329,10 +335,9 @@ namespace InformationTree.PgpEncryption
             return ExistsPasswordFromStream(File.OpenRead(privateKeyFile), password);
         }
 
-        #endregion
+        #endregion Test for existing key
 
         #region Encrypt
-
 
         public static string GetEncryptedStringFromString(string decryptedText, string publicKeyText, bool armor, bool withIntegrityCheck)
         {
@@ -340,7 +345,7 @@ namespace InformationTree.PgpEncryption
             {
                 using (Stream publicKeyStream = GenerateStreamFromString(publicKeyText))
                 {
-                        return GetEncryptedStringFromStream(decryptedText, publicKeyStream, armor, withIntegrityCheck);
+                    return GetEncryptedStringFromStream(decryptedText, publicKeyStream, armor, withIntegrityCheck);
                 }
             }
             catch (Exception ex)
@@ -358,7 +363,6 @@ namespace InformationTree.PgpEncryption
                 {
                     using (var outputStream = new MemoryStream())
                     {
-
                         PGPEncryptDecrypt.EncryptFromStream(
                             inputStream,
                             outputStream,

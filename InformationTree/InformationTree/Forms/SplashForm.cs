@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -43,7 +41,7 @@ namespace InformationTree.Forms
         //The type of form to be displayed as the splash screen.
         private static List<SplashForm> splashFormList;
 
-        static public void ShowSplashScreen()
+        public static void ShowSplashScreen()
         {
             // Make sure it is only launched once.
             if (splashFormList == null)
@@ -58,23 +56,23 @@ namespace InformationTree.Forms
             }
         }
 
-        static public bool HasInstance()
+        public static bool HasInstance()
         {
-            return splashFormList != null && splashFormList.Count > 0 && splashFormList.Any(f=>!f.IsDisposed);
+            return splashFormList != null && splashFormList.Count > 0 && splashFormList.Any(f => !f.IsDisposed);
         }
 
-        static public void CloseForm()
+        public static void CloseForm()
         {
             if (splashFormList != null)
             {
                 foreach (var form in splashFormList)
-                    form.Invoke(new CloseDelegate(()=>CloseFormInternal(form)));
+                    form.Invoke(new CloseDelegate(() => CloseFormInternal(form)));
                 splashFormList.Clear();
                 splashFormList = null;
             }
         }
 
-        static private void CloseFormInternal(SplashForm form)
+        private static void CloseFormInternal(SplashForm form)
         {
             if (form != null)
             {

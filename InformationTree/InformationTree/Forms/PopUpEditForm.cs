@@ -1,15 +1,10 @@
 ﻿using InformationTree.PgpEncryption;
-using InformationTree.TextProcessing;
 using InformationTree.Tree;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -17,6 +12,7 @@ namespace InformationTree.Forms
     public partial class PopUpEditForm : Form
     {
         #region constants
+
         private const int WM_COPY = 0x301;
         private const int WM_CUT = 0x300;
         private const int WM_PASTE = 0x302;
@@ -24,23 +20,26 @@ namespace InformationTree.Forms
         private const int WM_UNDO = 0x304;
         private const int EM_UNDO = 0xC7;
         private const int EM_CANUNDO = 0xC6;
-        #endregion
+
+        #endregion constants
 
         #region Properties
+
         private string data;
+
         public string Data
         {
             get
             {
                 if (data != null)
                     return data;
-                if(tbData.TextLength == 0)
+                if (tbData.TextLength == 0)
                     return string.Empty;
                 return tbData.Rtf;
             }
         }
 
-        bool DataIsPgpEncrypted
+        private bool DataIsPgpEncrypted
         {
             get
             {
@@ -48,18 +47,16 @@ namespace InformationTree.Forms
             }
         }
 
-
         public bool FromFile;
 
         public string PgpPassword;
         public string PgpKeyFile;
         public string PgpKeyText;
 
-
-        CanvasPopUpForm CanvasForm;
+        private CanvasPopUpForm CanvasForm;
         private static Stopwatch timer = new Stopwatch();
 
-        #endregion
+        #endregion Properties
 
         #region Constructor
 
@@ -68,8 +65,8 @@ namespace InformationTree.Forms
             InitializeComponent();
 
             this.FormClosing += tbExitPopUpAndSave_Click;
-            
-            if(tbData != null && tbData.TextBox != null)
+
+            if (tbData != null && tbData.TextBox != null)
                 tbData.TextBox.AllowDrop = true;
 
             this.tbData.TextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PopUpEditForm_KeyUp);
@@ -96,8 +93,8 @@ namespace InformationTree.Forms
             var richTextBoxBackColor = tbData.BackColor;
             if (richTextBoxBackColor != TreeNodeHelper.DefaultBackGroundColor)
                 tbData.BackColor = TreeNodeHelper.DefaultBackGroundColor;
-            
-            if(tbData != null && tbData.TextBox != null && tbData.TextBox.Text != null)
+
+            if (tbData != null && tbData.TextBox != null && tbData.TextBox.Text != null)
             {
                 for (int i = 0; i < tbData.TextBox.Text.Length; i++)
                 {
@@ -119,7 +116,7 @@ namespace InformationTree.Forms
             {
                 case Keys.Control | Keys.V:
                 case Keys.Shift | Keys.Insert:
-                    if(Clipboard.ContainsImage())
+                    if (Clipboard.ContainsImage())
                     {
                         var image = Clipboard.GetImage();
                         var maxWidth = tbData.Width - 10;
@@ -130,12 +127,12 @@ namespace InformationTree.Forms
 
                         if (newHeight > maxHeight)
                         {
-                            // Resize with height instead  
+                            // Resize with height instead
                             newWidth = image.Width * maxHeight / image.Height;
                             newHeight = maxHeight;
                         }
 
-                        if(newWidth != image.Width || newHeight != image.Height)
+                        if (newWidth != image.Width || newHeight != image.Height)
                         {
                             image = image.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
                             Clipboard.SetImage(image);
@@ -143,6 +140,7 @@ namespace InformationTree.Forms
                     }
 
                     return base.ProcessCmdKey(ref msg, keyData);
+
                 default:
                     return base.ProcessCmdKey(ref msg, keyData);
             }
@@ -150,7 +148,7 @@ namespace InformationTree.Forms
 
         private void tbExitPopUpAndSave_Click(object sender, EventArgs e)
         {
-            if(object.ReferenceEquals(sender, tbExitPopUpAndSave))
+            if (object.ReferenceEquals(sender, tbExitPopUpAndSave))
                 this.Close();
         }
 
@@ -194,7 +192,7 @@ namespace InformationTree.Forms
             {
                 PgpDecrypt form = new PgpDecrypt(cbFromFile.Checked);
                 if (!form.IsDisposed)
-                { 
+                {
                     Program.CenterForm(form, this);
 
                     form.FormClosed += PgpDecryptForm_FormClosed;
@@ -215,7 +213,7 @@ namespace InformationTree.Forms
                 PgpKeyText = form.PgpPrivateKeyText;
 
                 var result = string.Empty;
-                if(FromFile)
+                if (FromFile)
                 {
                     result = PGPEncryptDecrypt.GetDecryptedStringFromFile(tbData.Text, PgpKeyFile, PgpPassword);
                     lblEncryption.Text = "Decrypted with key: " + PgpKeyFile;
@@ -254,7 +252,7 @@ namespace InformationTree.Forms
                         using (var reader = new StreamReader(outputStream))
                         {
                             var resultedText = reader.ReadToEnd();
-                            if(tbData.Text != resultedText)
+                            if (tbData.Text != resultedText)
                             {
                                 data = null;
                                 tbData.Text = resultedText;
@@ -326,7 +324,7 @@ namespace InformationTree.Forms
 
         private void PopUpEditForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Escape)
+            if (e.KeyCode == Keys.Escape)
                 this.Close();
         }
 

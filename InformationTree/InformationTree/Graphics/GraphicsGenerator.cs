@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
-using D = System.Drawing;
 
 namespace InformationTree.Graphics
 {
@@ -23,23 +20,23 @@ namespace InformationTree.Graphics
         public static List<string> ComputeXComputeY(int points, double x, double y, double radius, double theta, int number, int iterations, int computeType = 0)
         {
             List<string> lines = new List<string>();
-            
+
             if (iterations >= -1)
             {
                 int i;
-                if(computeType == 0)
+                if (computeType == 0)
                     lines.Add("AddFigureOnce Figure " + points + " " + x + " " + y + " " + radius);
-                else if(computeType == 1)
+                else if (computeType == 1)
                     lines.Add("AddFigureOnce Figure 0 " + x + " " + y + " " + radius);
 
                 if (iterations != -1)
                     for (i = 0; i < number; i++)
-                {
-                    double cpx0 = (Math.Abs(Graphics.ComputeX(radius, theta, i, number)) > 0.01) ? x + Graphics.ComputeX(radius, theta, i, number) : x;
-                    double cpy0 = (Math.Abs(Graphics.ComputeY(radius, theta, i, number)) > 0.01) ? y + Graphics.ComputeY(radius, theta, i, number) : y;
+                    {
+                        double cpx0 = (Math.Abs(Graphics.ComputeX(radius, theta, i, number)) > 0.01) ? x + Graphics.ComputeX(radius, theta, i, number) : x;
+                        double cpy0 = (Math.Abs(Graphics.ComputeY(radius, theta, i, number)) > 0.01) ? y + Graphics.ComputeY(radius, theta, i, number) : y;
 
-                    lines.Add("AddFigureOnce Figure " + points + " " + cpx0 + " " + cpy0 + " " + radius);
-                }
+                        lines.Add("AddFigureOnce Figure " + points + " " + cpx0 + " " + cpy0 + " " + radius);
+                    }
 
                 for (i = 0; i < number; i++)
                 {

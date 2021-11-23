@@ -7,8 +7,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
 using System.Xml;
@@ -37,31 +35,31 @@ namespace InformationTree.Tree
 
         #region XML Attributes
 
-        const string XmlAttrText = "text";
-        const string XmlAttrName = "name";
-        const string XmlAttrBold = "bold";
-        const string XmlAttrItalic = "italic";
-        const string XmlAttrUnderline = "underline";
-        const string XmlAttrStrikeout = "strikeout";
-        const string XmlAttrForegroundColor = "foreground";
-        const string XmlAttrBackgroundColor = "background";
-        const string XmlAttrFontFamily = "fontFamily";
-        const string XmlAttrFontSize = "fontSize";
-        const string XmlAttrAddedNumber = "addedNumber";
-        const string XmlAttrAddedDate = "addedDate";
-        const string XmlAttrLastChangeDate = "lastChangeDate";
-        const string XmlAttrUrgency = "urgency";
-        const string XmlAttrLink = "link";
-        const string XmlAttrCategory = "category";
-        const string XmlAttrIsStartupAlert = "isStartupAlert";
+        private const string XmlAttrText = "text";
+        private const string XmlAttrName = "name";
+        private const string XmlAttrBold = "bold";
+        private const string XmlAttrItalic = "italic";
+        private const string XmlAttrUnderline = "underline";
+        private const string XmlAttrStrikeout = "strikeout";
+        private const string XmlAttrForegroundColor = "foreground";
+        private const string XmlAttrBackgroundColor = "background";
+        private const string XmlAttrFontFamily = "fontFamily";
+        private const string XmlAttrFontSize = "fontSize";
+        private const string XmlAttrAddedNumber = "addedNumber";
+        private const string XmlAttrAddedDate = "addedDate";
+        private const string XmlAttrLastChangeDate = "lastChangeDate";
+        private const string XmlAttrUrgency = "urgency";
+        private const string XmlAttrLink = "link";
+        private const string XmlAttrCategory = "category";
+        private const string XmlAttrIsStartupAlert = "isStartupAlert";
 
-        const string XmlAttrData = "data";
+        private const string XmlAttrData = "data";
 
-        const string XmlAttrPercentCompleted = "percentCompleted";
-
+        private const string XmlAttrPercentCompleted = "percentCompleted";
 
         #region Old XML Attribute Names
-        static List<string> XmlAttrForegroundColorAcceptedList
+
+        private static List<string> XmlAttrForegroundColorAcceptedList
         {
             get
             {
@@ -69,7 +67,7 @@ namespace InformationTree.Tree
             }
         }
 
-        static List<string> XmlAttrBackgroundColorAcceptedList
+        private static List<string> XmlAttrBackgroundColorAcceptedList
         {
             get
             {
@@ -77,7 +75,7 @@ namespace InformationTree.Tree
             }
         }
 
-        static List<string> XmlAttrUrgencyAcceptedList
+        private static List<string> XmlAttrUrgencyAcceptedList
         {
             get
             {
@@ -85,7 +83,7 @@ namespace InformationTree.Tree
             }
         }
 
-        static List<string> XmlAttrLinkAcceptedList
+        private static List<string> XmlAttrLinkAcceptedList
         {
             get
             {
@@ -105,7 +103,9 @@ namespace InformationTree.Tree
         #region Properties
 
         #region FileName
+
         private static string fileName;
+
         public static string FileName
         {
             get
@@ -119,13 +119,14 @@ namespace InformationTree.Tree
                 fileName = value;
             }
         }
-        #endregion FileName
 
+        #endregion FileName
 
         public static bool IsSafeToSave;
         public static bool ReadOnlyState;
 
         private static bool _treeUnchanged;
+
         public static bool TreeUnchanged
         {
             get
@@ -137,7 +138,7 @@ namespace InformationTree.Tree
                 if (TreeUnchangedFreeze)
                     return;
 
-                if(_treeUnchanged != value)
+                if (_treeUnchanged != value)
                 {
                     _treeUnchanged = value;
 
@@ -146,6 +147,7 @@ namespace InformationTree.Tree
                 }
             }
         }
+
         public static bool TreeUnchangedFreeze { get; set; }
         public static Action<bool> TreeUnchangedChangeDelegate;
 
@@ -159,6 +161,7 @@ namespace InformationTree.Tree
         #endregion Properties
 
         #region Fix Tree
+
         public static bool TreeNodesNeedFix(TreeNodeCollection nodes)
         {
             foreach (TreeNode tn in nodes)
@@ -201,6 +204,7 @@ namespace InformationTree.Tree
                 FixTreeNodes(nodes);
             }
         }
+
         #endregion Fix Tree
 
         #region Load
@@ -208,7 +212,7 @@ namespace InformationTree.Tree
         public static DateTime? StringToDateTime(string s)
         {
             var convertedDateTime = (DateTime?)null;
-            if(!string.IsNullOrEmpty(s))
+            if (!string.IsNullOrEmpty(s))
             {
                 try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormat, CultureInfo.InvariantCulture); } catch { }
                 if (convertedDateTime == null)
@@ -223,7 +227,7 @@ namespace InformationTree.Tree
         {
             var convertedColor = (Color?)null;
             if (!string.IsNullOrEmpty(s))
-                try { convertedColor = Color.FromName(s);  } catch (Exception ex) { Program.GlobalExceptionHandling(ex); }
+                try { convertedColor = Color.FromName(s); } catch (Exception ex) { Program.GlobalExceptionHandling(ex); }
             return convertedColor;
         }
 
@@ -362,7 +366,7 @@ namespace InformationTree.Tree
                 CopyNode(to.Nodes, node, addedNumberHigherThan, addedNumberLowerThan, type);
         }
 
-        #endregion
+        #endregion CopyNode, CopyNodes
 
         public static TreeNode GetNewNodeFromTextNameAttr(XmlAttributeCollection attributes)
         {
@@ -455,7 +459,7 @@ namespace InformationTree.Tree
             };
             return node;
         }
-        
+
         public static void LoadXML(Form t, TreeView tv)
         {
             try
@@ -509,10 +513,10 @@ namespace InformationTree.Tree
             if (from == null || to == null || from.Count == 0)
                 return false;
 
-            if(categories == null || categories.Count == 0)
+            if (categories == null || categories.Count == 0)
                 to.Clear();
 
-            if(categories == null)
+            if (categories == null)
                 categories = new Dictionary<string, TreeNode>();
 
             foreach (TreeNode node in from)
@@ -520,13 +524,13 @@ namespace InformationTree.Tree
                 var nodeData = node.Tag as TreeNodeData;
                 if (nodeData != null && !string.IsNullOrEmpty(nodeData.Category) && ((includeOnlyWithStartupAlert && nodeData.IsStartupAlert) || (!includeOnlyWithStartupAlert)))
                 {
-                    if(!categories.ContainsKey(nodeData.Category))
+                    if (!categories.ContainsKey(nodeData.Category))
                         categories.Add(nodeData.Category, new TreeNode(nodeData.Category));
                     categories[nodeData.Category].Nodes.Add(node.Clone() as TreeNode);
                 }
                 else if (nodeData != null && string.IsNullOrEmpty(nodeData.Category) && (includeOnlyWithStartupAlert && nodeData.IsStartupAlert))
                 {
-                    if(!categories.ContainsKey(string.Empty))
+                    if (!categories.ContainsKey(string.Empty))
                         categories.Add(string.Empty, new TreeNode(nodeData.Category));
                     categories[string.Empty].Nodes.Add(node.Clone() as TreeNode);
                 }
@@ -537,7 +541,7 @@ namespace InformationTree.Tree
 
             foreach (var key in categories.Keys.OrderBy(c => c))
             {
-                if(to.OfType<TreeNode>().Count(e => e.Text == key) == 0)
+                if (to.OfType<TreeNode>().Count(e => e.Text == key) == 0)
                     to.Add(categories[key]);
 
                 //foreach(TreeNode child in categories[key].Nodes)
@@ -552,9 +556,11 @@ namespace InformationTree.Tree
 
             return categories.Count > 0;
         }
+
         #endregion Load
-            
+
         #region Save
+
         public static string DateTimeToString(DateTime? dt)
         {
             var convertedString = (String)null;
@@ -597,8 +603,8 @@ namespace InformationTree.Tree
         private static string GetXmlAttributeText(string attribute, string value, bool spaceAfterAttribute = false, string emptyValue = null)
         {
             return
-                (string.IsNullOrEmpty(value) || value == emptyValue) ? 
-                string.Empty : 
+                (string.IsNullOrEmpty(value) || value == emptyValue) ?
+                string.Empty :
                 (attribute + "=\"" + HttpUtility.HtmlEncode(value) + "\"" + (spaceAfterAttribute ? " " : string.Empty));
         }
 
@@ -665,7 +671,7 @@ namespace InformationTree.Tree
 
                 if (node.Nodes.Count > 0)
                 {
-                    tagNodeLine = tagNodeLine.Substring(0,tagNodeLine.Length-1) + ">"; // remove a space before ">"
+                    tagNodeLine = tagNodeLine.Substring(0, tagNodeLine.Length - 1) + ">"; // remove a space before ">"
                     streamWriter.WriteLine(tagNodeLine);
                     SaveNode(node.Nodes, indentTabs + 1);
                     streamWriter.WriteLine(GetTabsByIndent(indentTabs) + "</node>");
@@ -677,6 +683,7 @@ namespace InformationTree.Tree
                 }
             }
         }
+
         #endregion Save
 
         #region Load & save
@@ -704,6 +711,7 @@ namespace InformationTree.Tree
         #endregion Load & save
 
         #region Node update
+
         public static bool ParseNodeAndUpdate(TreeNode node, string taskName, string nodeValue)
         {
             if (node.Text.Equals(taskName /* StartsWith + " [" */))
@@ -727,9 +735,11 @@ namespace InformationTree.Tree
             }
             return false;
         }
+
         #endregion Node update
 
         #region Node percentage
+
         public static double GetPercentageFromChildren(TreeNode topNode)
         {
             var sum = 0.0;
@@ -757,7 +767,6 @@ namespace InformationTree.Tree
                 return (sum / nr);
             return 0;
         }
-
 
         public static void SetPercentageToChildren(TreeNode topNode, double percentage)
         {
@@ -811,6 +820,7 @@ namespace InformationTree.Tree
         #endregion Node deletion
 
         #region Nodes completed/unfinished
+
         public static bool? TasksCompleteAreHidden(TreeView tv)
         {
             if (tv.Nodes.Count > 0)
@@ -992,9 +1002,11 @@ namespace InformationTree.Tree
                 }
             }
         }
-        #endregion
+
+        #endregion Node search
 
         #region Node show by urgency or added number
+
         public static void ShowNodesFromTaskToNumberOfTask(TreeView tv, decimal addedNumberLowerThan, decimal addedNumberHigherThan, int type)
         {
             if (nodes == null)
@@ -1022,9 +1034,11 @@ namespace InformationTree.Tree
                 TreeNodeHelper.ReadOnlyState = false;
             }
         }
+
         #endregion Node show by urgency or added number
 
         #region Node data size calculation
+
         public static int CalculateDataSizeFromNodeAndChildren(TreeNode node)
         {
             if (node == null)
@@ -1035,13 +1049,15 @@ namespace InformationTree.Tree
                 return 0;
 
             var size = tagData.Data == null ? 0 : tagData.Data.Length;
-            foreach(TreeNode n in node.Nodes)
+            foreach (TreeNode n in node.Nodes)
                 size += CalculateDataSizeFromNodeAndChildren(n);
             return size;
         }
+
         #endregion Node data size calculation
 
         #region Node move
+
         public static void UpdateCurrentSelection(TreeNode node)
         {
             oldSelection = currentSelection;
@@ -1064,7 +1080,7 @@ namespace InformationTree.Tree
                 }
             }
 
-            if(!removedNode)
+            if (!removedNode)
                 tv.Nodes.Remove(oldSelection);
 
             var currentSelectionTagData = currentSelection.Tag as TreeNodeData;
@@ -1076,11 +1092,12 @@ namespace InformationTree.Tree
             else
                 currentSelection.Nodes.Add(oldSelection);
         }
+
         #endregion Node move
 
         public static void UpdateSizeOfTreeNodes(TreeNodeCollection treeNodeCollection, float changedSize)
         {
-            foreach(TreeNode node in treeNodeCollection)
+            foreach (TreeNode node in treeNodeCollection)
             {
                 if (node.NodeFont != null)
                     node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);

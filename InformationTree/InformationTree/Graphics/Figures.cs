@@ -209,7 +209,8 @@ namespace InformationTree.Graphics
                     var _r = double.Parse(words[3]);
                     Move(_position, _x, _y, _r);
                     break;
-            }        }
+            }
+        }
 
         public void SetPoints(int _position, int _points)
         {
@@ -228,7 +229,8 @@ namespace InformationTree.Graphics
                     SetPoints(_position, _points);
                     break;
             }
-        }    
+        }
+
         public void SetColor(int _position, double _r, double _g, double _b)
         {
             if (FigureList != null && FigureList.Count > _position && _position >= 0)

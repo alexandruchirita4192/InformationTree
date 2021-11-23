@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace RicherTextBox
 {
     public partial class FindForm : Form
     {
-        int lastFound = 0;
-        RichTextBox rtbInstance = null;
+        private int lastFound = 0;
+        private RichTextBox rtbInstance = null;
+
         public RichTextBox RtbInstance
         {
             set { rtbInstance = value; }
@@ -30,7 +26,7 @@ namespace RicherTextBox
             this.TopMost = true;
         }
 
-        void rtbInstance_SelectionChanged(object sender, EventArgs e)
+        private void rtbInstance_SelectionChanged(object sender, EventArgs e)
         {
             lastFound = rtbInstance.SelectionStart;
         }
@@ -58,7 +54,6 @@ namespace RicherTextBox
                 MessageBox.Show("Search string not found", "Find", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 lastFound = 0;
             }
-
         }
 
         private void FindForm_Load(object sender, EventArgs e)

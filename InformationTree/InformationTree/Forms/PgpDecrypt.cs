@@ -1,13 +1,6 @@
 ﻿using InformationTree.PgpEncryption;
-using InformationTree.TextProcessing;
 using InformationTree.Tree;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -15,6 +8,7 @@ namespace InformationTree.Forms
     public partial class PgpDecrypt : Form
     {
         #region Properties
+
         public string PgpPassword
         {
             get
@@ -27,7 +21,6 @@ namespace InformationTree.Forms
 
         public string PgpPrivateKeyFile;
         public string PgpPrivateKeyText;
-
 
         #endregion Properties
 
@@ -133,6 +126,5 @@ namespace InformationTree.Forms
         {
             PgpPrivateKeyFile = PGPEncryptDecrypt.GetPrivateKeyFile();
         }
-
     }
 }

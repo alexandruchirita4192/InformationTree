@@ -20,6 +20,7 @@ namespace InformationTree.Graphics
             {
                 case FigureType.None:
                     break;
+
                 case FigureType.Text:
                     switch (words.Length)
                     {
@@ -27,11 +28,13 @@ namespace InformationTree.Graphics
                             // TextFigure Text X Y
                             ret = new TextFigure(words[1], int.Parse(words[2]), int.Parse(words[3]));
                             break;
+
                         case 7:
                             // TextFigure Text X Y R G B
                             ret = new TextFigure(words[1], int.Parse(words[2]),
                                 int.Parse(words[3]), int.Parse(words[4]), int.Parse(words[5]), int.Parse(words[6]));
                             break;
+
                         case 9:
                             // TextFigure Text X Y Font Size R G B
                             ret = new TextFigure(
@@ -40,6 +43,7 @@ namespace InformationTree.Graphics
                             break;
                     }
                     break;
+
                 case FigureType.Arc:
                     switch (words.Length)
                     {
@@ -52,6 +56,7 @@ namespace InformationTree.Graphics
                                 0f,
                                 0.5f);
                             break;
+
                         case 6:
                             // ArcFigure X Y R ThetaFrom ThetaTo
                             ret = new ArcFigure(
@@ -63,6 +68,7 @@ namespace InformationTree.Graphics
                             break;
                     }
                     break;
+
                 case FigureType.Point:
                     switch (words.Length)
                     {
@@ -70,12 +76,14 @@ namespace InformationTree.Graphics
                             // Point X Y Radius
                             ret = new Figure(1, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
                             break;
+
                         case 5:
                             // Point X Y Radius Rotation
                             ret = new Figure(1, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
                             break;
                     }
                     break;
+
                 case FigureType.Line:
                     switch (words.Length)
                     {
@@ -83,6 +91,7 @@ namespace InformationTree.Graphics
                             // Line X Y Radius
                             ret = new Figure(2, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
                             break;
+
                         case 5:
                             // Line X Y Radius Rotation
                             ret = new Figure(2, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
@@ -90,6 +99,7 @@ namespace InformationTree.Graphics
                     }
                     break;
                     break;
+
                 case FigureType.Circle:
                     switch (words.Length)
                     {
@@ -97,12 +107,14 @@ namespace InformationTree.Graphics
                             // Circle X Y Radius
                             ret = new Figure(0, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
                             break;
+
                         case 5:
                             // Circle X Y Radius Rotation
                             ret = new Figure(0, double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
                             break;
                     }
                     break;
+
                 case FigureType.Polygon:
                 case FigureType.Figure:
                     switch (words.Length)
@@ -112,6 +124,7 @@ namespace InformationTree.Graphics
                             // Polygon Points X Y Radius
                             ret = new Figure(int.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]), double.Parse(words[4]));
                             break;
+
                         case 6:
                             // Figure Points X Y Radius Rotation
                             // Polygon Points X Y Radius Rotation
@@ -123,5 +136,5 @@ namespace InformationTree.Graphics
 
             return ret;
         }
-}
+    }
 }

@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Web;
 
 namespace InformationTree.TextProcessing
@@ -105,7 +103,7 @@ namespace InformationTree.TextProcessing
 
             if (text.Length <= charsCount)
                 return text;
-            
+
             return new String(text.Take(charsCount).ToArray()) + "[...]";
         }
 
@@ -119,7 +117,7 @@ namespace InformationTree.TextProcessing
                 var urlDecodedBytes = HttpServerUtility.UrlTokenDecode(data);
                 if (urlDecodedBytes == null)
                     return data;
-                
+
                 using (var outputStream = Decompress(urlDecodedBytes))
                 using (var sr = new StreamReader(outputStream))
                     return sr.ReadToEnd();
@@ -131,7 +129,6 @@ namespace InformationTree.TextProcessing
 
         public static string GetCompressedData(string data)
         {
-
             if (String.IsNullOrEmpty(data))
                 return data;
 

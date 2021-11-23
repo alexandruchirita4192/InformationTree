@@ -1,19 +1,13 @@
 ﻿using InformationTree.Graphics;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using D = System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Threading.Tasks;
+using D = System.Drawing;
 
 namespace InformationTree.Forms
 {
     public partial class CanvasPopUpForm : Form
     {
-        int op, nr, x, y, r;
+        private int op, nr, x, y, r;
         public Timer RunTimer;
         public GraphicsFile GraphicsFile;
         private D.BufferedGraphicsContext context;
@@ -89,7 +83,7 @@ namespace InformationTree.Forms
             //}
             //ticks++;
 
-            if(grafx != null && !IsDisposed)
+            if (grafx != null && !IsDisposed)
             {
                 UpdateGraphics(grafx.Graphics);
                 grafx.Render(D.Graphics.FromHwnd(this.Handle));
@@ -98,7 +92,6 @@ namespace InformationTree.Forms
             if (RunTimer != null)
                 RunTimer.Start();
         }
-
 
         private void CanvasPopUpForm_Resize(object sender, EventArgs e)
         {
@@ -147,15 +140,16 @@ namespace InformationTree.Forms
 
         private void CanvasPopUpForm_KeyDown(object sender, KeyEventArgs e)
         {
-            switch(e.KeyCode)
+            switch (e.KeyCode)
             {
                 case Keys.D1:
                 case Keys.NumPad1:
-                    if(op == 0)
-                       GraphicsFile.GoToFrame("0");
+                    if (op == 0)
+                        GraphicsFile.GoToFrame("0");
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 1;
                     break;
+
                 case Keys.D2:
                 case Keys.NumPad2:
                     if (op == 0)
@@ -163,6 +157,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 1;
                     break;
+
                 case Keys.D3:
                 case Keys.NumPad3:
                     if (op == 0)
@@ -170,6 +165,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 2;
                     break;
+
                 case Keys.D4:
                 case Keys.NumPad4:
                     if (op == 0)
@@ -177,6 +173,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 3;
                     break;
+
                 case Keys.D5:
                 case Keys.NumPad5:
                     if (op == 0)
@@ -184,6 +181,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 4;
                     break;
+
                 case Keys.D6:
                 case Keys.NumPad6:
                     if (op == 0)
@@ -191,6 +189,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 5;
                     break;
+
                 case Keys.D7:
                 case Keys.NumPad7:
                     if (op == 0)
@@ -198,6 +197,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 6;
                     break;
+
                 case Keys.D8:
                 case Keys.NumPad8:
                     if (op == 0)
@@ -205,6 +205,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 7;
                     break;
+
                 case Keys.D9:
                 case Keys.NumPad9:
                     if (op == 0)
@@ -212,6 +213,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 8;
                     break;
+
                 case Keys.D0:
                 case Keys.NumPad0:
                     if (op == 0)
@@ -219,6 +221,7 @@ namespace InformationTree.Forms
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 9;
                     break;
+
                 case Keys.F: // figure
                     op = 1; nr = 0;
                     break;
@@ -235,35 +238,39 @@ namespace InformationTree.Forms
                 //    op = 5;nr = 0;
                 //    break;
                 case Keys.Enter:
-                    if(op == 1)
+                    if (op == 1)
                     {
                         x = nr;
                         nr = 0;
                         op++;
                     }
-                    else if(op == 2)
+                    else if (op == 2)
                     {
                         y = nr;
                         nr = 0;
                         op++;
                     }
-                    else if(op == 3)
+                    else if (op == 3)
                     {
                         r = nr;
                         nr = 0;
                     }
                     break;
+
                 case Keys.Left:
                     GraphicsFile.ChangeToPreviousFrame();
                     break;
+
                 case Keys.Right:
                     GraphicsFile.ChangeToNextFrame("true");
                     break;
+
                 case Keys.Q:
                 case Keys.X:
                 case Keys.Escape:
                     Close();
                     break;
+
                 case Keys.D:
 
                     break;

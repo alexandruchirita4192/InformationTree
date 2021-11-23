@@ -1,18 +1,17 @@
-﻿using System;
-using System.Windows.Forms;
-using InformationTree.Forms;
-using InformationTree.Tree;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+﻿using InformationTree.Forms;
 using InformationTree.Sound;
+using InformationTree.Tree;
+using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace InformationTree
 {
-    static class Program
+    internal static class Program
     {
         #region extern
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, ExactSpelling = true, SetLastError = true)]
         public static extern void MoveWindow(IntPtr hwnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
@@ -21,6 +20,7 @@ namespace InformationTree
         #region MainForm
 
         public static MainForm _mainForm;
+
         public static MainForm MainForm
         {
             get
@@ -38,7 +38,7 @@ namespace InformationTree
 
         #endregion MainForm
 
-        static Timer AutoSaveTimer;
+        private static Timer AutoSaveTimer;
 
         public static void CenterForm(Form form, Form parentForm)
         {
@@ -90,9 +90,8 @@ namespace InformationTree
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
-            
             Application.EnableVisualStyles();
             try
             {
@@ -126,7 +125,7 @@ namespace InformationTree
                     SoundHelper.PlaySystemSound(4);
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo);
 
-                    if(result == DialogResult.No)
+                    if (result == DialogResult.No)
                     {
                         TreeNodeHelper.IsSafeToSave = true;
                         TreeNodeHelper.TreeUnchanged = false;
@@ -139,7 +138,7 @@ namespace InformationTree
 
                     SoundHelper.PlaySystemSound(4);
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo);
-                    if(result == DialogResult.Yes && !TreeNodeHelper.IsSafeToSave)
+                    if (result == DialogResult.Yes && !TreeNodeHelper.IsSafeToSave)
                         TreeNodeHelper.IsSafeToSave = true;
                     if (result == DialogResult.No)
                     {

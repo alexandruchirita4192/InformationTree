@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using D = System.Drawing;
 
 namespace InformationTree.Graphics
@@ -19,6 +18,7 @@ namespace InformationTree.Graphics
                 return Figures != null ? Figures.CenterPoint : new D.Point();
             }
         }
+
         public D.Point RealCenterPoint
         {
             get
@@ -31,9 +31,16 @@ namespace InformationTree.Graphics
 
         #region Constructor
 
-        public Frame() : this(true) { }
-        public Frame(bool isActive) : this(isActive, null) { }
-        public Frame(bool isActive, Frame nextFrame) { IsActive = isActive; NextFrame = nextFrame; Figures = new Figures(); }
+        public Frame() : this(true)
+        {
+        }
+
+        public Frame(bool isActive) : this(isActive, null)
+        {
+        }
+
+        public Frame(bool isActive, Frame nextFrame)
+        { IsActive = isActive; NextFrame = nextFrame; Figures = new Figures(); }
 
         #endregion Constructor
 
@@ -42,7 +49,7 @@ namespace InformationTree.Graphics
         public void NewFrame()
         {
             Frame c = this;
-            while(c.NextFrame != null)
+            while (c.NextFrame != null)
             {
                 c.IsActive = false;
                 c = c.NextFrame;
@@ -64,7 +71,7 @@ namespace InformationTree.Graphics
         public bool ChangeToNextFrame(bool addNewFrameIfNextFrameIsNull = true)
         {
             Frame c = this;
-            while(c.NextFrame != null)
+            while (c.NextFrame != null)
             {
                 if (c.IsActive)
                     break;
@@ -101,7 +108,7 @@ namespace InformationTree.Graphics
 
         public void CycleFramesFromThis()
         {
-            if(!ChangeToNextFrame(false))
+            if (!ChangeToNextFrame(false))
                 InactivateFramesAndReactivateThis();
         }
 
@@ -120,7 +127,7 @@ namespace InformationTree.Graphics
 
             c = this;
             //activam frame-ul pe care il vrem
-            while((position != 0) && (c.NextFrame != null))
+            while ((position != 0) && (c.NextFrame != null))
             {
                 position--;
                 c = c.NextFrame;
@@ -175,7 +182,6 @@ namespace InformationTree.Graphics
             return GetFirstActiveFrame() != null;
         }
 
-
         public Frame GetFirstActiveFrame()
         {
             Frame c = this;
@@ -195,7 +201,7 @@ namespace InformationTree.Graphics
             this.IsActive = frame == null ? true : this.IsActive; // fix IsActive
             return frame ?? this;
         }
-        
+
         public void InactivateFramesAndReactivateThis()
         {
             Frame c = this;

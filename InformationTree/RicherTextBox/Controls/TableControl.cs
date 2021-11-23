@@ -8,18 +8,23 @@ namespace RicherTextBox.Controls
     public partial class TableControl : UserControl
     {
         #region Consts
-        const string TableSignature = "Table";
-        const string DefaultSplitter = "#";
+
+        private const string TableSignature = "Table";
+        private const string DefaultSplitter = "#";
+
         #endregion Consts
 
         #region Properties
+
         private BindingSource bindingSource;
         private DataTable dataTable;
         private RicherTextBox parent;
         private int selectionStart, selectionLength;
+
         #endregion Properties
 
         #region Constructors
+
         public TableControl()
         {
             InitializeComponent();
@@ -33,7 +38,7 @@ namespace RicherTextBox.Controls
             selectionStart = parent != null ? parent.TextBox.SelectionStart : 0;
             selectionLength = parent != null ? parent.TextBox.SelectionLength : 0;
 
-            if(parent != null)
+            if (parent != null)
             {
                 parent.TextBox.Controls.Add(this);
                 TextBox_Resize(this, EventArgs.Empty);
@@ -66,9 +71,11 @@ namespace RicherTextBox.Controls
             : this(GetDataTableFromString(initializationData), parent)
         {
         }
+
         #endregion Constructors
 
         #region Methods
+
         public static DataTable GetDataTableFromString(string initializationData)
         {
             var dataTable = new DataTable();
@@ -100,8 +107,8 @@ namespace RicherTextBox.Controls
             foreach (var line in lines)
             {
                 var items = line.Split(splitter, StringSplitOptions.None);
-                
-                if(dataTable.Columns.Count < items.Length)
+
+                if (dataTable.Columns.Count < items.Length)
                     for (int i = dataTable.Columns.Count; i < items.Length; i++)
                         dataTable.Columns.Add(new DataColumn("Column " + i.ToString(), typeof(string)));
 
@@ -121,7 +128,7 @@ namespace RicherTextBox.Controls
             var result = TableSignature + DefaultSplitter + Environment.NewLine;
             splitter = string.IsNullOrEmpty(splitter) ? DefaultSplitter : splitter;
 
-            foreach(DataRow row in dataTableRef.Rows)
+            foreach (DataRow row in dataTableRef.Rows)
                 result += string.Join(splitter, row.ItemArray) + Environment.NewLine;
 
             return string.IsNullOrEmpty(result) ? string.Empty : result;
@@ -137,7 +144,7 @@ namespace RicherTextBox.Controls
 
         private void btnSaveTableData_Click(object sender, EventArgs e)
         {
-            if(parent != null)
+            if (parent != null)
             {
                 parent.TextBox.SelectionStart = selectionStart;
                 parent.TextBox.SelectionLength = selectionLength;
@@ -161,6 +168,7 @@ namespace RicherTextBox.Controls
 
             base.Dispose();
         }
+
         #endregion Methods
     }
 }

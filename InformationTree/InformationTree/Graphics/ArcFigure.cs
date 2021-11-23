@@ -1,4 +1,4 @@
-﻿using D=System.Drawing;
+﻿using D = System.Drawing;
 
 namespace InformationTree.Graphics
 {

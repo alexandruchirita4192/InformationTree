@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Text;
-using System.Windows.Forms;
 using System.IO;
+using System.Windows.Forms;
 
 namespace RicherTextBox.Controls
 {
     public partial class RicherTextBox : UserControl
     {
         #region Settings
+
         private int indent = 10;
+
         [Category("Settings")]
         [Description("Value indicating the number of characters used for indentation")]
         public int INDENT
@@ -20,9 +19,11 @@ namespace RicherTextBox.Controls
             get { return indent; }
             set { indent = value; }
         }
-        #endregion
+
+        #endregion Settings
 
         #region Properties for toolstrip items visibility
+
         [Category("Global visibility")]
         public bool GlobalVisibility
         {
@@ -31,23 +32,24 @@ namespace RicherTextBox.Controls
             {
                 Visible = value;
 
-                if(Controls != null)
+                if (Controls != null)
                     foreach (Control control in Controls)
                     {
                         control.Visible = value;
 
-                        if(control != null && control.Controls != null)
+                        if (control != null && control.Controls != null)
                             foreach (Control ctrl in control.Controls)
                             {
                                 ctrl.Visible = value;
 
-                                if(ctrl != null && ctrl.Controls != null)
+                                if (ctrl != null && ctrl.Controls != null)
                                     foreach (Control c in ctrl.Controls)
                                         c.Visible = value;
                             }
                     }
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupSaveAndLoadVisible
         {
@@ -60,6 +62,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator6.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupFontNameAndSizeVisible
         {
@@ -73,6 +76,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator1.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupBoldUnderlineItalicVisible
         {
@@ -86,6 +90,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator2.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupAlignmentVisible
         {
@@ -99,6 +104,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator3.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupFontColorVisible
         {
@@ -111,6 +117,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator4.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupIndentationAndBulletsVisible
         {
@@ -124,6 +131,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator5.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupInsertVisible
         {
@@ -135,6 +143,7 @@ namespace RicherTextBox.Controls
                 toolStripSeparator7.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool GroupZoomVisible
         {
@@ -147,12 +156,14 @@ namespace RicherTextBox.Controls
                 tstxtZoomFactor.Visible = value;
             }
         }
+
         [Category("Toolstip items visibility")]
         public bool ToolStripVisible
         {
             get { return toolStripMenu.Visible; }
             set { toolStripMenu.Visible = value; }
         }
+
         [Category("Toolstip items visibility")]
         public bool FindReplaceVisible
         {
@@ -166,203 +177,235 @@ namespace RicherTextBox.Controls
             get { return tsbtnSave.Visible; }
             set { tsbtnSave.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool LoadVisible
         {
             get { return tsbtnOpen.Visible; }
             set { tsbtnOpen.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorSaveLoadVisible
         {
             get { return toolStripSeparator6.Visible; }
             set { toolStripSeparator6.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool FontFamilyVisible
         {
             get { return tscmbFont.Visible; }
             set { tscmbFont.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool FontSizeVisible
         {
             get { return tscmbFontSize.Visible; }
             set { tscmbFontSize.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool ChooseFontVisible
         {
             get { return tsbtnChooseFont.Visible; }
             set { tsbtnChooseFont.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorFontVisible
         {
             get { return toolStripSeparator1.Visible; }
             set { toolStripSeparator1.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool BoldVisible
         {
             get { return tsbtnBold.Visible; }
             set { tsbtnBold.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool ItalicVisible
         {
             get { return tsbtnItalic.Visible; }
             set { tsbtnItalic.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool UnderlineVisible
         {
             get { return tsbtnUnderline.Visible; }
             set { tsbtnUnderline.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorBoldUnderlineItalicVisible
         {
             get { return toolStripSeparator2.Visible; }
             set { toolStripSeparator2.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool AlignLeftVisible
         {
             get { return tsbtnAlignLeft.Visible; }
             set { tsbtnAlignLeft.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool AlignRightVisible
         {
             get { return tsbtnAlignRight.Visible; }
             set { tsbtnAlignRight.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool AlignCenterVisible
         {
             get { return tsbtnAlignCenter.Visible; }
             set { tsbtnAlignCenter.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorAlignVisible
         {
             get { return toolStripSeparator3.Visible; }
             set { toolStripSeparator3.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool FontColorVisible
         {
             get { return tsbtnFontColor.Visible; }
             set { tsbtnFontColor.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool WordWrapVisible
         {
             get { return tsbtnWordWrap.Visible; }
             set { tsbtnWordWrap.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorFontColorVisible
         {
             get { return toolStripSeparator4.Visible; }
             set { toolStripSeparator4.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool IndentVisible
         {
             get { return tsbtnIndent.Visible; }
             set { tsbtnIndent.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool OutdentVisible
         {
             get { return tsbtnOutdent.Visible; }
             set { tsbtnOutdent.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool BulletsVisible
         {
             get { return tsbtnBullets.Visible; }
             set { tsbtnBullets.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorIndentAndBulletsVisible
         {
             get { return toolStripSeparator5.Visible; }
             set { toolStripSeparator5.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool InsertPictureVisible
         {
             get { return tsbtnInsertPicture.Visible; }
             set { tsbtnInsertPicture.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorInsertVisible
         {
             get { return toolStripSeparator7.Visible; }
             set { toolStripSeparator7.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool ZoomInVisible
         {
             get { return tsbtnZoomIn.Visible; }
             set { tsbtnZoomIn.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool ZoomOutVisible
         {
             get { return tsbtnZoomOut.Visible; }
             set { tsbtnZoomOut.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool ZoomFactorTextVisible
         {
             get { return tstxtZoomFactor.Visible; }
             set { tstxtZoomFactor.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool SeparatorNewButtonsVisible
         {
             get { return toolStripMenuItem5.Visible; }
             set { toolStripMenuItem5.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool TableVisible
         {
             get { return tsbtnTable.Visible; }
             set { tsbtnTable.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool CalculateVisible
         {
             get { return tsbtnCalculate.Visible; }
             set { tsbtnCalculate.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool EncryptDecryptCategoryVisible
         {
             get { return encryptDecryptToolStripMenuItem.Visible; }
             set { encryptDecryptToolStripMenuItem.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool EncryptVisible
         {
             get { return tsbtnEncrypt.Visible; }
             set { tsbtnEncrypt.Visible = value; }
         }
+
         [Category("Toolstrip single items visibility")]
         public bool DecryptVisible
         {
             get { return tsbtnDecrypt.Visible; }
             set { tsbtnDecrypt.Visible = value; }
         }
-        
-            
-        #endregion
+
+        #endregion Properties for toolstrip items visibility
 
         #region data properties
+
         [Category("Text length")]
         [Description("RicherTextBox text length")]
         [Browsable(true)]
@@ -370,7 +413,6 @@ namespace RicherTextBox.Controls
         {
             get { return rtbDocument.TextLength; }
         }
-
 
         [Category("Document data")]
         [Description("RicherTextBox content in plain text")]
@@ -386,7 +428,8 @@ namespace RicherTextBox.Controls
         public string Rtf
         {
             get { return rtbDocument.Rtf; }
-            set {
+            set
+            {
                 if (IsRichText(value))
                 {
                     try { rtbDocument.Rtf = value; } catch (ArgumentException) { rtbDocument.Text = value; }
@@ -403,7 +446,8 @@ namespace RicherTextBox.Controls
             get { return rtbDocument; }
             set { rtbDocument = value; }
         }
-        #endregion
+
+        #endregion data properties
 
         #region Events
 
@@ -419,9 +463,10 @@ namespace RicherTextBox.Controls
             remove { rtbDocument.KeyUp -= value; }
         }
 
-        #endregion
+        #endregion Events
 
         #region Construction and initial loading
+
         public RicherTextBox()
         {
             InitializeComponent();
@@ -450,7 +495,7 @@ namespace RicherTextBox.Controls
             tsbtnWordWrap.Checked = rtbDocument.WordWrap;
         }
 
-        #endregion
+        #endregion Construction and initial loading
 
         #region Toolstrip items handling
 
@@ -628,7 +673,6 @@ namespace RicherTextBox.Controls
             }
         }
 
-
         private void tscmbFontSize_TextChanged(object sender, EventArgs e)
         {
             // font size custom
@@ -761,7 +805,6 @@ namespace RicherTextBox.Controls
                     {
                         MessageBox.Show("Error reading file: \n" + exc_a.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-
                 }
             }
         }
@@ -829,7 +872,7 @@ namespace RicherTextBox.Controls
 
         private void tsbtnEncrypt_Click(object sender, EventArgs e)
         {
-            if(EncryptFunction == null)
+            if (EncryptFunction == null)
                 return;// throw new NotImplementedException();
             rtbDocument.Rtf = EncryptFunction(rtbDocument.Rtf);
         }
@@ -850,7 +893,7 @@ namespace RicherTextBox.Controls
             TableFunction(rtbDocument.SelectedText);
         }
 
-        #endregion
+        #endregion Toolstrip items handling
 
         #region Public methods for accessing the functionality of the RicherTextBox
 
@@ -973,9 +1016,11 @@ namespace RicherTextBox.Controls
         {
             rtbDocument.WordWrap = activated;
         }
-        #endregion
+
+        #endregion Public methods for accessing the functionality of the RicherTextBox
 
         #region Overrides
+
         public override Color BackColor
         {
             get
@@ -1045,10 +1090,11 @@ namespace RicherTextBox.Controls
                 base.AutoSize = value;
             }
         }
-    
-        #endregion
+
+        #endregion Overrides
 
         #region Context menu handlers
+
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             rtbDocument.Cut();
@@ -1091,8 +1137,6 @@ namespace RicherTextBox.Controls
             leftToolStripMenuItem.Checked = true;
             centerToolStripMenuItem.Checked = false;
             rightToolStripMenuItem.Checked = false;
-
-
         }
 
         private void centerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1183,9 +1227,10 @@ namespace RicherTextBox.Controls
             tsbtnDecrypt.PerformClick();
         }
 
-        #endregion
+        #endregion Context menu handlers
 
         #region Find and Replace
+
         private void tsbtnFind_Click(object sender, EventArgs e)
         {
             FindForm findForm = new FindForm();
@@ -1201,7 +1246,7 @@ namespace RicherTextBox.Controls
             replaceForm.InitialText = this.tstxtSearchText.Text;
             replaceForm.Show();
         }
-        #endregion
 
+        #endregion Find and Replace
     }
 }

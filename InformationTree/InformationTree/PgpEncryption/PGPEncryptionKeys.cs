@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Org.BouncyCastle.Bcpg.OpenPgp;
+using System;
 using System.IO;
 using System.Linq;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace InformationTree.PgpEncryption
 {

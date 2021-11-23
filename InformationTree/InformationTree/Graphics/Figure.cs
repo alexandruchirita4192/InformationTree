@@ -102,7 +102,6 @@ namespace InformationTree.Graphics
             }
         }
 
-
         public void Move(double _x, double _y, double _r)
         {
             if (Points == 0 || Points > 1)

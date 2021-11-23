@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Media;
-using System.Text;
+﻿using System.Media;
 
 namespace InformationTree.Sound
 {
@@ -21,24 +17,28 @@ namespace InformationTree.Sound
 
         public static void PlaySystemSound(string soundName)
         {
-            switch((soundName ?? "").ToLowerInvariant())
+            switch ((soundName ?? "").ToLowerInvariant())
             {
                 case "1":
                 case "asterisk":
                     SystemSounds.Asterisk.Play();
                     break;
+
                 case "2":
                 case "beep":
                     SystemSounds.Beep.Play();
                     break;
+
                 case "3":
                 case "exclamation":
                     SystemSounds.Exclamation.Play();
                     break;
+
                 case "4":
                 case "hand":
                     SystemSounds.Hand.Play();
                     break;
+
                 case "5":
                 case "question":
                     SystemSounds.Question.Play();
