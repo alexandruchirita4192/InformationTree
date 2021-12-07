@@ -98,7 +98,6 @@ namespace InformationTree.Graphics
                             break;
                     }
                     break;
-                    break;
 
                 case FigureType.Circle:
                     switch (words.Length)
