@@ -350,9 +350,9 @@ namespace InformationTree.Tree
 
             var font = from.NodeFont;
             to.NodeFont = font != null ? new Font(font.FontFamily, font.SizeInPoints, font.Style) : MainForm.DefaultFont;
-            
-            to.ForeColor = from.ForeColor;
-            to.BackColor = from.BackColor;
+
+            to.ForeColor = from.ForeColor.IsEmpty ? DefaultForeGroundColor : from.ForeColor;
+            to.BackColor = from.BackColor.IsEmpty ? DefaultBackGroundColor : from.BackColor;
 
             foreach (TreeNode node in from.Nodes)
                 CopyNode(to.Nodes, node, addedNumberHigherThan, addedNumberLowerThan, type);
