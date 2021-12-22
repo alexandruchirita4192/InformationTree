@@ -504,7 +504,7 @@ namespace RicherTextBox.Controls
             // bold, italic, underline, strikeout
             try
             {
-                if (!(rtbDocument.SelectionFont == null))
+                if (rtbDocument.SelectionFont != null)
                 {
                     Font currentFont = rtbDocument.SelectionFont;
                     FontStyle newFontStyle = rtbDocument.SelectionFont.Style;

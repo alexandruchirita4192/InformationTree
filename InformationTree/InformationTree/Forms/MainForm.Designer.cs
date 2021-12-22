@@ -664,7 +664,7 @@
             this.clbStyle.FormattingEnabled = true;
             this.clbStyle.Location = new System.Drawing.Point(10, 68);
             this.clbStyle.Name = "clbStyle";
-            this.clbStyle.Size = new System.Drawing.Size(184, 64);
+            this.clbStyle.Size = new System.Drawing.Size(184, 79);
             this.clbStyle.TabIndex = 12;
             this.clbStyle.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbStyle_ItemCheck);
             // 

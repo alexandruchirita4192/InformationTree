@@ -349,18 +349,10 @@ namespace InformationTree.Tree
             to.Name = from.Name;
 
             var font = from.NodeFont;
-            if (font != null)
-                to.NodeFont = new Font(font.FontFamily, font.SizeInPoints, font.Style);
-
-            if (from.ForeColor != null)
-                to.ForeColor = from.ForeColor;
-            else
-                to.ForeColor = DefaultForeGroundColor;
-
-            if (from.BackColor != null)
-                to.BackColor = from.BackColor;
-            else
-                to.BackColor = DefaultBackGroundColor;
+            to.NodeFont = font != null ? new Font(font.FontFamily, font.SizeInPoints, font.Style) : MainForm.DefaultFont;
+            
+            to.ForeColor = from.ForeColor;
+            to.BackColor = from.BackColor;
 
             foreach (TreeNode node in from.Nodes)
                 CopyNode(to.Nodes, node, addedNumberHigherThan, addedNumberLowerThan, type);
@@ -1099,10 +1091,7 @@ namespace InformationTree.Tree
         {
             foreach (TreeNode node in treeNodeCollection)
             {
-                if (node.NodeFont != null)
-                    node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);
-                else
-                    node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);
+                node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);
             }
         }
     }

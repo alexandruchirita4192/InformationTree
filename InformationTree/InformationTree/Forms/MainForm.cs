@@ -118,7 +118,7 @@ namespace InformationTree.Forms
 
         #region Constants
 
-        private new static readonly Font DefaultFont = new Font(FontFamily.GenericSansSerif, 8.5F, FontStyle.Regular);
+        public new static readonly Font DefaultFont = new Font(FontFamily.GenericSansSerif, 8.5F, FontStyle.Regular);
 
         #endregion Constants
 
@@ -277,54 +277,46 @@ namespace InformationTree.Forms
                 {
                     if (node != null && node.NodeFont != null)
                     {
-                        int idx = clbStyle.Items.IndexOf(FontStyle.Regular);
-                        if ((!clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx)))
-                            clbStyle.SetItemCheckState(idx, CheckState.Checked);
+                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Regular);
+                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Italic);
+                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Bold);
+                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Strikeout);
+                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Underline);
 
-                        idx = clbStyle.Items.IndexOf(FontStyle.Italic);
-                        if (((!clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx))) && (node.NodeFont.Style & FontStyle.Italic) != 0)
-                            clbStyle.SetItemCheckState(idx, CheckState.Checked);
-                        else if ((clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx)))
-                            clbStyle.SetItemCheckState(idx, CheckState.Unchecked);
-
-                        idx = clbStyle.Items.IndexOf(FontStyle.Bold);
-                        if (((!clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx))) && ((node.NodeFont.Style & FontStyle.Bold) != 0))
-                            clbStyle.SetItemCheckState(idx, CheckState.Checked);
-                        else if ((clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx)))
-                            clbStyle.SetItemCheckState(idx, CheckState.Unchecked);
-
-                        idx = clbStyle.Items.IndexOf(FontStyle.Strikeout);
-                        if (((!clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx))) && ((node.NodeFont.Style & FontStyle.Strikeout) != 0))
-                            clbStyle.SetItemCheckState(idx, CheckState.Checked);
-                        else if ((clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx)))
-                            clbStyle.SetItemCheckState(idx, CheckState.Unchecked);
-
-                        idx = clbStyle.Items.IndexOf(FontStyle.Underline);
-                        if (((!clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx))) && ((node.NodeFont.Style & FontStyle.Underline) != 0))
-                            clbStyle.SetItemCheckState(idx, CheckState.Checked);
-                        else if ((clbStyle.GetItemChecked(idx)) && (!clbStyle.SelectedIndices.Contains(idx)))
-                            clbStyle.SetItemCheckState(idx, CheckState.Unchecked);
-
+                        // Update font family based on current font
                         if (node.NodeFont.FontFamily != null && cbFontFamily.Items.Count != 0)
                             for (int i = 0; i < cbFontFamily.Items.Count; i++)
                             {
-                                var fontFamily = cbFontFamily.Items[i] as String;
+                                var fontFamily = cbFontFamily.Items[i] as string;
                                 if (fontFamily != null && fontFamily == node.NodeFont.FontFamily.Name)
                                 {
                                     cbFontFamily.SelectedIndex = i;
                                     break;
                                 }
                             }
-
-                        tbTextColor.Text = node.ForeColor.Name;
-                        tbBackgroundColor.Text = node.BackColor.Name;
                     }
+
+                    tbTextColor.Text = node.ForeColor.Name;
+                    tbBackgroundColor.Text = node.BackColor.Name;
                 }
             }
             finally
             {
                 TreeNodeHelper.TreeUnchangedFreeze = false;
             }
+        }
+
+        private void UpdateCheckedListBoxBasedOnFont(TreeNode node, CheckedListBox clb, FontStyle fontStyle)
+        {
+            if (node == null || node.NodeFont == null || clb == null)
+                return;
+
+            int idx = clb.Items.IndexOf(fontStyle);
+            
+            var itemChecked = ((node.NodeFont.Style & fontStyle) != 0) || (node.NodeFont.Style == fontStyle);
+            var checkedState = ((!clb.GetItemChecked(idx)) && itemChecked) || fontStyle == FontStyle.Regular ? CheckState.Checked : CheckState.Unchecked;
+            
+            clb.SetItemCheckState(idx, checkedState);
         }
 
         private void btnNoTask_Click(object sender, EventArgs e)
@@ -389,7 +381,6 @@ namespace InformationTree.Forms
             var taskName = TextProcessingHelper.GetTextAndProcentCompleted(tbTaskName.Text, ref taskPercentCompleted, true);
             var urgency = (int)nudUrgency.Value;
             var link = tbLink.Text;
-            var nodeCategory = string.Empty;
 
             // update part
             var selectedNode = tvTaskList.SelectedNode;
@@ -464,6 +455,9 @@ namespace InformationTree.Forms
             }
 
             UpdateShowUntilNumber();
+
+            // TODO: Fix properly
+            btnUpdateText_Click(sender, e); // workaround fix for some weirdly added spaces
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -599,68 +593,57 @@ namespace InformationTree.Forms
 
         private void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            clbStyle_ItemCheckEntered = true;
-            if (tvTaskList.SelectedNode != null)
+            if (clbStyle_ItemCheckEntered)
+                return;
+
+            try
             {
-                if (clbStyle.SelectedItem != null)
+                clbStyle_ItemCheckEntered = true;
+
+                if (tvTaskList.SelectedNode != null)
                 {
                     var newFontStyle = FontStyle.Regular;
-                    var currentFontStyle = clbStyle.SelectedItem as FontStyle?;
-                    if (currentFontStyle.HasValue)
-                    {
-                        int idx = clbStyle.Items.IndexOf(FontStyle.Regular);
-                        var checkedState = idx == e.Index ? e.NewValue : clbStyle.GetItemCheckState(idx);
-                        if (checkedState == CheckState.Checked)
-                            newFontStyle = newFontStyle | FontStyle.Regular;
 
-                        idx = clbStyle.Items.IndexOf(FontStyle.Italic);
-                        checkedState = idx == e.Index ? e.NewValue : clbStyle.GetItemCheckState(idx);
-                        if (checkedState == CheckState.Checked)
-                            newFontStyle = newFontStyle | FontStyle.Italic;
+                    AppendTheCheckedFontStyleToCurrentFontStyle(e, clbStyle, ref newFontStyle, FontStyle.Italic);
+                    AppendTheCheckedFontStyleToCurrentFontStyle(e, clbStyle, ref newFontStyle, FontStyle.Bold);
+                    AppendTheCheckedFontStyleToCurrentFontStyle(e, clbStyle, ref newFontStyle, FontStyle.Underline);
+                    AppendTheCheckedFontStyleToCurrentFontStyle(e, clbStyle, ref newFontStyle, FontStyle.Strikeout);
 
-                        idx = clbStyle.Items.IndexOf(FontStyle.Bold);
-                        checkedState = idx == e.Index ? e.NewValue : clbStyle.GetItemCheckState(idx);
-                        if (checkedState == CheckState.Checked)
-                            newFontStyle = newFontStyle | FontStyle.Bold;
+                    var font = tvTaskList.SelectedNode.NodeFont ?? tvTaskList.SelectedNode.Parent?.NodeFont ?? DefaultFont;
+                    if (font != null)
+                        tvTaskList.SelectedNode.NodeFont = new Font(font.FontFamily, font.Size, newFontStyle);
 
-                        idx = clbStyle.Items.IndexOf(FontStyle.Underline);
-                        checkedState = idx == e.Index ? e.NewValue : clbStyle.GetItemCheckState(idx);
-                        if (checkedState == CheckState.Checked)
-                            newFontStyle = newFontStyle | FontStyle.Underline;
+                    var backColor = tvTaskList.SelectedNode.BackColor;
+                    tvTaskList.SelectedNode.BackColor = backColor != null && !backColor.IsEmpty ? backColor : TreeNodeHelper.DefaultBackGroundColor;
+                    var foreColor = tvTaskList.SelectedNode.ForeColor;
+                    tvTaskList.SelectedNode.ForeColor = foreColor != null && !foreColor.IsEmpty ? foreColor : TreeNodeHelper.DefaultForeGroundColor;
 
-                        idx = clbStyle.Items.IndexOf(FontStyle.Strikeout);
-                        checkedState = idx == e.Index ? e.NewValue : clbStyle.GetItemCheckState(idx);
-                        if (checkedState == CheckState.Checked)
-                            newFontStyle = newFontStyle | FontStyle.Strikeout;
+                    var nodeData = tvTaskList.SelectedNode.Tag as TreeNodeData ?? new TreeNodeData();
+                    nodeData.LastChangeDate = DateTime.Now;
+                    tvTaskList.SelectedNode.Tag = nodeData; // set for newly created TreeNodeData instances
 
-                        var font = tvTaskList.SelectedNode.NodeFont ?? (tvTaskList.SelectedNode.Parent != null ? tvTaskList.SelectedNode.Parent.NodeFont : null);
-                        var backColor = tvTaskList.SelectedNode.BackColor;
-                        var foreColor = tvTaskList.SelectedNode.ForeColor;
+                    tvTaskList_AfterSelect(sender, new TreeViewEventArgs(tvTaskList.SelectedNode));
 
-                        if (font != null)
-                        {
-                            tvTaskList.SelectedNode.NodeFont = new Font(font.FontFamily, font.Size, newFontStyle);
-                            tvTaskList.SelectedNode.BackColor = backColor != null && !backColor.IsEmpty ? backColor : TreeNodeHelper.DefaultBackGroundColor;
-                            tvTaskList.SelectedNode.ForeColor = foreColor != null && !foreColor.IsEmpty ? foreColor : TreeNodeHelper.DefaultForeGroundColor;
-                        }
-
-                        var nodeData = tvTaskList.SelectedNode.Tag as TreeNodeData;
-                        if (nodeData != null)
-                            nodeData.LastChangeDate = DateTime.Now;
-                        else
-                        {
-                            nodeData = new TreeNodeData();
-                            nodeData.LastChangeDate = DateTime.Now;
-                            tvTaskList.SelectedNode.Tag = nodeData;
-                        }
-
-                        tvTaskList_AfterSelect(sender, new TreeViewEventArgs(tvTaskList.SelectedNode));
-
-                        TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
-                    }
+                    TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
                 }
+
             }
-            clbStyle_ItemCheckEntered = false;
+            finally
+            {
+                clbStyle_ItemCheckEntered = false;
+            }
+        }
+
+        private FontStyle AppendTheCheckedFontStyleToCurrentFontStyle(ItemCheckEventArgs e, CheckedListBox clb, ref FontStyle currentFontStyle, FontStyle checkedFontStyle)
+        {
+            if (e == null || clb == null)
+                return currentFontStyle;
+
+            var idx = clb.Items.IndexOf(checkedFontStyle);
+            var checkedState = idx == e.Index ? e.NewValue : clb.GetItemCheckState(idx);
+            if (checkedState == CheckState.Checked)
+                currentFontStyle = currentFontStyle | checkedFontStyle;
+            return currentFontStyle;
         }
 
         private void tbTextColor_TextChanged(object sender, EventArgs e)
