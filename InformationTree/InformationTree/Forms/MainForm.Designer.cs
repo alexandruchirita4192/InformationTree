@@ -210,15 +210,6 @@
             this.tvTaskList.Name = "tvTaskList";
             this.tvTaskList.Size = new System.Drawing.Size(951, 552);
             this.tvTaskList.TabIndex = 3;
-            this.tvTaskList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvTaskList_AfterSelect);
-            this.tvTaskList.FontChanged += new System.EventHandler(this.tvTaskList_FontChanged);
-            this.tvTaskList.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.tvTaskList_ControlAdded);
-            this.tvTaskList.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.tvTaskList_ControlRemoved);
-            this.tvTaskList.DoubleClick += new System.EventHandler(this.tvTaskList_DoubleClick);
-            this.tvTaskList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tvTaskList_KeyDown);
-            this.tvTaskList.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
-            this.tvTaskList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tvTaskList_MouseClick);
-            this.tvTaskList.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tvTaskList_MouseMove);
             // 
             // gbTaskList
             // 
@@ -666,7 +657,6 @@
             this.clbStyle.Name = "clbStyle";
             this.clbStyle.Size = new System.Drawing.Size(184, 79);
             this.clbStyle.TabIndex = 12;
-            this.clbStyle.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.clbStyle_ItemCheck);
             // 
             // cbFontFamily
             // 
@@ -676,7 +666,6 @@
             this.cbFontFamily.Name = "cbFontFamily";
             this.cbFontFamily.Size = new System.Drawing.Size(124, 21);
             this.cbFontFamily.TabIndex = 11;
-            this.cbFontFamily.SelectedIndexChanged += new System.EventHandler(this.cbFontFamily_SelectedIndexChanged);
             // 
             // lblFontSize
             // 
@@ -706,7 +695,6 @@
             this.nudFontSize.Size = new System.Drawing.Size(124, 20);
             this.nudFontSize.TabIndex = 6;
             this.nudFontSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudFontSize.ValueChanged += new System.EventHandler(this.nudFontSize_ValueChanged);
             // 
             // tbTaskDetails
             // 

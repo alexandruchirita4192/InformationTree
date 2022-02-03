@@ -36,7 +36,7 @@ namespace InformationTree.Forms
             nudShowToUrgencyNumber.Maximum = 100;
             nudShowToUrgencyNumber.Value = 100;
 
-            this.AcceptButton = this.btnAddTask;
+            AcceptButton = btnAddTask;
 
             if (cbFontFamily.Items.Count == 0)
                 foreach (var fontFamily in FontFamily.Families)
@@ -73,9 +73,72 @@ namespace InformationTree.Forms
                 lblUnchanged.Text = (a ? "Tree unchanged (do not save)" : "Tree changed (save)");
             };
 
-            this.MouseWheel += tvTaskList_MouseClick;
             IsControlPressed = false;
             StartPosition = FormStartPosition.CenterScreen;
+
+            InitializeComponent_AddEvents();
+        }
+
+        private void InitializeComponent_AddEvents()
+        {
+            if (IsDisposed)
+                return;
+            MouseWheel += tvTaskList_MouseClick;
+
+            if (tvTaskList == null)
+                return;
+            tvTaskList.AfterSelect += tvTaskList_AfterSelect;
+            tvTaskList.FontChanged += tvTaskList_FontChanged;
+            tvTaskList.ControlAdded += tvTaskList_ControlAdded;
+            tvTaskList.ControlRemoved += tvTaskList_ControlRemoved;
+            tvTaskList.DoubleClick += tvTaskList_DoubleClick;
+            tvTaskList.KeyDown += tvTaskList_KeyDown;
+            tvTaskList.KeyUp += MainForm_KeyUp;
+            tvTaskList.MouseClick += tvTaskList_MouseClick;
+            tvTaskList.MouseMove += tvTaskList_MouseMove;
+
+            if (clbStyle == null)
+                return;
+            clbStyle.ItemCheck += clbStyle_ItemCheck;
+
+            if (cbFontFamily == null)
+                return;
+            cbFontFamily.SelectedIndexChanged += cbFontFamily_SelectedIndexChanged;
+
+            if (nudFontSize == null)
+                return;
+            nudFontSize.ValueChanged += nudFontSize_ValueChanged;
+        }
+
+        private void InitializeComponent_RemoveEvents()
+        {
+            if (IsDisposed)
+                return;
+            MouseWheel -= tvTaskList_MouseClick;
+
+            if (tvTaskList == null)
+                return;
+            tvTaskList.AfterSelect -= tvTaskList_AfterSelect;
+            tvTaskList.FontChanged -= tvTaskList_FontChanged;
+            tvTaskList.ControlAdded -= tvTaskList_ControlAdded;
+            tvTaskList.ControlRemoved -= tvTaskList_ControlRemoved;
+            tvTaskList.DoubleClick -= tvTaskList_DoubleClick;
+            tvTaskList.KeyDown -= tvTaskList_KeyDown;
+            tvTaskList.KeyUp -= MainForm_KeyUp;
+            tvTaskList.MouseClick -= tvTaskList_MouseClick;
+            tvTaskList.MouseMove -= tvTaskList_MouseMove;
+
+            if (clbStyle == null)
+                return;
+            clbStyle.ItemCheck -= clbStyle_ItemCheck;
+
+            if (cbFontFamily == null)
+                return;
+            cbFontFamily.SelectedIndexChanged -= cbFontFamily_SelectedIndexChanged;
+
+            if (nudFontSize == null)
+                return;
+            nudFontSize.ValueChanged -= nudFontSize_ValueChanged;
         }
 
         /// <summary>
@@ -226,7 +289,7 @@ namespace InformationTree.Forms
         {
             try
             {
-                TreeNodeHelper.TreeUnchangedFreeze = true;
+                InitializeComponent_RemoveEvents();
 
                 var node = e.Node;
                 if (node == null)
@@ -302,7 +365,7 @@ namespace InformationTree.Forms
             }
             finally
             {
-                TreeNodeHelper.TreeUnchangedFreeze = false;
+                InitializeComponent_AddEvents();
             }
         }
 

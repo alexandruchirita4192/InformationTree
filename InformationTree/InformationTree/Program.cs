@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace InformationTree
 {
-    internal static class Program
+    public static class Program
     {
         #region extern
 
@@ -19,7 +19,7 @@ namespace InformationTree
 
         #region MainForm
 
-        public static MainForm _mainForm;
+        private static MainForm _mainForm;
 
         public static MainForm MainForm
         {
@@ -27,7 +27,6 @@ namespace InformationTree
             {
                 if (_mainForm != null)
                     return _mainForm;
-                _mainForm = new MainForm();
                 return _mainForm;
             }
             set
@@ -115,12 +114,15 @@ namespace InformationTree
                 if (SplashForm.HasInstance())
                     return;
 
-                var notSafeToChangeCaption = !TreeNodeHelper.IsSafeToSave ? "[HadException]" : "";
+                var notSafeToChangeCaption = !TreeNodeHelper.IsSafeToSave ? "[HadException]" : string.Empty;
                 var notSavingData = TreeNodeHelper.TreeUnchanged || !TreeNodeHelper.IsSafeToSave;
+                var alreadySavedMessage = TreeNodeHelper.TreeSaved ? $"[Tree already saved at {TreeNodeHelper.TreeSavedAt}]" : string.Empty;
+                var unchangedMessage = TreeNodeHelper.TreeUnchanged && !TreeNodeHelper.TreeSaved ? $"[Tree unchanged]" : string.Empty;
+
                 if (notSavingData)
                 {
-                    var message = "Really close without saving?";
-                    var caption = "Do you want to close without saving?" + notSafeToChangeCaption;
+                    var caption = $"Do you want to close without saving? {notSafeToChangeCaption}";
+                    var message = $"Really close without saving? {alreadySavedMessage}{unchangedMessage}";
 
                     SoundHelper.PlaySystemSound(4);
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo);
@@ -133,8 +135,8 @@ namespace InformationTree
                 }
                 else
                 {
-                    var caption = "Do you want to close saving data?" + notSafeToChangeCaption;
-                    var message = "Really close saving data?";
+                    var caption = $"Do you want to close saving data? {notSafeToChangeCaption}";
+                    var message = $"Really close saving data? {alreadySavedMessage}{unchangedMessage}";
 
                     SoundHelper.PlaySystemSound(4);
                     var result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo);
@@ -151,14 +153,12 @@ namespace InformationTree
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm);
+            Application.Run(MainForm = new MainForm());
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)
         {
-            AutoSaveTimer.Stop();
             SaveTree();
-            AutoSaveTimer.Start();
         }
     }
 }

@@ -3,6 +3,7 @@ using InformationTree.Sound;
 using InformationTree.TextProcessing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -135,11 +136,10 @@ namespace InformationTree.Tree
             }
             set
             {
-                if (TreeUnchangedFreeze)
-                    return;
-
                 if (_treeUnchanged != value)
                 {
+                    if (value == false)
+                        MessageBox.Show(new StackTrace().ToString(), $"Tree unchanged set as {value} was called by");
                     _treeUnchanged = value;
 
                     if (TreeUnchangedChangeDelegate != null)
@@ -148,7 +148,9 @@ namespace InformationTree.Tree
             }
         }
 
-        public static bool TreeUnchangedFreeze { get; set; }
+        public static bool TreeSaved { get; private set; }
+        public static DateTime TreeSavedAt { get; private set; }
+
         public static Action<bool> TreeUnchangedChangeDelegate;
 
         public static int TreeNodeCounter = 0;
@@ -581,6 +583,8 @@ namespace InformationTree.Tree
                 streamWriter.Close();
 
                 TreeUnchanged = true;
+                TreeSaved = true;
+                TreeSavedAt = DateTime.Now;
             }
         }
 
