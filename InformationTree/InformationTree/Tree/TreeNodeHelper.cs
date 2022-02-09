@@ -138,8 +138,7 @@ namespace InformationTree.Tree
             {
                 if (_treeUnchanged != value)
                 {
-                    if (value == false)
-                        MessageBox.Show(new StackTrace().ToString(), $"Tree unchanged set as {value} was called by");
+                    File.AppendAllText("TreeUnchangedIssue", $"Tree unchanged set as {value} was called by {new StackTrace()} at {DateTime.Now}");
                     _treeUnchanged = value;
 
                     if (TreeUnchangedChangeDelegate != null)
