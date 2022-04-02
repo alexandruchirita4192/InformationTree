@@ -13,3 +13,4 @@ obj/
 Debug/
 packages/
 InformationTree.userprefs
+*.user

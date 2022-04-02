@@ -1,11 +1,10 @@
-﻿using InformationTree.Graphics;
-using InformationTree.Sound;
+﻿using InformationTree.Domain.Entities;
+using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -189,8 +188,9 @@ namespace InformationTree.Forms
 
         public bool clbStyle_ItemCheckEntered { get; set; }
 
-        private CanvasPopUpForm CanvasForm;
-
+        // TODO: Use some Forms factory generating forms based on used features?
+        //private CanvasPopUpForm CanvasForm; 
+        
         private static Stopwatch timer = new Stopwatch();
         private static Timer randomTimer = new Timer();
         private static int systemSoundNumber = -1;
@@ -911,7 +911,7 @@ namespace InformationTree.Forms
 
                 var form = new PopUpEditForm(selectedNode.Text, data);
 
-                Program.CenterForm(form, this);
+                WinFormsApplication.CenterForm(form, this);
 
                 form.FormClosing += (s, ev) =>
                 {
@@ -956,13 +956,14 @@ namespace InformationTree.Forms
             }
             else
             {
-                if (CanvasForm == null || CanvasForm.IsDisposed)
-                    CanvasForm = new CanvasPopUpForm();
-                CanvasForm.RunTimer.Stop();
-                CanvasForm.GraphicsFile.Clean();
-                CanvasForm.GraphicsFile.ParseLines(TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList));
-                //CanvasForm.RunTimer.Start();
-                CanvasForm.Show();
+                // TODO: create the CanvasForm using the newly created factory
+                //if (CanvasForm == null || CanvasForm.IsDisposed)
+                //    CanvasForm = new CanvasPopUpForm();
+                //CanvasForm.RunTimer.Stop();
+                //CanvasForm.GraphicsFile.Clean();
+                //CanvasForm.GraphicsFile.ParseLines(TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList));
+                ////CanvasForm.RunTimer.Start();
+                //CanvasForm.Show();
             }
         }
 
@@ -1024,7 +1025,7 @@ namespace InformationTree.Forms
         {
             var form = new SearchForm(tbSearchBox.Text);
 
-            Program.CenterForm(form, this);
+            WinFormsApplication.CenterForm(form, this);
 
             form.FormClosed += SearchForm_FormClosed;
             form.ShowDialog();
@@ -1054,7 +1055,7 @@ namespace InformationTree.Forms
                 }
                 catch (Exception ex)
                 {
-                    Program.GlobalExceptionHandling(ex);
+                    WinFormsApplication.GlobalExceptionHandling(ex);
                 }
 
                 if (searchText.Length < 3)
@@ -1069,9 +1070,10 @@ namespace InformationTree.Forms
 
         private void btnShowCanvasPopUp_Click(object sender, EventArgs e)
         {
-            if (CanvasForm == null || CanvasForm.IsDisposed)
-                CanvasForm = new CanvasPopUpForm();
-            CanvasForm.Show();
+            // TODO: create the CanvasForm using the newly created factory
+            //if (CanvasForm == null || CanvasForm.IsDisposed)
+            //    CanvasForm = new CanvasPopUpForm();
+            //CanvasForm.Show();
         }
 
         private void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
@@ -1108,25 +1110,30 @@ namespace InformationTree.Forms
             ShowStartupAlertForm();
         }
 
+        // TODO: hide or show this button based on graphics feature?
         private void btnExecCommand_Click(object sender, EventArgs e)
         {
             if (tbCommand.Lines.Length <= 0)
                 return;
 
-            if (CanvasForm == null || CanvasForm.IsDisposed)
-                CanvasForm = new CanvasPopUpForm();
-            CanvasForm.RunTimer.Stop();
-            CanvasForm.GraphicsFile.Clean();
-            CanvasForm.GraphicsFile.ParseLines(tbCommand.Lines);
-            CanvasForm.RunTimer.Start();
-            CanvasForm.Show();
+            // TODO: create the CanvasForm using the newly created factory (and use the instance afterwards to run the code)
+            //if (CanvasForm == null || CanvasForm.IsDisposed)
+            //    CanvasForm = new CanvasPopUpForm();
+            //CanvasForm.RunTimer.Stop();
+            //CanvasForm.GraphicsFile.Clean();
+            //CanvasForm.GraphicsFile.ParseLines(tbCommand.Lines);
+            //CanvasForm.RunTimer.Start();
+            //CanvasForm.Show();
         }
 
+        // TODO: hide or show this button based on graphics feature?
         private void btnDeleteCanvas_Click(object sender, EventArgs e)
         {
-            CanvasForm = null;
+            // TODO: Hide the canvas and delete the reference value
+            //CanvasForm = null;
         }
 
+        // TODO: hide or show this button based on graphics feature?
         private void btnGenerate_Click(object sender, EventArgs e)
         {
             var x = (double)nudX.Value;
@@ -1157,10 +1164,11 @@ namespace InformationTree.Forms
                 TreeNodeHelper.TreeUnchanged = false;
             }
 
-            if (cbUseDefaultsChecked)
-                tbCommand.Lines = GraphicsGenerator.ComputeXComputeY(radius, iterations, computeType).Distinct().ToArray<string>();
-            else
-                tbCommand.Lines = GraphicsGenerator.ComputeXComputeY(points, x, y, radius, theta, number, iterations, computeType).Distinct().ToArray<string>();
+            // TODO: use GraphicsGenerator like a IGraphicsProvider
+            //if (cbUseDefaultsChecked)
+            //    tbCommand.Lines = GraphicsGenerator.ComputeXComputeY(radius, iterations, computeType).Distinct().ToArray<string>();
+            //else
+            //    tbCommand.Lines = GraphicsGenerator.ComputeXComputeY(points, x, y, radius, theta, number, iterations, computeType).Distinct().ToArray<string>();
         }
 
         private void cbUseDefaults_CheckedChanged(object sender, EventArgs e)
@@ -1175,10 +1183,11 @@ namespace InformationTree.Forms
 
             if (cbUseDefaultsChecked)
             {
-                nudX.Value = (decimal)GraphicsGenerator.DefaultX;
-                nudY.Value = (decimal)GraphicsGenerator.DefaultY;
-                nudNumber.Value = GraphicsGenerator.DefaultNumber;
-                nudPoints.Value = GraphicsGenerator.DefaultPoints;
+                // TODO: use GraphicsGenerator like a IGraphicsProvider
+                //nudX.Value = (decimal)GraphicsGenerator.DefaultX;
+                //nudY.Value = (decimal)GraphicsGenerator.DefaultY;
+                //nudNumber.Value = GraphicsGenerator.DefaultNumber;
+                //nudPoints.Value = GraphicsGenerator.DefaultPoints;
                 nudTheta.Value = 0;
             }
         }
@@ -1293,7 +1302,8 @@ namespace InformationTree.Forms
 
         private void RandomTimer_Tick(object sender, EventArgs e)
         {
-            SoundHelper.PlaySystemSound(systemSoundNumber);
+            // TODO: Use ISoundProvider
+            //SoundHelper.PlaySystemSound(systemSoundNumber);
             RandomTimer_ChangeIntervalAndSound();
         }
 
@@ -1317,6 +1327,7 @@ namespace InformationTree.Forms
         {
         }
 
+        // TODO: Remove zombie code if it really is not showing anything proper
         //private void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         //{
         //    if (e.KeyCode == Keys.ControlKey)
@@ -1328,6 +1339,7 @@ namespace InformationTree.Forms
         //    }
         //}
 
+        // TODO: Remove zombie code if it really is not showing anything proper
         //private void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         //{
         //    if(e.Delta != 0)

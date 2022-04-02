@@ -814,12 +814,12 @@ namespace RicherTextBox.Controls
             OpenFile();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void tsbtnZoomIn_Click(object sender, EventArgs e)
         {
             if (rtbDocument.ZoomFactor < 64.0f - 0.20f)
             {
                 rtbDocument.ZoomFactor += 0.20f;
-                tstxtZoomFactor.Text = String.Format("{0:F0}", rtbDocument.ZoomFactor * 100);
+                tstxtZoomFactor.Text = string.Format("{0:F0}", rtbDocument.ZoomFactor * 100);
             }
         }
 
@@ -828,7 +828,7 @@ namespace RicherTextBox.Controls
             if (rtbDocument.ZoomFactor > 0.16f + 0.20f)
             {
                 rtbDocument.ZoomFactor -= 0.20f;
-                tstxtZoomFactor.Text = String.Format("{0:F0}", rtbDocument.ZoomFactor * 100);
+                tstxtZoomFactor.Text = string.Format("{0:F0}", rtbDocument.ZoomFactor * 100);
             }
         }
 
@@ -836,7 +836,7 @@ namespace RicherTextBox.Controls
         {
             try
             {
-                rtbDocument.ZoomFactor = Convert.ToSingle(tstxtZoomFactor.Text) / 100;
+                rtbDocument.ZoomFactor = Convert.ToSingle(tstxtZoomFactor.Text) / 100.0f;
             }
             catch (FormatException)
             {

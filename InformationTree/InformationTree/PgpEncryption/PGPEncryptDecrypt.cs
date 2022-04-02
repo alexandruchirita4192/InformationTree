@@ -9,6 +9,8 @@ using System.Windows.Forms;
 
 namespace InformationTree.PgpEncryption
 {
+    [Obsolete("Break into many classes")]
+    // TODO: break into class with encryption/decryption, move class related to UI (using OpenFileDialog), maybe have a facade to hide subsystem complexity and expose only required encryption/decryption methods
     public static class PGPEncryptDecrypt
     {
         #region Constants
@@ -33,13 +35,14 @@ namespace InformationTree.PgpEncryption
 
         #region Keys from file dialog
 
+        [Obsolete("Move to other class related to UI")]
         public static string GetKeyFile(string fileType)
         {
             var lowerFileType = fileType.ToLower();
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "Open " + lowerFileType + " key file";
             dlg.Filter = fileType + " Key Files|*.asc;*.skr;*." + lowerFileType + "|All files (*.*)|*.*";
-            dlg.InitialDirectory = Application.StartupPath;
+            dlg.InitialDirectory = System.Windows.Forms.Application.StartupPath;
             if (dlg.ShowDialog() == DialogResult.OK)
                 return dlg.FileName;
             return null;

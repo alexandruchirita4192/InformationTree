@@ -1,4 +1,6 @@
-﻿using InformationTree.PgpEncryption;
+﻿using InformationTree.Domain.Entities;
+using InformationTree.PgpEncryption;
+using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
 using System;
 using System.Data;
@@ -53,7 +55,7 @@ namespace InformationTree.Forms
         public string PgpKeyFile;
         public string PgpKeyText;
 
-        private CanvasPopUpForm CanvasForm;
+        //private CanvasPopUpForm CanvasForm; // TODO: maybe remove this field??
         private static Stopwatch timer = new Stopwatch();
 
         #endregion Properties
@@ -193,7 +195,7 @@ namespace InformationTree.Forms
                 PgpDecrypt form = new PgpDecrypt(cbFromFile.Checked);
                 if (!form.IsDisposed)
                 {
-                    Program.CenterForm(form, this);
+                    WinFormsApplication.CenterForm(form, this);
 
                     form.FormClosed += PgpDecryptForm_FormClosed;
                     form.ShowDialog();
@@ -280,7 +282,7 @@ namespace InformationTree.Forms
         {
             var form = new SearchForm();
 
-            Program.CenterForm(form, Program.MainForm);
+            WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
 
             form.FormClosed += SearchForm_FormClosed;
             form.ShowDialog();
@@ -293,10 +295,10 @@ namespace InformationTree.Forms
             {
                 var textToFind = form.TextToFind;
 
-                if (Program.MainForm == null || Program.MainForm.TaskList == null || Program.MainForm.TaskList.Nodes == null)
+                if (WinFormsApplication.MainForm == null || WinFormsApplication.MainForm.TaskList == null || WinFormsApplication.MainForm.TaskList.Nodes == null)
                     return;
 
-                var node = TreeNodeHelper.GetFirstNode(Program.MainForm.TaskList.Nodes, textToFind);
+                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind);
                 if (node != null)
                 {
                     var nodeData = node.Tag as TreeNodeData;
@@ -333,19 +335,21 @@ namespace InformationTree.Forms
             MessageBox.Show("Not supported");
         }
 
+        // TODO: hide or show this button based on graphics feature?
         private void btnShowGraphics_Click(object sender, EventArgs e)
         {
             var text = tbData.TextBox.SelectedText.Length > 0 ? tbData.TextBox.SelectedText : tbData.TextBox.Text;
             if (text.Length <= 0)
                 return;
 
-            if (CanvasForm == null || CanvasForm.IsDisposed)
-                CanvasForm = new CanvasPopUpForm();
-            CanvasForm.RunTimer.Stop();
-            CanvasForm.GraphicsFile.Clean();
-            CanvasForm.GraphicsFile.ParseLines(text);
-            CanvasForm.RunTimer.Start();
-            CanvasForm.Show();
+            // TODO: use the form factory to create the CanvasForm and use the instance afterwards to do what is required
+            //if (CanvasForm == null || CanvasForm.IsDisposed)
+            //    CanvasForm = new CanvasPopUpForm();
+            //CanvasForm.RunTimer.Stop();
+            //CanvasForm.GraphicsFile.Clean();
+            //CanvasForm.GraphicsFile.ParseLines(text);
+            //CanvasForm.RunTimer.Start();
+            //CanvasForm.Show();
         }
     }
 }

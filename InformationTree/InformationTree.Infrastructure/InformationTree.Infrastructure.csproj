@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>InformationTree.Infrastructure.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Windsor" Version="5.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InformationTree.Domain\InformationTree.Domain.csproj" />
+    <ProjectReference Include="..\InformationTree.Extra.Graphics\InformationTree.Extra.Graphics.csproj" />
+    <ProjectReference Include="..\InformationTree.Extra.Sound\InformationTree.Extra.Sound.csproj" />
+    <ProjectReference Include="..\InformationTree\InformationTree.Render.WinForms.csproj" />
+    <ProjectReference Include="..\RicherTextBox\RicherTextBox.csproj" />
+  </ItemGroup>
+
+</Project>

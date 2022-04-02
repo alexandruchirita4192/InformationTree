@@ -714,7 +714,7 @@ namespace RicherTextBox.Controls
             this.tsbtnZoomIn.Size = new System.Drawing.Size(23, 22);
             this.tsbtnZoomIn.Text = "toolStripButton1";
             this.tsbtnZoomIn.ToolTipText = "Zoom In";
-            this.tsbtnZoomIn.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.tsbtnZoomIn.Click += new System.EventHandler(this.tsbtnZoomIn_Click);
             // 
             // tsbtnZoomOut
             // 

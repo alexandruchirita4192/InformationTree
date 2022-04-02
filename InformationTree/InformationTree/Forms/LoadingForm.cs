@@ -1,6 +1,4 @@
-﻿using InformationTree.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -11,18 +9,20 @@ namespace InformationTree.Forms
     {
         #region Properties
 
-        public GraphicsFile GraphicsFile { get; private set; }
+        //public GraphicsFile GraphicsFile { get; private set; } // TODO: Maybe remove this property that is feature-dependent?
         public Timer Timer { get; protected set; }
 
         #endregion Properties
 
         #region Constructors
 
-        public LoadingForm() : this(null, null, null)
+        public LoadingForm() : this(null, /*null,*/ null) // TODO: use the commented parameter if possible/necessary, or remove the comment
         {
         }
 
-        public LoadingForm(int? screenIndex, GraphicsFile graphicsFile = null, Timer timer = null)
+
+        // TODO: Maybe find a way to remove constructor or GraphicsFile parameter?? (for now the parameter is removed)
+        public LoadingForm(int? screenIndex, /*GraphicsFile graphicsFile = null,*/ Timer timer = null)
         {
             InitializeComponent();
 
@@ -36,7 +36,7 @@ namespace InformationTree.Forms
             Bounds = screen.Bounds;
             Location = new Point((rcScreen.Left + rcScreen.Right) / 2 - (rcForm.Width / 2), rcScreen.Top);
 
-            GraphicsFile = graphicsFile != null ? graphicsFile : GetDefaultGraphicsFile(screen);
+            //GraphicsFile = graphicsFile != null ? graphicsFile : GetDefaultGraphicsFile(screen);
             Timer = timer != null ? timer : GetDefaultTimer();
             if (Timer != null)
             {
@@ -56,49 +56,50 @@ namespace InformationTree.Forms
 
         #region Methods
 
-        private GraphicsFile GetDefaultGraphicsFile(Screen screen)
-        {
-            if (screen == null)
-                return null;
+        // TODO: maybe extract this to the graphics project?
+        //private GraphicsFile GetDefaultGraphicsFile(Screen screen)
+        //{
+        //    if (screen == null)
+        //        return null;
 
-            var ret = new GraphicsFile();
-            var y = screen.Bounds.Height / 2;
-            var x = screen.Bounds.Width / 2;
-            var maxScreen = screen.Bounds.Height > screen.Bounds.Width ? screen.Bounds.Height : screen.Bounds.Width;
-            var max = (maxScreen / 2.0) * 1.41421356237;
-            var lines = new List<string>();
+        //    var ret = new GraphicsFile();
+        //    var y = screen.Bounds.Height / 2;
+        //    var x = screen.Bounds.Width / 2;
+        //    var maxScreen = screen.Bounds.Height > screen.Bounds.Width ? screen.Bounds.Height : screen.Bounds.Width;
+        //    var max = (maxScreen / 2.0) * 1.41421356237;
+        //    var lines = new List<string>();
 
-            #region Old code (kept because might be preety)
+        //    #region Old code (kept because might be preety)
 
-            //lines.Add("ComputeXComputeY 4 200 200 50 0 0 -1 0");
-            //lines.Add("AddFrame");
-            //lines.Add("ComputeXComputeY 4 200 200 50 0 6 0 0");
-            //lines.Add("AddFrame");
-            //lines.Add("ComputeXComputeY 4 200 200 50 0 6 1 0");
-            //lines.Add("AddFrame");
-            //lines.Add("ComputeXComputeY 4 200 200 50 0 6 2 0");
-            //lines.Add("AddFrame");
-            //lines.Add("ComputeXComputeY 5 200 200 50 0 6 1 0");
-            //lines.Add("AddFrame");
-            //lines.Add("ComputeXComputeY 6 200 200 50 0 6 1 0");
-            //lines.Add("AllCenter 200 200 " + x.ToString() + " " + y.ToString());
-            //lines.Add("Cycle 200");
+        //    //lines.Add("ComputeXComputeY 4 200 200 50 0 0 -1 0");
+        //    //lines.Add("AddFrame");
+        //    //lines.Add("ComputeXComputeY 4 200 200 50 0 6 0 0");
+        //    //lines.Add("AddFrame");
+        //    //lines.Add("ComputeXComputeY 4 200 200 50 0 6 1 0");
+        //    //lines.Add("AddFrame");
+        //    //lines.Add("ComputeXComputeY 4 200 200 50 0 6 2 0");
+        //    //lines.Add("AddFrame");
+        //    //lines.Add("ComputeXComputeY 5 200 200 50 0 6 1 0");
+        //    //lines.Add("AddFrame");
+        //    //lines.Add("ComputeXComputeY 6 200 200 50 0 6 1 0");
+        //    //lines.Add("AllCenter 200 200 " + x.ToString() + " " + y.ToString());
+        //    //lines.Add("Cycle 200");
 
-            #endregion Old code (kept because might be preety)
+        //    #endregion Old code (kept because might be preety)
 
-            lines.Add("ComputeXComputeY 4 200 200 45 0 0 -1 0");
+        //    lines.Add("ComputeXComputeY 4 200 200 45 0 0 -1 0");
 
-            for (int i = 50; i <= max; i += 4)
-            {
-                lines.Add("AddFrame");
-                lines.Add("ComputeXComputeY 4 200 200 " + i.ToString() + " 0 0 -1 0");
-            }
-            lines.Add("AllCenter 200 200 " + x.ToString() + " " + y.ToString());
-            lines.Add("Cycle 1");
-            ret.ParseLines(lines.ToArray());
+        //    for (int i = 50; i <= max; i += 4)
+        //    {
+        //        lines.Add("AddFrame");
+        //        lines.Add("ComputeXComputeY 4 200 200 " + i.ToString() + " 0 0 -1 0");
+        //    }
+        //    lines.Add("AllCenter 200 200 " + x.ToString() + " " + y.ToString());
+        //    lines.Add("Cycle 1");
+        //    ret.ParseLines(lines.ToArray());
 
-            return ret;
-        }
+        //    return ret;
+        //}
 
         #endregion Methods
 
@@ -135,9 +136,11 @@ namespace InformationTree.Forms
             e.Graphics.DrawIcon(extractedIconFromCurrentAssembly, 0, 0);
         }
 
+        // TODO: maybe use this method based on graphics feature enabled/disabled
         private void pbLoadingGraphics_Paint(object sender, PaintEventArgs e)
         {
-            GraphicsFile.Show(e.Graphics);
+            // TODO: Use an interface after GraphicsFile has an interface in the Domain project
+            //GraphicsFile.Show(e.Graphics);
         }
 
         #endregion Handlers

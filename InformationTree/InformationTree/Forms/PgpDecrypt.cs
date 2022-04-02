@@ -1,7 +1,9 @@
-﻿using InformationTree.PgpEncryption;
-using InformationTree.Tree;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using InformationTree.Domain.Entities;
+using InformationTree.PgpEncryption;
+using InformationTree.Render.WinForms.Services;
+using InformationTree.Tree;
 
 namespace InformationTree.Forms
 {
@@ -59,7 +61,7 @@ namespace InformationTree.Forms
         {
             var form = new SearchForm();
 
-            Program.CenterForm(form, Program.MainForm);
+            WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
 
             form.FormClosed += SearchForm_FormClosed;
             form.ShowDialog();
@@ -72,10 +74,10 @@ namespace InformationTree.Forms
             {
                 var textToFind = form.TextToFind;
 
-                if (Program.MainForm == null || Program.MainForm.TaskList == null || Program.MainForm.TaskList.Nodes == null)
+                if (WinFormsApplication.MainForm == null || WinFormsApplication.MainForm.TaskList == null || WinFormsApplication.MainForm.TaskList.Nodes == null)
                     return;
 
-                var node = TreeNodeHelper.GetFirstNode(Program.MainForm.TaskList.Nodes, textToFind);
+                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind);
                 if (node != null)
                 {
                     var nodeData = node.Tag as TreeNodeData;

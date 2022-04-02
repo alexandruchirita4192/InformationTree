@@ -1,5 +1,6 @@
-﻿using InformationTree.Forms;
-using InformationTree.Sound;
+﻿using InformationTree.Domain.Entities;
+using InformationTree.Forms;
+using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ using System.Xml;
 
 namespace InformationTree.Tree
 {
+    [Obsolete("Break into many classes with many purposes")] 
+    // TODO: file reading/writing purpose (XML), Tree state (Composite/Object tree with it's state), some configuration file with colors, some constant file with attributes of XML parsing
     public static class TreeNodeHelper
     {
         #region Constants
@@ -228,7 +231,7 @@ namespace InformationTree.Tree
         {
             var convertedColor = (Color?)null;
             if (!string.IsNullOrEmpty(s))
-                try { convertedColor = Color.FromName(s); } catch (Exception ex) { Program.GlobalExceptionHandling(ex); }
+                try { convertedColor = Color.FromName(s); } catch (Exception ex) { WinFormsApplication.GlobalExceptionHandling(ex); }
             return convertedColor;
         }
 
@@ -478,14 +481,15 @@ namespace InformationTree.Tree
             }
             catch (XmlException xExc)
             {
-                Program.GlobalExceptionHandling(xExc);
+                WinFormsApplication.GlobalExceptionHandling(xExc);
                 MessageBox.Show(xExc.Message);
             }
             finally
             {
                 SplashForm.CloseForm();
                 t.Cursor = Cursors.Default;
-                SoundHelper.PlaySystemSound(4);
+                // TODO: This might use the ISoundProvider later, if required
+                //SoundHelper.PlaySystemSound(4);
             }
         }
 
