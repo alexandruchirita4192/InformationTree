@@ -62,9 +62,6 @@ namespace InformationTree.Forms
         public string PgpKeyFile;
         public string PgpKeyText;
 
-        //private CanvasPopUpForm CanvasForm; // TODO: maybe remove this field??
-        private static Stopwatch timer = new Stopwatch();
-
         #endregion Properties
 
         #region Constructor
