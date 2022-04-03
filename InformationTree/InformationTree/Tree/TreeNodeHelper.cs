@@ -99,8 +99,9 @@ namespace InformationTree.Tree
 
         #endregion XML Attributes
 
-        public const string DateTimeFormat = "dd.MM.yyyy HH:mm:ss";
-        public const string DateTimeFormat2 = "dd/MM/yyyy HH:mm:ss";
+        // TODO: Create some datetime parsing service that tries both parsing formats and use it everywhere those 2 constants are used
+        public const string DateTimeFormatSeparatedWithDot = "dd.MM.yyyy HH:mm:ss";
+        public const string DateTimeFormatSeparatedWithSlash = "dd/MM/yyyy HH:mm:ss";
 
         #endregion Constants
 
@@ -218,9 +219,9 @@ namespace InformationTree.Tree
             var convertedDateTime = (DateTime?)null;
             if (!string.IsNullOrEmpty(s))
             {
-                try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormat, CultureInfo.InvariantCulture); } catch { }
+                try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithDot, CultureInfo.InvariantCulture); } catch { }
                 if (convertedDateTime == null)
-                    try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormat2, CultureInfo.InvariantCulture); } catch { }
+                    try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithSlash, CultureInfo.InvariantCulture); } catch { }
                 if (convertedDateTime == null)
                     try { convertedDateTime = DateTime.Parse(s); } catch { }
             }
@@ -562,7 +563,7 @@ namespace InformationTree.Tree
         {
             var convertedString = (String)null;
             if (dt.HasValue)
-                convertedString = dt.Value.ToString(DateTimeFormat);
+                convertedString = dt.Value.ToString(DateTimeFormatSeparatedWithDot);
             return convertedString;
         }
 
@@ -656,8 +657,8 @@ namespace InformationTree.Tree
                         GetXmlAttributeText(XmlAttrFontFamily, attrFontFamily, true) +
                         GetXmlAttributeText(XmlAttrFontSize, attrFontSize, true, 8.5F.ToString()) +
                         GetXmlAttributeText(XmlAttrData, attrData, true) +
-                        GetXmlAttributeText(XmlAttrAddedDate, attrAddedDate.HasValue ? ((DateTime)attrAddedDate).ToString(DateTimeFormat) : null, true) +
-                        GetXmlAttributeText(XmlAttrLastChangeDate, ((attrAddedDate.HasValue && attrLastChangeDate.HasValue && attrAddedDate.Value != attrLastChangeDate.Value) || (!attrLastChangeDate.HasValue)) ? ((DateTime)attrLastChangeDate).ToString(DateTimeFormat) : null, true) +
+                        GetXmlAttributeText(XmlAttrAddedDate, attrAddedDate.HasValue ? ((DateTime)attrAddedDate).ToString(DateTimeFormatSeparatedWithDot) : null, true) +
+                        GetXmlAttributeText(XmlAttrLastChangeDate, ((attrAddedDate.HasValue && attrLastChangeDate.HasValue && attrAddedDate.Value != attrLastChangeDate.Value) || (!attrLastChangeDate.HasValue)) ? ((DateTime)attrLastChangeDate).ToString(DateTimeFormatSeparatedWithDot) : null, true) +
                         GetXmlAttributeText(XmlAttrAddedNumber, attrAddedNumber.ToString(), true) +
                         GetXmlAttributeText(XmlAttrUrgency, attrUrgency.HasValue ? attrUrgency.ToString() : null, true, "0") +
                         GetXmlAttributeText(XmlAttrLink, attrLink, true) +

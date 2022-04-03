@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Services;
+using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.Tree;
 
@@ -15,17 +16,20 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpConfirmation _popUpConfirmation;
         private readonly ISoundProvider _soundProvider;
+        private readonly IGraphicsFileRecursiveGenerator _graphicsFileRecursiveGenerator;
 
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
             IConfigurationReader configurationReader,
             IPopUpConfirmation popUpConfirmation,
-            ISoundProvider soundProvider)
+            ISoundProvider soundProvider,
+            IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
             _popUpConfirmation = popUpConfirmation;
             _soundProvider = soundProvider;
+            _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
         }
 
         #region extern
@@ -163,7 +167,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

@@ -1,11 +1,15 @@
 ﻿using InformationTree.Domain.Entities;
+using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Services;
+using InformationTree.Domain.Services.Graphics;
+using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -15,14 +19,16 @@ namespace InformationTree.Forms
         #region Fields
 
         private readonly ISoundProvider _soundProvider;
+        private readonly IGraphicsFileRecursiveGenerator _graphicsFileRecursiveGenerator;
 
         #endregion Fields
 
         #region ctor
 
-        public MainForm(ISoundProvider soundProvider)
+        public MainForm(ISoundProvider soundProvider, IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator)
         {
             _soundProvider = soundProvider;
+            _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             
             InitializeComponent();
 
@@ -314,8 +320,8 @@ namespace InformationTree.Forms
 
                 if (tagData != null)
                 {
-                    tbAddedDate.Text = (tagData.AddedDate.HasValue ? tagData.AddedDate.Value.ToString(TreeNodeHelper.DateTimeFormat) : "-");
-                    tbLastChangeDate.Text = (tagData.LastChangeDate.HasValue ? tagData.LastChangeDate.Value.ToString(TreeNodeHelper.DateTimeFormat) : "-");
+                    tbAddedDate.Text = (tagData.AddedDate.HasValue ? tagData.AddedDate.Value.ToString(TreeNodeHelper.DateTimeFormatSeparatedWithDot) : "-");
+                    tbLastChangeDate.Text = (tagData.LastChangeDate.HasValue ? tagData.LastChangeDate.Value.ToString(TreeNodeHelper.DateTimeFormatSeparatedWithDot) : "-");
                     tbAddedNumber.Text = tagData.AddedNumber.ToString();
                     tbTaskName.BackColor = string.IsNullOrEmpty(tagData.Data) ? (string.IsNullOrEmpty(tagData.Link) ? TreeNodeHelper.DefaultBackGroundColor : TreeNodeHelper.LinkBackGroundColor) : TreeNodeHelper.DataBackGroundColor;
 
@@ -1154,13 +1160,14 @@ namespace InformationTree.Forms
             var iterations = (int)nudIterations.Value;
 
             var cbUseDefaultsChecked = cbUseDefaults.Checked;
-            var computeType = (int)nudComputeType.Value;
+            var computeType = (ComputeType)nudComputeType.Value;
+            var computeTypeInt = (int)computeType;
 
             var cbLogChecked = cbLog.Checked;
             var node = tvTaskList.SelectedNode;
             var commandData = cbUseDefaultsChecked ?
-                "ComputeXComputeY " + radius + " " + theta + " " + iterations + " " + computeType :
-                "ComputeXComputeY " + points + " " + x + " " + y + " " + radius + " " + theta + " " + number + " " + iterations + " " + computeType;
+                $"{GraphicsFileConstants.ComputeXComputeY.DefaultName} {radius} {theta} {iterations} {computeTypeInt}" :
+                $"{GraphicsFileConstants.ComputeXComputeY.DefaultName} {points} {x} {y} {radius} {theta} {number} {iterations} {computeTypeInt}";
 
             if (cbLogChecked && node != null)
             {
@@ -1173,11 +1180,10 @@ namespace InformationTree.Forms
                 TreeNodeHelper.TreeUnchanged = false;
             }
 
-            // TODO: use GraphicsGenerator like a IGraphicsProvider
-            //if (cbUseDefaultsChecked)
-            //    tbCommand.Lines = GraphicsGenerator.ComputeXComputeY(radius, iterations, computeType).Distinct().ToArray<string>();
-            //else
-            //    tbCommand.Lines = GraphicsGenerator.ComputeXComputeY(points, x, y, radius, theta, number, iterations, computeType).Distinct().ToArray<string>();
+            if (cbUseDefaultsChecked)
+                tbCommand.Lines = _graphicsFileRecursiveGenerator.GenerateFigureLines(radius, iterations, computeType).Distinct().ToArray();
+            else
+                tbCommand.Lines = _graphicsFileRecursiveGenerator.GenerateFigureLines(points, x, y, radius, theta, number, iterations, computeType).Distinct().ToArray();
         }
 
         private void cbUseDefaults_CheckedChanged(object sender, EventArgs e)
@@ -1192,11 +1198,10 @@ namespace InformationTree.Forms
 
             if (cbUseDefaultsChecked)
             {
-                // TODO: use GraphicsGenerator like a IGraphicsProvider
-                //nudX.Value = (decimal)GraphicsGenerator.DefaultX;
-                //nudY.Value = (decimal)GraphicsGenerator.DefaultY;
-                //nudNumber.Value = GraphicsGenerator.DefaultNumber;
-                //nudPoints.Value = GraphicsGenerator.DefaultPoints;
+                nudX.Value = (decimal)_graphicsFileRecursiveGenerator.DefaultX;
+                nudY.Value = (decimal)_graphicsFileRecursiveGenerator.DefaultY;
+                nudNumber.Value = _graphicsFileRecursiveGenerator.DefaultNumber;
+                nudPoints.Value = _graphicsFileRecursiveGenerator.DefaultPoints;
                 nudTheta.Value = 0;
             }
         }
@@ -1327,12 +1332,14 @@ namespace InformationTree.Forms
 
         private void encryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // TODO: Create a feature for this and deactivate it at first not showing something without any working code
         }
 
         private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // TODO: Create a feature for this and deactivate it at first not showing something without any working code
         }
-        
+
         private void tbTask_DoubleClick(object sender, EventArgs e)
         {
             MainForm_DoubleClick(sender, e);

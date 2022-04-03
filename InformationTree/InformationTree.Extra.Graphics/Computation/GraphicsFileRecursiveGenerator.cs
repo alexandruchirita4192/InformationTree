@@ -1,6 +1,6 @@
-﻿using InformationTree.Domain.Services.Graphics;
+﻿using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
-using InformationTree.Extra.Graphics.Services.FileParsing;
 
 namespace InformationTree.Extra.Graphics.Computation
 {
@@ -25,15 +25,15 @@ namespace InformationTree.Extra.Graphics.Computation
 
             if (iterations < -1)
                 return lines;
-            
+
             if (computeType == ComputeType.Generic)
             {
                 // The generic calculation does not add anything extra
             }
             else if (computeType == ComputeType.ExtraFiguresWithPointsNumberOfCorners)
-                lines.Add($"{GraphicsFile.Constants.AddFigureOnce.DefaultName} {FigureType.Figure} {points} {x} {y} {radius}");
+                lines.Add($"{GraphicsFileConstants.AddFigureOnce.DefaultName} {FigureType.Figure} {points} {x} {y} {radius}");
             else if (computeType == ComputeType.ExtraCircles)
-                lines.Add($"{GraphicsFile.Constants.AddFigureOnce.DefaultName} {FigureType.Figure} 0 {x} {y} {radius}");
+                lines.Add($"{GraphicsFileConstants.AddFigureOnce.DefaultName} {FigureType.Figure} 0 {x} {y} {radius}");
 
             for (int i = 0; i < number; i++)
             {
@@ -45,7 +45,7 @@ namespace InformationTree.Extra.Graphics.Computation
                 var computedY = newYrelativeToCircleOnly > DefaultTreshold ? y + newYrelativeToCircleOnly : y;
 
                 if (iterations != -1)
-                    lines.Add($"{GraphicsFile.Constants.AddFigureOnce.DefaultName} {FigureType.Figure} {points} {computedX} {computedY} {radius}");
+                    lines.Add($"{GraphicsFileConstants.AddFigureOnce.DefaultName} {FigureType.Figure} {points} {computedX} {computedY} {radius}");
 
                 // Recursive call for the next iteration
                 lines.AddRange(GenerateFigureLines(points, computedX, computedY, radius, theta, number, iterations - 1));
@@ -60,5 +60,16 @@ namespace InformationTree.Extra.Graphics.Computation
         }
 
         #endregion Methods
+
+        #region IGraphicsFileRecursiveGenerator
+
+        double IGraphicsFileRecursiveGenerator.DefaultX => DefaultX;
+        double IGraphicsFileRecursiveGenerator.DefaultY => DefaultY;
+        int IGraphicsFileRecursiveGenerator.DefaultNumber => DefaultNumber;
+        int IGraphicsFileRecursiveGenerator.DefaultPoints => DefaultPoints;
+        double IGraphicsFileRecursiveGenerator.DefaultTheta => DefaultTheta;
+        double IGraphicsFileRecursiveGenerator.DefaultTreshold => DefaultTreshold;
+
+        #endregion IGraphicsFileRecursiveGenerator
     }
 }

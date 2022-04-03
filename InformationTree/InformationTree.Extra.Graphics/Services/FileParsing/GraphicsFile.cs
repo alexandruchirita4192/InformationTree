@@ -4,132 +4,13 @@ using InformationTree.Graphics;
 using D = System.Drawing;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
+using InformationTree.Domain.Entities.Graphics;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
     [Obsolete("Break into many classes later")] // TODO: file parsing in one file, figures drawing in another
     public class GraphicsFile : IDisposable
     {
-        /// <summary>
-        /// Constants class with all commands (including some legacy commands)
-        /// </summary>
-        public static class Constants
-        {
-            public static class FrameRelativeToPoint
-            {
-                public const string DefaultName = $"{nameof(FrameRelativeToPoint)}";
-                public const string FrameRelative = "FrameRelative";
-                public const string FrameCenter = "FrameCenter";
-            }
-            
-            public static class AllRelativeToPoint
-            {
-                public const string DefaultName = $"{nameof(AllRelativeToPoint)}";
-                public const string RelativeToPoint = "RelativeToPoint";
-                public const string Relative = "Relative";
-                public const string Center = "Center";
-                public const string AllRelative = "AllRelative";
-                public const string AllCenter = "AllCenter";
-            }
-            
-            public static class AddFigure
-            {
-                public const string DefaultName = $"{nameof(AddFigure)}";
-                public const string f = "f";
-                public const string figure = "figure";
-            }
-
-            public static class AddText
-            {
-                public const string DefaultName = $"{nameof(AddText)}";
-                public const string t = "t";
-                public const string txt = "txt";
-                public const string text = "text";
-            }
-
-            public static class AddFigureOnce
-            {
-                public const string DefaultName = $"{nameof(AddFigureOnce)}";
-                public const string o = "o";
-                public const string fo = "fo";
-                public const string figureonce = "figureonce";
-                public const string figure_once = "figure_once";
-            }
-
-            public static class InitRotate
-            {
-                public const string DefaultName = $"{nameof(InitRotate)}";
-            }
-            public static class AddRotateAround
-            {
-                public const string DefaultName = $"{nameof(AddRotateAround)}";
-            }
-            public static class Rotate
-            {
-                public const string DefaultName = $"{nameof(Rotate)}";
-            }
-
-            public static class SetPoints
-            {
-                public const string DefaultName = $"{nameof(SetPoints)}";
-                public const string set_points = "set_points";
-            }
-            public static class SetColor
-            {
-                public const string DefaultName = $"{nameof(SetColor)}";
-                public const string set_color = "set_color";
-            }
-
-            public static class AddFrame
-            {
-                public const string DefaultName = $"{nameof(AddFrame)}";
-                public const string add_frame = "add_frame";
-                public const string add = "add";
-            }
-            public static class GoToFrame
-            {
-                public const string DefaultName = $"{nameof(GoToFrame)}";
-                public const string goto_frame = "goto_frame";
-                public const string GoTo = "GoTo";
-                public const string @goto = "goto";
-            }
-            public static class ChangeToNextFrame
-            {
-                public const string DefaultName = $"{nameof(ChangeToNextFrame)}";
-                public const string next_frame = "next_frame";
-                public const string next = "next";
-            }
-            public static class ChangeToPreviousFrame
-            {
-                public const string DefaultName = $"{nameof(ChangeToPreviousFrame)}";
-                public const string previous_frame = "previous_frame";
-                public const string prev_frame = "prev_frame";
-                public const string prev = "prev";
-            }
-
-            // TODO: Rename this to explain that this recursively generates a lot of figures
-            public static class ComputeXComputeY
-            {
-                public const string DefaultName = $"{nameof(ComputeXComputeY)}";
-                public const string cxcy = "cxcy";
-                public const string cpx_cpy = "cpx_cpy";
-            }
-            public static class Cycle
-            {
-                public const string DefaultName = $"{nameof(Cycle)}";
-            }
-            public static class StopFileProcessing
-            {
-                public const string DefaultName = $"{nameof(StopFileProcessing)}";
-                public const string end = "end";
-                public const string x = "x";
-                public const string stop = "stop";
-                public const string exit = "exit";
-                public const string q = "q";
-                public const string quit = "quit";
-            }
-        }
-
         private IGraphicsFileRecursiveGenerator _graphicsProvider;
 
         #region Properties
@@ -180,107 +61,107 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 {
                     switch (firstWord)
                     {
-                        case Constants.FrameRelativeToPoint.DefaultName:
-                        case Constants.FrameRelativeToPoint.FrameRelative:
-                        case Constants.FrameRelativeToPoint.FrameCenter:
+                        case GraphicsFileConstants.FrameRelativeToPoint.DefaultName:
+                        case GraphicsFileConstants.FrameRelativeToPoint.FrameRelative:
+                        case GraphicsFileConstants.FrameRelativeToPoint.FrameCenter:
                             FrameRelativeToPoint(parameters);
                             break;
 
-                        case Constants.AllRelativeToPoint.DefaultName:
-                        case Constants.AllRelativeToPoint.RelativeToPoint:
-                        case Constants.AllRelativeToPoint.Relative:
-                        case Constants.AllRelativeToPoint.Center:
-                        case Constants.AllRelativeToPoint.AllRelative:
-                        case Constants.AllRelativeToPoint.AllCenter:
+                        case GraphicsFileConstants.AllRelativeToPoint.DefaultName:
+                        case GraphicsFileConstants.AllRelativeToPoint.RelativeToPoint:
+                        case GraphicsFileConstants.AllRelativeToPoint.Relative:
+                        case GraphicsFileConstants.AllRelativeToPoint.Center:
+                        case GraphicsFileConstants.AllRelativeToPoint.AllRelative:
+                        case GraphicsFileConstants.AllRelativeToPoint.AllCenter:
                             AllRelativeToPoint(parameters);
                             break;
 
-                        case Constants.AddFigure.DefaultName:
-                        case Constants.AddFigure.figure:
-                        case Constants.AddFigure.f:
+                        case GraphicsFileConstants.AddFigure.DefaultName:
+                        case GraphicsFileConstants.AddFigure.figure:
+                        case GraphicsFileConstants.AddFigure.f:
                             AddFigure(parameters);
                             break;
 
-                        case Constants.AddText.DefaultName:
-                        case Constants.AddText.text:
-                        case Constants.AddText.txt:
-                        case Constants.AddText.t:
+                        case GraphicsFileConstants.AddText.DefaultName:
+                        case GraphicsFileConstants.AddText.text:
+                        case GraphicsFileConstants.AddText.txt:
+                        case GraphicsFileConstants.AddText.t:
                             AddText(parameters);
                             break;
 
-                        case Constants.AddFigureOnce.DefaultName:
-                        case Constants.AddFigureOnce.figure_once:
-                        case Constants.AddFigureOnce.figureonce:
-                        case Constants.AddFigureOnce.fo:
-                        case Constants.AddFigureOnce.o:
+                        case GraphicsFileConstants.AddFigureOnce.DefaultName:
+                        case GraphicsFileConstants.AddFigureOnce.figure_once:
+                        case GraphicsFileConstants.AddFigureOnce.figureonce:
+                        case GraphicsFileConstants.AddFigureOnce.fo:
+                        case GraphicsFileConstants.AddFigureOnce.o:
                             AddFigureOnce(parameters);
                             break;
 
-                        case Constants.InitRotate.DefaultName:
+                        case GraphicsFileConstants.InitRotate.DefaultName:
                             InitRotate(parameters);
                             break;
 
-                        case Constants.AddRotateAround.DefaultName:
+                        case GraphicsFileConstants.AddRotateAround.DefaultName:
                             AddRotateAround(parameters);
                             break;
 
-                        case Constants.Rotate.DefaultName:
+                        case GraphicsFileConstants.Rotate.DefaultName:
                             Rotate(parameters);
                             break;
 
-                        case Constants.SetPoints.DefaultName:
-                        case Constants.SetPoints.set_points:
+                        case GraphicsFileConstants.SetPoints.DefaultName:
+                        case GraphicsFileConstants.SetPoints.set_points:
                             SetPoints(parameters);
                             break;
 
-                        case Constants.SetColor.DefaultName:
-                        case Constants.SetColor.set_color:
+                        case GraphicsFileConstants.SetColor.DefaultName:
+                        case GraphicsFileConstants.SetColor.set_color:
                             SetColor(parameters);
                             break;
 
-                        case Constants.AddFrame.DefaultName:
-                        case Constants.AddFrame.add_frame:
-                        case Constants.AddFrame.add:
+                        case GraphicsFileConstants.AddFrame.DefaultName:
+                        case GraphicsFileConstants.AddFrame.add_frame:
+                        case GraphicsFileConstants.AddFrame.add:
                             AddFrame();
                             break;
 
-                        case Constants.GoToFrame.DefaultName:
-                        case Constants.GoToFrame.goto_frame:
-                        case Constants.GoToFrame.GoTo:
-                        case Constants.GoToFrame.@goto:
+                        case GraphicsFileConstants.GoToFrame.DefaultName:
+                        case GraphicsFileConstants.GoToFrame.goto_frame:
+                        case GraphicsFileConstants.GoToFrame.GoTo:
+                        case GraphicsFileConstants.GoToFrame.@goto:
                             GoToFrame(parameters);
                             break;
 
-                        case Constants.ChangeToNextFrame.DefaultName:
-                        case Constants.ChangeToNextFrame.next_frame:
-                        case Constants.ChangeToNextFrame.next:
+                        case GraphicsFileConstants.ChangeToNextFrame.DefaultName:
+                        case GraphicsFileConstants.ChangeToNextFrame.next_frame:
+                        case GraphicsFileConstants.ChangeToNextFrame.next:
                             ChangeToNextFrame(parameters);
                             break;
 
-                        case Constants.ChangeToPreviousFrame.DefaultName:
-                        case Constants.ChangeToPreviousFrame.previous_frame:
-                        case Constants.ChangeToPreviousFrame.prev_frame:
-                        case Constants.ChangeToPreviousFrame.prev:
+                        case GraphicsFileConstants.ChangeToPreviousFrame.DefaultName:
+                        case GraphicsFileConstants.ChangeToPreviousFrame.previous_frame:
+                        case GraphicsFileConstants.ChangeToPreviousFrame.prev_frame:
+                        case GraphicsFileConstants.ChangeToPreviousFrame.prev:
                             ChangeToPreviousFrame();
                             break;
 
-                        case Constants.ComputeXComputeY.DefaultName:
-                        case Constants.ComputeXComputeY.cxcy:
-                        case Constants.ComputeXComputeY.cpx_cpy:
+                        case GraphicsFileConstants.ComputeXComputeY.DefaultName:
+                        case GraphicsFileConstants.ComputeXComputeY.cxcy:
+                        case GraphicsFileConstants.ComputeXComputeY.cpx_cpy:
                             ComputeXComputeY(parameters);
                             break;
 
-                        case Constants.Cycle.DefaultName:
+                        case GraphicsFileConstants.Cycle.DefaultName:
                             Cycle(parameters);
                             break;
 
-                        case Constants.StopFileProcessing.DefaultName:
-                        case Constants.StopFileProcessing.end:
-                        case Constants.StopFileProcessing.x:
-                        case Constants.StopFileProcessing.stop:
-                        case Constants.StopFileProcessing.exit:
-                        case Constants.StopFileProcessing.q:
-                        case Constants.StopFileProcessing.quit:
+                        case GraphicsFileConstants.StopFileProcessing.DefaultName:
+                        case GraphicsFileConstants.StopFileProcessing.end:
+                        case GraphicsFileConstants.StopFileProcessing.x:
+                        case GraphicsFileConstants.StopFileProcessing.stop:
+                        case GraphicsFileConstants.StopFileProcessing.exit:
+                        case GraphicsFileConstants.StopFileProcessing.q:
+                        case GraphicsFileConstants.StopFileProcessing.quit:
                             breakFromLoop = true;
                             break;
                     }
