@@ -2,14 +2,15 @@
 using InformationTree.Extra.Graphics.Computation;
 using InformationTree.Graphics;
 using D = System.Drawing;
-using InformationTree.Domain.Services;
+using InformationTree.Domain.Services.Graphics;
+using InformationTree.Extra.Graphics.Domain;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
     [Obsolete("Break into many classes later")] // TODO: file parsing in one file, figures drawing in another
     public class GraphicsFile : IDisposable
     {
-        private IGraphicsProvider _graphicsProvider;
+        private IGraphicsFileRecursiveGenerator _graphicsProvider;
 
         #region Properties
 
@@ -20,7 +21,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Constructor
 
-        public GraphicsFile(IGraphicsProvider graphicsProvider)
+        public GraphicsFile(IGraphicsFileRecursiveGenerator graphicsProvider)
         {
             _graphicsProvider = graphicsProvider;
 
@@ -59,6 +60,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 {
                     switch (firstWord)
                     {
+                        // TODO: move commands to a constants class and reuse them into GraphicsFile, GraphicsProvider (name subject to change), etc
                         case "FrameRelativeToPoint":
                         case "FrameRelative":
                         case "FrameCenter":
@@ -325,7 +327,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 return;
             var words = s.Split(' ');
             double _radius;
-            int _iterations, _computeType;
+            int _iterations;
+            ComputeType _computeType;
 
             switch (words.Length)
             {
@@ -333,8 +336,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 case 3:
                     _radius = double.Parse(words[0]);
                     _iterations = int.Parse(words[1]);
-                    _computeType = words.Length == 3 ? int.Parse(words[2]) : 0;
-                    ParseLines(_graphicsProvider.ComputeXComputeY(_radius, _iterations, _computeType).Distinct().ToArray());
+                    _computeType = words.Length == 3 ? (ComputeType)int.Parse(words[2]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
+                    ParseLines(_graphicsProvider.GenerateGraphicsFileLines(_radius, _iterations, _computeType).Distinct().ToArray());
                     break;
 
                 case 7:
@@ -346,8 +349,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                     var _theta = double.Parse(words[4]);
                     var _number = int.Parse(words[5]);
                     _iterations = int.Parse(words[6]);
-                    _computeType = words.Length == 8 ? int.Parse(words[7]) : 0;
-                    ParseLines(_graphicsProvider.ComputeXComputeY(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
+                    _computeType = words.Length == 8 ? (ComputeType)int.Parse(words[7]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
+                    ParseLines(_graphicsProvider.GenerateFigureLines(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
                     break;
             }
         }

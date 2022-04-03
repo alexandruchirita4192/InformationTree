@@ -15,7 +15,7 @@ namespace InformationTree.Forms
         public CanvasPopUpForm(GraphicsFile graphicsInitializer)
         {
             InitializeComponent();
-            GraphicsFile = graphicsInitializer; //TODO: Fix this better??; old code had this too: ?? new GraphicsFile();
+            GraphicsFile = graphicsInitializer; //TODO: Fix this better??; old code had this too: "?? new GraphicsFile();"
 
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
