@@ -17,19 +17,22 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IPopUpConfirmation _popUpConfirmation;
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileRecursiveGenerator _graphicsFileRecursiveGenerator;
+        private readonly ICanvasFormFactory _canvasFormFactory;
 
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
             IConfigurationReader configurationReader,
             IPopUpConfirmation popUpConfirmation,
             ISoundProvider soundProvider,
-            IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator)
+            IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator,
+            ICanvasFormFactory canvasFormFactory)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
             _popUpConfirmation = popUpConfirmation;
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
+            _canvasFormFactory = canvasFormFactory;
         }
 
         #region extern
@@ -167,7 +170,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

@@ -1,4 +1,6 @@
-﻿namespace InformationTree.Forms
+﻿using System.Windows.Forms;
+
+namespace InformationTree.Forms
 {
     partial class MainForm
     {
@@ -18,9 +20,22 @@
                 components.Dispose();
             }
 
-            if(disposing)
+            if (disposing)
                 this.MouseWheel -= tvTaskList_MouseClick;
 
+            if (disposing && _timer != null)
+            {
+                _timer.Stop();
+                _timer = null;
+            }
+
+            if (disposing && _randomTimer != null)
+            {
+                _randomTimer.Stop();
+                _randomTimer.Elapsed -= RandomTimer_Elapsed;
+                _randomTimer = null;
+            }
+            
             base.Dispose(disposing);
         }
 

@@ -475,7 +475,7 @@ namespace RicherTextBox.Controls
             {
                 var tableControl = new TableControl(target, this);
 
-                ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // to do something here
+                ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // TODO: change here to see the table in RTF
                 return target;
             };
         }
@@ -865,6 +865,7 @@ namespace RicherTextBox.Controls
 
         private void tsbtnDecrypt_Click(object sender, EventArgs e)
         {
+            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (DecryptFunction == null)
                 return;// throw new NotImplementedException();
             rtbDocument.Rtf = DecryptFunction(rtbDocument.Rtf);
@@ -872,6 +873,7 @@ namespace RicherTextBox.Controls
 
         private void tsbtnEncrypt_Click(object sender, EventArgs e)
         {
+            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (EncryptFunction == null)
                 return;// throw new NotImplementedException();
             rtbDocument.Rtf = EncryptFunction(rtbDocument.Rtf);
@@ -879,6 +881,7 @@ namespace RicherTextBox.Controls
 
         private void tsbtnCalculate_Click(object sender, EventArgs e)
         {
+            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (CalculateFunction == null)
                 return;// throw new NotImplementedException();
             rtbDocument.Rtf = CalculateFunction(rtbDocument.Rtf);
@@ -886,6 +889,7 @@ namespace RicherTextBox.Controls
 
         private void tsbtnTable_Click(object sender, EventArgs e)
         {
+            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (TableFunction == null)
                 return;// throw new NotImplementedException();
 

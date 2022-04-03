@@ -1,22 +1,24 @@
-﻿using InformationTree.Extra.Graphics.Computation;
-using InformationTree.Extra.Graphics.Services.FileParsing;
+﻿using System.Timers;
+using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Extra.Graphics.Computation;
 using D = System.Drawing;
 
 namespace InformationTree.Forms
 {
-    public partial class CanvasPopUpForm : Form
+    public partial class CanvasPopUpForm : Form, ICanvasForm
     {
         private int op, nr, x, y, r;
-        public System.Threading.Timer RunTimer;
-        public GraphicsFile GraphicsFile;
+        public System.Timers.Timer RunTimer { get; private set; }
+        public IGraphicsFile GraphicsFile { get; private set; }
         private D.BufferedGraphicsContext context;
         private D.BufferedGraphics grafx;
 
-        public CanvasPopUpForm(GraphicsFile graphicsInitializer)
+        public CanvasPopUpForm(IGraphicsFile graphicsFile)
         {
+            GraphicsFile = graphicsFile;
+            
             InitializeComponent();
-            GraphicsFile = graphicsInitializer; //TODO: Fix this better??; old code had this too: "?? new GraphicsFile();"
-
+            
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             context = D.BufferedGraphicsManager.Current;
@@ -28,7 +30,9 @@ namespace InformationTree.Forms
 
             op = 0; nr = 0;
             var interval = GraphicsComputation.MillisecondsPerFrame;
-            RunTimer = new System.Threading.Timer(RunTimer_Tick, null, interval, interval);            
+            RunTimer = new System.Timers.Timer(interval);
+            RunTimer.Elapsed += new ElapsedEventHandler(RunTimer_Tick);
+            RunTimer.Start();
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace InformationTree.Forms
         }
 
         //static int ticks;
-        private void RunTimer_Tick(object? sender)
+        private void RunTimer_Tick(object? sender, ElapsedEventArgs e)
         {
             if (this.IsDisposed)
             {
@@ -64,10 +68,7 @@ namespace InformationTree.Forms
             }
 
             if (RunTimer != null)
-            {
-                // Stop timer
-                try { RunTimer.Change(Timeout.Infinite, Timeout.Infinite); } catch { /* silent crash */ }
-            }
+                RunTimer.Enabled = false;
             
             //if (ticks == 20)
             //{
@@ -83,11 +84,7 @@ namespace InformationTree.Forms
             }
 
             if (RunTimer != null)
-            {
-                // Start timer
-                var interval = GraphicsComputation.MillisecondsPerFrame;
-                RunTimer.Change(interval, interval);
-            }
+                RunTimer.Enabled = true;
         }
 
         private void CanvasPopUpForm_Resize(object sender, EventArgs e)
@@ -103,7 +100,7 @@ namespace InformationTree.Forms
 
             // Cause the background to be cleared and redraw.
             UpdateGraphics(grafx.Graphics);
-            this.Refresh();
+            Refresh();
         }
 
         private void CanvasPopUpForm_MouseDoubleClick(object sender, MouseEventArgs e)

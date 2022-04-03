@@ -1,13 +1,13 @@
-﻿using InformationTree.Domain.Entities;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows.Forms;
+using InformationTree.Domain.Entities;
+using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Services.Graphics;
 using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
-using System;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace InformationTree.Forms
 {
@@ -24,6 +24,13 @@ namespace InformationTree.Forms
         private const int EM_CANUNDO = 0xC6;
 
         #endregion constants
+
+        #region Fields
+
+        private readonly ICanvasFormFactory _canvasFormFactory;
+        private ICanvasForm _canvasForm;
+        
+        #endregion Fields
 
         #region Properties
 
@@ -62,7 +69,7 @@ namespace InformationTree.Forms
 
         #region Constructor
 
-        public PopUpEditForm()
+        public PopUpEditForm(ICanvasFormFactory canvasFormFactory)
         {
             InitializeComponent();
 
@@ -72,10 +79,11 @@ namespace InformationTree.Forms
                 tbData.TextBox.AllowDrop = true;
 
             this.tbData.TextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PopUpEditForm_KeyUp);
+            _canvasFormFactory = canvasFormFactory;
         }
 
-        public PopUpEditForm(string title, string data)
-            : this()
+        public PopUpEditForm(ICanvasFormFactory canvasFormFactory, string title, string data)
+            : this(canvasFormFactory)
         {
             this.Text += ": " + title;
 
@@ -342,14 +350,17 @@ namespace InformationTree.Forms
             if (text.Length <= 0)
                 return;
 
-            // TODO: use the form factory to create the CanvasForm and use the instance afterwards to do what is required
-            //if (CanvasForm == null || CanvasForm.IsDisposed)
-            //    CanvasForm = new CanvasPopUpForm();
-            //CanvasForm.RunTimer.Stop();
-            //CanvasForm.GraphicsFile.Clean();
-            //CanvasForm.GraphicsFile.ParseLines(text);
-            //CanvasForm.RunTimer.Start();
-            //CanvasForm.Show();
+            if (_canvasForm == null || _canvasForm.IsDisposed)
+                _canvasForm = _canvasFormFactory.Create(new[] { text });
+            else
+            {
+                _canvasForm.RunTimer.Stop();
+                _canvasForm.GraphicsFile.Clean();
+                _canvasForm.GraphicsFile.ParseLines(new[] { text });
+                _canvasForm.RunTimer.Start();
+            }
+            
+            _canvasForm.Show();
         }
     }
 }

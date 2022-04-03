@@ -5,18 +5,19 @@ using D = System.Drawing;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Domain.Entities.Graphics;
+using System.Timers;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
     [Obsolete("Break into many classes later")] // TODO: file parsing in one file, figures drawing in another
-    public class GraphicsFile : IDisposable
+    public class GraphicsFile : IGraphicsFile, IDisposable
     {
         private IGraphicsFileRecursiveGenerator _graphicsProvider;
 
         #region Properties
 
         public Frame Frame { get; private set; }
-        public System.Threading.Timer RunTimer { get; set; }
+        public System.Timers.Timer RunTimer { get; set; }
 
         #endregion Properties
 
@@ -28,7 +29,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
             Frame = new Frame();
             var interval = GraphicsComputation.MillisecondsPerFrame;
-            RunTimer = new System.Threading.Timer(RunTimer_Tick, null, interval, interval);
+            RunTimer = new System.Timers.Timer(interval);
+            RunTimer.Elapsed += RunTimer_Elapsed; // timer disposed in Dispose(bool)
+            RunTimer.Start();
         }
 
         #endregion Constructor
@@ -239,13 +242,17 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             try
             {
                 // Start timer
+                RunTimer.Enabled = false;
                 var interval = int.Parse(s);
-                RunTimer.Change(interval, interval);
+                RunTimer.Interval = interval;
+                RunTimer.Enabled = true;                
             }
-            catch
+            catch(Exception ex)
             {
                 // Stop timer
-                try { RunTimer.Change(Timeout.Infinite, Timeout.Infinite); } catch { /* silent crash */ }
+                RunTimer.Enabled = false;
+
+                // TODO: Log exception, maybe even show a pop-up with generic message
             }
         }
 
@@ -303,7 +310,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             }
         }
 
-        private void RunTimer_Tick(object? sender)
+        private void RunTimer_Elapsed(object? sender, ElapsedEventArgs elapsedEventArgs)
         {
             CycleFrames();
         }
@@ -468,7 +475,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
         {
             if (RunTimer != null)
             {
-                RunTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                RunTimer.Elapsed -= RunTimer_Elapsed;
+                RunTimer.Enabled = false;
                 RunTimer.Dispose();
             }
         }

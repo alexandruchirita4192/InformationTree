@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Reflection;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -10,7 +11,7 @@ namespace InformationTree.Forms
         #region Properties
 
         //public GraphicsFile GraphicsFile { get; private set; } // TODO: Maybe remove this property that is feature-dependent?
-        public Timer Timer { get; protected set; }
+        public System.Timers.Timer Timer { get; protected set; }
 
         #endregion Properties
 
@@ -22,7 +23,7 @@ namespace InformationTree.Forms
 
 
         // TODO: Maybe find a way to remove constructor or GraphicsFile parameter?? (for now the parameter is removed)
-        public LoadingForm(int? screenIndex, /*GraphicsFile graphicsFile = null,*/ Timer timer = null)
+        public LoadingForm(int? screenIndex, /*GraphicsFile graphicsFile = null,*/ System.Timers.Timer timer = null)
         {
             InitializeComponent();
 
@@ -37,18 +38,17 @@ namespace InformationTree.Forms
             Location = new Point((rcScreen.Left + rcScreen.Right) / 2 - (rcForm.Width / 2), rcScreen.Top);
 
             //GraphicsFile = graphicsFile != null ? graphicsFile : GetDefaultGraphicsFile(screen);
-            Timer = timer != null ? timer : GetDefaultTimer();
+            Timer = timer ?? GetDefaultTimer();
             if (Timer != null)
             {
-                Timer.Tick += T_Tick; // timer disposed in Dispose(bool)
+                Timer.Elapsed += T_Elapsed; // timer disposed in Dispose(bool)
                 Timer.Start();
             }
         }
 
-        private Timer GetDefaultTimer()
+        private System.Timers.Timer GetDefaultTimer()
         {
-            var ret = new Timer();
-            ret.Interval = 100;
+            var ret = new System.Timers.Timer(100);
             return ret;
         }
 
@@ -105,7 +105,7 @@ namespace InformationTree.Forms
 
         #region Handlers
 
-        private void T_Tick(object sender, EventArgs e)
+        private void T_Elapsed(object sender, ElapsedEventArgs e)
         {
             //pbFileLoad.PerformStep();
             pbLoadingGraphics.Refresh(); // paint?

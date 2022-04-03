@@ -20,7 +20,7 @@
 
             // Timer dispose
             if (disposing && Timer != null)
-                Timer.Tick -= T_Tick;
+                Timer.Elapsed -= T_Elapsed;
 
             base.Dispose(disposing);
         }

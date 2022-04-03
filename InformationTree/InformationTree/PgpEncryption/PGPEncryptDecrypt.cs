@@ -73,7 +73,8 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // TODO: log exception, show generic error message in some pop-up
+                //MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return encryptedText;
             }
         }
@@ -89,7 +90,8 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // TODO: log exception, show generic error message in some pop-up
+                //MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return encryptedText;
             }
         }
@@ -118,7 +120,8 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // TODO: log exception, show generic error message in some pop-up
+                //MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return encryptedText;
             }
         }
@@ -172,6 +175,7 @@ namespace InformationTree.PgpEncryption
 
                 if (enc == null)
                 {
+                    // TODO: log exception, show generic error message in some pop-up
                     MessageBox.Show("No encrypted message", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }

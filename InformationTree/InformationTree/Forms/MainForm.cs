@@ -10,6 +10,8 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace InformationTree.Forms
@@ -20,15 +22,20 @@ namespace InformationTree.Forms
 
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileRecursiveGenerator _graphicsFileRecursiveGenerator;
+        private readonly ICanvasFormFactory _canvasFormFactory;
 
         #endregion Fields
 
         #region ctor
 
-        public MainForm(ISoundProvider soundProvider, IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator)
+        public MainForm(
+            ISoundProvider soundProvider,
+            IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator,
+            ICanvasFormFactory canvasFormFactory)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
+            _canvasFormFactory = canvasFormFactory;
             
             InitializeComponent();
 
@@ -87,7 +94,7 @@ namespace InformationTree.Forms
                 lblUnchanged.Text = (a ? "Tree unchanged (do not save)" : "Tree changed (save)");
             };
 
-            IsControlPressed = false;
+            _isControlPressed = false;
             StartPosition = FormStartPosition.CenterScreen;
 
             InitializeComponent_AddEvents();
@@ -201,15 +208,16 @@ namespace InformationTree.Forms
 
         #region Properties
 
-        public bool clbStyle_ItemCheckEntered { get; set; }
+        private bool _clbStyle_ItemCheckEntered { get; set; }
 
-        // TODO: Use some Forms factory generating forms based on used features?
-        //private CanvasPopUpForm CanvasForm; 
+        private ICanvasForm _canvasForm;
         
-        private static Stopwatch timer = new Stopwatch();
-        private static Timer randomTimer = new Timer();
-        private static int systemSoundNumber = -1;
+        private Stopwatch _timer = new Stopwatch();
+        private System.Timers.Timer _randomTimer = new System.Timers.Timer();
+        private static int _systemSoundNumber = -1;
 
+        // TODO: Use TreeNodeData here instead of TaskList
+        [Obsolete("Use another tree using TreeNodeData instead and maybe an adapter from one to another")]
         public TreeView TaskList
         {
             get
@@ -218,9 +226,9 @@ namespace InformationTree.Forms
             }
         }
 
-        private int oldX = 0, oldY = 0;
+        private int _oldX = 0, _oldY = 0;
 
-        private bool IsControlPressed;
+        private bool _isControlPressed;
 
         #endregion Properties
 
@@ -351,7 +359,7 @@ namespace InformationTree.Forms
                     nudFontSize.Value = size;
                 }
 
-                if (!clbStyle_ItemCheckEntered)
+                if (!_clbStyle_ItemCheckEntered)
                 {
                     if (node != null && node.NodeFont != null)
                     {
@@ -569,7 +577,7 @@ namespace InformationTree.Forms
         {
             if (tvTaskList.SelectedNode != null)
             {
-                timer.Start();
+                _timer.Start();
                 gbTask.Enabled = false;
                 gbTaskList.Enabled = false;
             }
@@ -582,12 +590,12 @@ namespace InformationTree.Forms
                 return;
             try
             {
-                timer.Stop();
+                _timer.Stop();
                 var oldElapsedTime = long.Parse(node.Name);
-                var elapsedTime = timer.ElapsedMilliseconds;
+                var elapsedTime = _timer.ElapsedMilliseconds;
                 var totalElapsedTime = (oldElapsedTime + elapsedTime);
                 node.Name = totalElapsedTime.ToString();
-                timer.Reset();
+                _timer.Reset();
 
                 var timeSpanTotal = TimeSpan.FromMilliseconds(totalElapsedTime);
                 nudHours.Value = timeSpanTotal.Hours;
@@ -671,12 +679,12 @@ namespace InformationTree.Forms
 
         private void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (clbStyle_ItemCheckEntered)
+            if (_clbStyle_ItemCheckEntered)
                 return;
 
             try
             {
-                clbStyle_ItemCheckEntered = true;
+                _clbStyle_ItemCheckEntered = true;
 
                 if (tvTaskList.SelectedNode != null)
                 {
@@ -708,7 +716,7 @@ namespace InformationTree.Forms
             }
             finally
             {
-                clbStyle_ItemCheckEntered = false;
+                _clbStyle_ItemCheckEntered = false;
             }
         }
 
@@ -881,7 +889,7 @@ namespace InformationTree.Forms
 
         private void tvTaskList_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.X == oldX && e.Y == oldY)
+            if (e.X == _oldX && e.Y == _oldY)
                 return;
 
             // Get the node at the current mouse pointer location.
@@ -909,8 +917,8 @@ namespace InformationTree.Forms
                 this.toolTip1.SetToolTip(this.tvTaskList, "");
             }
 
-            oldX = e.X;
-            oldY = e.Y;
+            _oldX = e.X;
+            _oldY = e.Y;
         }
 
         private void tbTaskName_DoubleClick(object sender, EventArgs e)
@@ -924,7 +932,7 @@ namespace InformationTree.Forms
                 if (tagData != null)
                     data = tagData.Data;
 
-                var form = new PopUpEditForm(selectedNode.Text, data);
+                var form = new PopUpEditForm(_canvasFormFactory, selectedNode.Text, data);
 
                 WinFormsApplication.CenterForm(form, this);
 
@@ -958,6 +966,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: use the graphics feature inside this button event based on graphics feature?
         private void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
@@ -971,14 +980,24 @@ namespace InformationTree.Forms
             }
             else
             {
-                // TODO: create the CanvasForm using the newly created factory
-                //if (CanvasForm == null || CanvasForm.IsDisposed)
-                //    CanvasForm = new CanvasPopUpForm();
-                //CanvasForm.RunTimer.Stop();
-                //CanvasForm.GraphicsFile.Clean();
-                //CanvasForm.GraphicsFile.ParseLines(TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList));
-                ////CanvasForm.RunTimer.Start();
-                //CanvasForm.Show();
+                var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
+
+                if (_canvasForm == null || _canvasForm.IsDisposed)
+                    _canvasForm = _canvasFormFactory.Create(figureLines);
+                else
+                {
+                    _canvasForm.RunTimer.Enabled = false;
+                    try
+                    {
+                        _canvasForm.GraphicsFile.Clean();
+                        _canvasForm.GraphicsFile.ParseLines(figureLines);
+                    }
+                    finally
+                    {
+                        _canvasForm.RunTimer.Enabled = true;
+                    }
+                }
+                _canvasForm.Show();
             }
         }
 
@@ -1085,10 +1104,14 @@ namespace InformationTree.Forms
 
         private void btnShowCanvasPopUp_Click(object sender, EventArgs e)
         {
-            // TODO: create the CanvasForm using the newly created factory
-            //if (CanvasForm == null || CanvasForm.IsDisposed)
-            //    CanvasForm = new CanvasPopUpForm();
-            //CanvasForm.Show();
+            if (_canvasForm == null || _canvasForm.IsDisposed)
+            {
+                var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
+                
+                _canvasForm = _canvasFormFactory.Create(figureLines);
+            }
+            
+            _canvasForm.Show();
         }
 
         private void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
@@ -1130,22 +1153,39 @@ namespace InformationTree.Forms
         {
             if (tbCommand.Lines.Length <= 0)
                 return;
+                
+            var figureLines = tbCommand.Lines;
+            
+            if (_canvasForm == null || _canvasForm.IsDisposed)
+            {
+                _canvasForm = _canvasFormFactory.Create(figureLines);
+            }
+            else
+            {
+                _canvasForm.RunTimer.Enabled = false;
+                try
+                {
+                    _canvasForm.GraphicsFile.Clean();
+                    _canvasForm.GraphicsFile.ParseLines(figureLines);
+                }
+                finally
+                {
+                    _canvasForm.RunTimer.Enabled = false;
+                }
+            }
 
-            // TODO: create the CanvasForm using the newly created factory (and use the instance afterwards to run the code)
-            //if (CanvasForm == null || CanvasForm.IsDisposed)
-            //    CanvasForm = new CanvasPopUpForm();
-            //CanvasForm.RunTimer.Stop();
-            //CanvasForm.GraphicsFile.Clean();
-            //CanvasForm.GraphicsFile.ParseLines(tbCommand.Lines);
-            //CanvasForm.RunTimer.Start();
-            //CanvasForm.Show();
+            _canvasForm.Show();
         }
 
         // TODO: hide or show this button based on graphics feature?
         private void btnDeleteCanvas_Click(object sender, EventArgs e)
         {
-            // TODO: Hide the canvas and delete the reference value
-            //CanvasForm = null;
+            if (_canvasForm != null && !_canvasForm.IsDisposed)
+            {
+                _canvasForm.Close();
+                _canvasForm.Dispose();
+                _canvasForm = null;
+            }
         }
 
         // TODO: hide or show this button based on graphics feature?
@@ -1224,15 +1264,15 @@ namespace InformationTree.Forms
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            IsControlPressed = false;
+            _isControlPressed = false;
         }
 
         private void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control)
-                IsControlPressed = true;
+                _isControlPressed = true;
             else
-                IsControlPressed = false;
+                _isControlPressed = false;
 
             if (e.Control && e.KeyCode == Keys.F)
                 tbSearchBox_DoubleClick(sender, EventArgs.Empty);
@@ -1250,7 +1290,7 @@ namespace InformationTree.Forms
 
         private void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (IsControlPressed && tvTaskList != null)
+            if (_isControlPressed && tvTaskList != null)
             {
                 var deltaFloat = (float)e.Delta;
                 var changedSize = deltaFloat / 120f;
@@ -1275,26 +1315,26 @@ namespace InformationTree.Forms
         // TODO: Create another feature for this kind of alerts that might get annoying
         private void lblChangeTreeType_Click(object sender, EventArgs e)
         {
-            if (randomTimer == null)
+            if (_randomTimer == null)
                 return;
 
-            if (!randomTimer.Enabled)
+            if (!_randomTimer.Enabled)
             {
-                randomTimer.Tick += RandomTimer_Tick;
+                _randomTimer.Elapsed += RandomTimer_Elapsed; // timer disposed in Dispose(bool)
                 RandomTimer_ChangeIntervalAndSound();
-                randomTimer.Start();
+                _randomTimer.Start();
             }
             else
             {
-                randomTimer.Tick -= RandomTimer_Tick;
-                randomTimer.Stop();
+                _randomTimer.Elapsed -= RandomTimer_Elapsed;
+                _randomTimer.Stop();
             }
         }
 
         // TODO: Maybe move this to a separate service for alerts
         private void RandomTimer_ChangeIntervalAndSound()
         {
-            if (randomTimer == null)
+            if (_randomTimer == null)
                 return;
 
             var ticks = DateTime.Now.Ticks;
@@ -1304,17 +1344,17 @@ namespace InformationTree.Forms
             while (interval == 0)
                 interval = (new Random(ticksSeedAsInt).Next() % 10000);
 
-            randomTimer.Interval = interval;
+            _randomTimer.Interval = interval;
 
-            systemSoundNumber = -1;
+            _systemSoundNumber = -1;
 
-            while (systemSoundNumber < 1 || systemSoundNumber > 4)
-                systemSoundNumber = (new Random(ticksSeedAsInt).Next() % 4) + 1;
+            while (_systemSoundNumber < 1 || _systemSoundNumber > 4)
+                _systemSoundNumber = (new Random(ticksSeedAsInt).Next() % 4) + 1;
         }
 
-        private void RandomTimer_Tick(object sender, EventArgs e)
+        private void RandomTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            _soundProvider.PlaySystemSound(systemSoundNumber);
+            _soundProvider.PlaySystemSound(_systemSoundNumber);
             RandomTimer_ChangeIntervalAndSound();
         }
 
