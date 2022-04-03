@@ -27,7 +27,7 @@ namespace InformationTree.Forms
             UpdateGraphics(grafx.Graphics);
 
             op = 0; nr = 0;
-            var interval = 1000 / GraphicsComputation.FramesPerSecond;
+            var interval = GraphicsComputation.MillisecondsPerFrame;
             RunTimer = new System.Threading.Timer(RunTimer_Tick, null, interval, interval);            
         }
 
@@ -85,7 +85,7 @@ namespace InformationTree.Forms
             if (RunTimer != null)
             {
                 // Start timer
-                var interval = 1000 / GraphicsComputation.FramesPerSecond;
+                var interval = GraphicsComputation.MillisecondsPerFrame;
                 RunTimer.Change(interval, interval);
             }
         }

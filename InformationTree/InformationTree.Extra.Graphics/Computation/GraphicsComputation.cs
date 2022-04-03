@@ -6,6 +6,17 @@
     public static class GraphicsComputation
     {
         public static readonly int FramesPerSecond = 60;
+        public static readonly int MillisecondsPerFrame;
+
+        static GraphicsComputation()
+        {
+            // Calculate milliseconds per frame.
+            var secondInMilliseconds = 1000d;
+            var framePerSecondDouble = (double)FramesPerSecond;
+            var millisecondsPerFrame = secondInMilliseconds / framePerSecondDouble;
+            MillisecondsPerFrame = (int)millisecondsPerFrame;
+        }
+
         public const double GraphicsPI = 3.14159265358979323846;
 
         /// <summary>

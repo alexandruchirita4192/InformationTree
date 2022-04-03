@@ -1,4 +1,5 @@
 ﻿using InformationTree.Domain.Entities;
+using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
@@ -11,10 +12,18 @@ namespace InformationTree.Forms
 {
     public partial class MainForm : Form
     {
+        #region Fields
+
+        private readonly ISoundProvider _soundProvider;
+
+        #endregion Fields
+
         #region ctor
 
-        public MainForm()
+        public MainForm(ISoundProvider soundProvider)
         {
+            _soundProvider = soundProvider;
+            
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -1238,14 +1247,10 @@ namespace InformationTree.Forms
         {
             if (IsControlPressed && tvTaskList != null)
             {
-                TreeNodeHelper.UpdateSizeOfTreeNodes(tvTaskList.Nodes, (e.Delta / 120));
-                //var fontIsNotNull = tvTaskList.Font != null;
-                //var currentSize = fontIsNotNull ? tvTaskList.Font.Size : 0f;
-                //currentSize += (e.Delta / 120);
-                //var newFont = fontIsNotNull ?
-                //    new Font(tvTaskList.Font.FontFamily, currentSize, tvTaskList.Font.Style)
-                //    : new Font(DefaultFont.FontFamily, currentSize, DefaultFont.Style);
-                //tvTaskList.Font = newFont;
+                var deltaFloat = (float)e.Delta;
+                var changedSize = deltaFloat / 120f;
+                
+                TreeNodeHelper.UpdateSizeOfTreeNodes(tvTaskList.Nodes, changedSize);
             }
         }
 
@@ -1262,6 +1267,7 @@ namespace InformationTree.Forms
             MainForm_DoubleClick(sender, e);
         }
 
+        // TODO: Create another feature for this kind of alerts that might get annoying
         private void lblChangeTreeType_Click(object sender, EventArgs e)
         {
             if (randomTimer == null)
@@ -1280,6 +1286,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Maybe move this to a separate service for alerts
         private void RandomTimer_ChangeIntervalAndSound()
         {
             if (randomTimer == null)
@@ -1302,8 +1309,7 @@ namespace InformationTree.Forms
 
         private void RandomTimer_Tick(object sender, EventArgs e)
         {
-            // TODO: Use ISoundProvider
-            //SoundHelper.PlaySystemSound(systemSoundNumber);
+            _soundProvider.PlaySystemSound(systemSoundNumber);
             RandomTimer_ChangeIntervalAndSound();
         }
 
@@ -1326,27 +1332,7 @@ namespace InformationTree.Forms
         private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
         }
-
-        // TODO: Remove zombie code if it really is not showing anything proper
-        //private void tvTaskList_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.KeyCode == Keys.ControlKey)
-        //    {
-        //        var leKeyValue = e.KeyValue;
-        //        var leKeyCode = e.KeyCode;
-        //        var leKeyData = e.KeyData;
-
-        //    }
-        //}
-
-        // TODO: Remove zombie code if it really is not showing anything proper
-        //private void tvTaskList_MouseClick(object sender, MouseEventArgs e)
-        //{
-        //    if(e.Delta != 0)
-        //    {
-        //    }
-        //}
-
+        
         private void tbTask_DoubleClick(object sender, EventArgs e)
         {
             MainForm_DoubleClick(sender, e);

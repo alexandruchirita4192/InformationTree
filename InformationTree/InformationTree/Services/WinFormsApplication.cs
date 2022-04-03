@@ -14,22 +14,25 @@ namespace InformationTree.Render.WinForms.Services
         private readonly ICommandLineParser _commandLineParser;
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpConfirmation _popUpConfirmation;
+        private readonly ISoundProvider _soundProvider;
 
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
             IConfigurationReader configurationReader,
-            IPopUpConfirmation popUpConfirmation)
+            IPopUpConfirmation popUpConfirmation,
+            ISoundProvider soundProvider)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
             _popUpConfirmation = popUpConfirmation;
+            _soundProvider = soundProvider;
         }
 
         #region extern
 
         // TODO: Maybe remove these kinds of windows DllImport
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, ExactSpelling = true, SetLastError = true)]
-        public static extern void MoveWindow(IntPtr hwnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+        private static extern void MoveWindow(IntPtr hwnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
         #endregion extern
 
@@ -160,7 +163,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm());
+            Application.Run(MainForm = new MainForm(_soundProvider));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

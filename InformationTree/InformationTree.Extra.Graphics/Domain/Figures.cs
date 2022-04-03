@@ -143,31 +143,6 @@ namespace InformationTree.Extra.Graphics.Domain
             }
         }
 
-        public void ObsoleteAddRotateAround(string s)
-        {
-            var words = s.Split(' ');
-            if (words.Length != 3)
-                return;
-
-            var _position = int.Parse(words[0]);
-            var _addRotation = double.Parse(words[1]);
-            var _r = double.Parse(words[2]);
-            AddRotateAround(_position, _r, _addRotation);
-        }
-
-        public void ObsoleteAddRotateAround2(string s)
-        {
-            var words = s.Split(' ');
-            if (words.Length != 4)
-                return;
-
-            var _position = int.Parse(words[0]);
-            var _angle = double.Parse(words[1]);
-            var _addRotation = double.Parse(words[2]);
-            var _r = double.Parse(words[3]);
-            AddRotateAround(_position, _r, _addRotation, _angle);
-        }
-
         public void Move(int _position, double _x, double _y)
         {
             if (FigureList != null && FigureList.Count > _position && _position >= 0)

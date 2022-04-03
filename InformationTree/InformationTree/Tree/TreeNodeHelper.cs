@@ -1094,11 +1094,20 @@ namespace InformationTree.Tree
 
         #endregion Node move
 
+        /// <summary>
+        /// Changes the size of a collection of nodes recursively.
+        /// </summary>
+        /// <param name="treeNodeCollection">Collection of nodes.</param>
+        /// <param name="changedSize">Font size changed to all the nodes (added or substracted from nodes size).</param>
         public static void UpdateSizeOfTreeNodes(TreeNodeCollection treeNodeCollection, float changedSize)
         {
             foreach (TreeNode node in treeNodeCollection)
             {
                 node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);
+
+                // Change size of children recursively too
+                foreach (TreeNode childNode in node.Nodes)
+                    UpdateSizeOfTreeNodes(childNode.Nodes, changedSize);
             }
         }
     }
