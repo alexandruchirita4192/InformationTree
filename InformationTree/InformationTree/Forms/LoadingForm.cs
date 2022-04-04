@@ -10,7 +10,7 @@ namespace InformationTree.Forms
     {
         #region Properties
 
-        public IGraphicsFile GraphicsFile { get; private set; } // TODO: Maybe remove this property that is feature-dependent?
+        public IGraphicsFile GraphicsFile { get; private set; }
         public System.Timers.Timer Timer { get; protected set; }
 
         #endregion Properties
@@ -64,7 +64,7 @@ namespace InformationTree.Forms
 
         private void T_Elapsed(object sender, ElapsedEventArgs e)
         {
-            pbFileLoad.PerformStep();
+            pbFileLoad.PerformStep(); // TODO: TEST: Check if the progress bar changes
             pbLoadingGraphics.Refresh(); // paint?
         }
 
