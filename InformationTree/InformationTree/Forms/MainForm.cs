@@ -21,7 +21,7 @@ namespace InformationTree.Forms
         #region Fields
 
         private readonly ISoundProvider _soundProvider;
-        private readonly IGraphicsFileRecursiveGenerator _graphicsFileRecursiveGenerator;
+        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
 
         #endregion Fields
@@ -30,7 +30,7 @@ namespace InformationTree.Forms
 
         public MainForm(
             ISoundProvider soundProvider,
-            IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator,
+            IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory)
         {
             _soundProvider = soundProvider;
@@ -76,7 +76,7 @@ namespace InformationTree.Forms
             TreeNodeHelper.TreeUnchanged = true;
             TreeNodeHelper.IsSafeToSave = true;
 
-            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName);
+            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName, _graphicsFileRecursiveGenerator);
             if (loadedExisting)
             {
                 tvTaskList.CollapseAll();
@@ -975,7 +975,7 @@ namespace InformationTree.Forms
                 var tagData = node.Tag as TreeNodeData;
                 if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
                 {
-                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber);
+                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator);
                 }
             }
             else
@@ -1052,7 +1052,7 @@ namespace InformationTree.Forms
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber);
+            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)
@@ -1206,8 +1206,8 @@ namespace InformationTree.Forms
             var cbLogChecked = cbLog.Checked;
             var node = tvTaskList.SelectedNode;
             var commandData = cbUseDefaultsChecked ?
-                $"{GraphicsFileConstants.ComputeXComputeY.DefaultName} {radius} {theta} {iterations} {computeTypeInt}" :
-                $"{GraphicsFileConstants.ComputeXComputeY.DefaultName} {points} {x} {y} {radius} {theta} {number} {iterations} {computeTypeInt}";
+                $"{GraphicsFileConstants.GenerateFigureLines.DefaultName} {radius} {theta} {iterations} {computeTypeInt}" :
+                $"{GraphicsFileConstants.GenerateFigureLines.DefaultName} {points} {x} {y} {radius} {theta} {number} {iterations} {computeTypeInt}";
 
             if (cbLogChecked && node != null)
             {

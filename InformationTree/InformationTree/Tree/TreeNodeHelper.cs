@@ -1,4 +1,5 @@
 ﻿using InformationTree.Domain.Entities;
+using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
@@ -236,7 +237,7 @@ namespace InformationTree.Tree
             return convertedColor;
         }
 
-        public static bool LoadTree(Form t, TreeView tv, string fileName)
+        public static bool LoadTree(Form t, TreeView tv, string fileName, IGraphicsFileFactory graphicsFileRecursiveGenerator)
         {
             var fileNameExists = File.Exists(fileName);
             if (fileNameExists)
@@ -245,7 +246,7 @@ namespace InformationTree.Tree
                 if (result == DialogResult.Yes)
                 {
                     FileName = fileName;
-                    LoadXML(t, tv);
+                    LoadXML(t, tv, graphicsFileRecursiveGenerator);
                     return true;
                 }
                 else if (result == DialogResult.Cancel)
@@ -266,7 +267,7 @@ namespace InformationTree.Tree
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 FileName = dlg.FileName;
-                LoadXML(t, tv);
+                LoadXML(t, tv, graphicsFileRecursiveGenerator);
                 return true;
             }
 
@@ -457,12 +458,13 @@ namespace InformationTree.Tree
             return node;
         }
 
-        public static void LoadXML(Form t, TreeView tv)
+        // TODO: Extract loading and saving XML to separate class
+        public static void LoadXML(Form t, TreeView tv, IGraphicsFileFactory graphicsFileRecursiveGenerator)
         {
             try
             {
                 t.Cursor = Cursors.WaitCursor;
-                SplashForm.ShowSplashScreen();
+                SplashForm.ShowDefaultSplashScreen(graphicsFileRecursiveGenerator);
                 XmlDocument xDoc = new XmlDocument();
                 xDoc.Load(FileName);
 
@@ -688,11 +690,11 @@ namespace InformationTree.Tree
 
         #region Load & save
 
-        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber)
+        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber, IGraphicsFileFactory graphicsFileRecursiveGenerator)
         {
             SaveTree(tv);
             FileName = fileName;
-            LoadTree(t, tv, FileName);
+            LoadTree(t, tv, FileName, graphicsFileRecursiveGenerator);
             tv.CollapseAll();
             tv.Refresh();
 

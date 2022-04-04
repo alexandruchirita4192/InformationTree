@@ -103,10 +103,10 @@ public static class GraphicsFileConstants
         public const string prev = "prev";
     }
 
-    // TODO: Rename this to explain that this recursively generates a lot of figures
-    public static class ComputeXComputeY
+    public static class GenerateFigureLines
     {
-        public const string DefaultName = $"{nameof(ComputeXComputeY)}";
+        public const string DefaultName = $"{nameof(GenerateFigureLines)}";
+        public const string ComputeXComputeY = "ComputeXComputeY";
         public const string cxcy = "cxcy";
         public const string cpx_cpy = "cpx_cpy";
     }

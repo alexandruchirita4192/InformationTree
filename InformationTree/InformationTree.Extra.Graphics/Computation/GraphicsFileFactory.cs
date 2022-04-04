@@ -1,10 +1,11 @@
 ﻿using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
+using InformationTree.Extra.Graphics.Services.FileParsing;
 
 namespace InformationTree.Extra.Graphics.Computation
 {
-    public class GraphicsFileRecursiveGenerator : IGraphicsFileRecursiveGenerator
+    public class GraphicsFileFactory : IGraphicsFileFactory
     {
         #region Properties
 
@@ -14,10 +15,16 @@ namespace InformationTree.Extra.Graphics.Computation
         public const int DefaultPoints = 0;
         public const double DefaultTheta = 0d;
         public const double DefaultTreshold = 0.01d;
-
+        
         #endregion Properties
 
         #region Methods
+
+        public IGraphicsFile CreateGraphicsFile()
+        {
+            var graphicsFile = new GraphicsFile(this);
+            return graphicsFile;
+        }
 
         public List<string> GenerateFigureLines(int points, double x, double y, double radius, double theta, int number, int iterations, ComputeType computeType = ComputeType.ExtraFiguresWithPointsNumberOfCorners)
         {
@@ -59,16 +66,71 @@ namespace InformationTree.Extra.Graphics.Computation
             return GenerateFigureLines(DefaultPoints, DefaultX, DefaultY, radius, DefaultTheta, DefaultNumber, iterations, computeType);
         }
 
+        public IGraphicsFile GetDefaultGraphicsFile(int screenBoundsHeight, int screenBoundsWidth)
+        {
+            var ret = new GraphicsFile(this);
+            
+            var y = screenBoundsHeight / 2;
+            var x = screenBoundsWidth / 2;
+            var maxScreen = screenBoundsHeight > screenBoundsWidth ? screenBoundsHeight : screenBoundsWidth;
+            var max = (maxScreen / 2.0) * Math.Sqrt(2.0d);
+            
+            var lines = new List<string>
+            {
+                "ComputeXComputeY 4 200 200 45 0 0 -1 0"
+            };
+
+            for (int i = 50; i <= max; i += 4)
+            {
+                lines.Add("AddFrame");
+                lines.Add($"ComputeXComputeY 4 200 200 {i} 0 0 -1 0");
+            }
+            lines.Add($"AllCenter 200 200 {x} {y}");
+            lines.Add("Cycle 1");
+            
+            ret.ParseLines(lines.ToArray());
+
+            return ret;
+        }
+
+        public IGraphicsFile GetHardCodedPrettyFigures(int screenBoundsHeight, int screenBoundsWidth)
+        {
+            var y = screenBoundsHeight / 2;
+            var x = screenBoundsWidth / 2;
+            
+            var graphicsFile = new GraphicsFile(this);
+            
+            var lines = new List<string>
+            {
+                "ComputeXComputeY 4 200 200 50 0 0 -1 0",
+                "AddFrame",
+                "ComputeXComputeY 4 200 200 50 0 6 0 0",
+                "AddFrame",
+                "ComputeXComputeY 4 200 200 50 0 6 1 0",
+                "AddFrame",
+                "ComputeXComputeY 4 200 200 50 0 6 2 0",
+                "AddFrame",
+                "ComputeXComputeY 5 200 200 50 0 6 1 0",
+                "AddFrame",
+                "ComputeXComputeY 6 200 200 50 0 6 1 0",
+                $"AllCenter 200 200 {x} {y}",
+                "Cycle 200"
+            };
+
+            graphicsFile.ParseLines(lines.ToArray());
+            
+            return graphicsFile;
+        }
         #endregion Methods
 
         #region IGraphicsFileRecursiveGenerator
 
-        double IGraphicsFileRecursiveGenerator.DefaultX => DefaultX;
-        double IGraphicsFileRecursiveGenerator.DefaultY => DefaultY;
-        int IGraphicsFileRecursiveGenerator.DefaultNumber => DefaultNumber;
-        int IGraphicsFileRecursiveGenerator.DefaultPoints => DefaultPoints;
-        double IGraphicsFileRecursiveGenerator.DefaultTheta => DefaultTheta;
-        double IGraphicsFileRecursiveGenerator.DefaultTreshold => DefaultTreshold;
+        double IGraphicsFileFactory.DefaultX => DefaultX;
+        double IGraphicsFileFactory.DefaultY => DefaultY;
+        int IGraphicsFileFactory.DefaultNumber => DefaultNumber;
+        int IGraphicsFileFactory.DefaultPoints => DefaultPoints;
+        double IGraphicsFileFactory.DefaultTheta => DefaultTheta;
+        double IGraphicsFileFactory.DefaultTreshold => DefaultTreshold;
 
         #endregion IGraphicsFileRecursiveGenerator
     }

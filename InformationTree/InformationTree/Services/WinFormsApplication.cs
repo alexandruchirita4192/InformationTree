@@ -16,7 +16,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpConfirmation _popUpConfirmation;
         private readonly ISoundProvider _soundProvider;
-        private readonly IGraphicsFileRecursiveGenerator _graphicsFileRecursiveGenerator;
+        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
 
         public WinFormsApplication(
@@ -24,7 +24,7 @@ namespace InformationTree.Render.WinForms.Services
             IConfigurationReader configurationReader,
             IPopUpConfirmation popUpConfirmation,
             ISoundProvider soundProvider,
-            IGraphicsFileRecursiveGenerator graphicsFileRecursiveGenerator,
+            IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory)
         {
             _commandLineParser = commandLineParser;

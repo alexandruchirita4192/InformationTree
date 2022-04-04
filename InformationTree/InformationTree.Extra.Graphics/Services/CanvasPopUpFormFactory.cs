@@ -1,22 +1,21 @@
 ﻿using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Services.Graphics;
-using InformationTree.Extra.Graphics.Services.FileParsing;
 using InformationTree.Forms;
 
 namespace InformationTree.Extra.Graphics.Services
 {
     public class CanvasPopUpFormFactory : ICanvasFormFactory
     {
-        private readonly IGraphicsFileRecursiveGenerator _graphicsProvider;
+        private readonly IGraphicsFileFactory _graphicsFileFactory;
 
-        public CanvasPopUpFormFactory(IGraphicsFileRecursiveGenerator graphicsProvider)
+        public CanvasPopUpFormFactory(IGraphicsFileFactory graphicsFileFactory)
         {
-            _graphicsProvider = graphicsProvider;
+            _graphicsFileFactory = graphicsFileFactory;
         }
 
         public ICanvasForm Create(string[] figureLines)
         {
-            var graphicsFile = new GraphicsFile(_graphicsProvider);
+            var graphicsFile = _graphicsFileFactory.CreateGraphicsFile();
             graphicsFile.ParseLines(figureLines);
             var canvasForm = new CanvasPopUpForm(graphicsFile);
             return canvasForm;

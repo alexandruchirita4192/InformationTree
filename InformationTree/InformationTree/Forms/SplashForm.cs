@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Services.Graphics;
 
 namespace InformationTree.Forms
 {
@@ -8,12 +11,8 @@ namespace InformationTree.Forms
     {
         #region Constructor
 
-        public SplashForm() : this(null)
-        {
-        }
-
-        public SplashForm(int? screenIndex)
-            : base(screenIndex)
+        private SplashForm(IGraphicsFile graphicsFile, int? screenIndex)
+            : base(graphicsFile, screenIndex)
         {
             InitializeComponent();
         }
@@ -41,15 +40,30 @@ namespace InformationTree.Forms
         //The type of form to be displayed as the splash screen.
         private static List<SplashForm> splashFormList;
 
-        public static void ShowSplashScreen()
+        public static void ShowDefaultSplashScreen(IGraphicsFileFactory graphicsFileRecursiveGenerator)
+        {
+            InternalShowSplashScreen((currentScreenIndex) =>
+            {
+                var screen = Screen.AllScreens[currentScreenIndex];
+                var graphicsFile = graphicsFileRecursiveGenerator.GetDefaultGraphicsFile(screen.Bounds.Height, screen.Bounds.Width);
+                return graphicsFile;
+            });
+        }
+
+        public static void ShowSplashScreen(IGraphicsFile graphicsFile)
+        {
+            InternalShowSplashScreen((currentScreenIndex) => graphicsFile);
+        }
+
+        private static void InternalShowSplashScreen(Func<int, IGraphicsFile> graphicsFile)
         {
             // Make sure it is only launched once.
-            if (splashFormList == null)
+            if (splashFormList == null && graphicsFile != null)
             {
                 splashFormList = new List<SplashForm>();
-                for (int i = 0; i < Screen.AllScreens.Length; i++)
+                for (int currentScreenIndex = 0; currentScreenIndex < Screen.AllScreens.Length; currentScreenIndex++)
                 {
-                    var form = new SplashForm(i);
+                    var form = new SplashForm(graphicsFile(currentScreenIndex), currentScreenIndex);
                     form.Show();
                     splashFormList.Add(form);
                 }

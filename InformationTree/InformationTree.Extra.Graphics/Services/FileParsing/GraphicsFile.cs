@@ -12,7 +12,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
     [Obsolete("Break into many classes later")] // TODO: file parsing in one file, figures drawing in another
     public class GraphicsFile : IGraphicsFile, IDisposable
     {
-        private IGraphicsFileRecursiveGenerator _graphicsProvider;
+        private IGraphicsFileFactory _graphicsFileRecursiveGenerator;
 
         #region Properties
 
@@ -23,9 +23,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Constructor
 
-        public GraphicsFile(IGraphicsFileRecursiveGenerator graphicsProvider)
+        public GraphicsFile(IGraphicsFileFactory graphicsProvider)
         {
-            _graphicsProvider = graphicsProvider;
+            _graphicsFileRecursiveGenerator = graphicsProvider;
 
             Frame = new Frame();
             var interval = GraphicsComputation.MillisecondsPerFrame;
@@ -148,10 +148,11 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                             ChangeToPreviousFrame();
                             break;
 
-                        case GraphicsFileConstants.ComputeXComputeY.DefaultName:
-                        case GraphicsFileConstants.ComputeXComputeY.cxcy:
-                        case GraphicsFileConstants.ComputeXComputeY.cpx_cpy:
-                            ComputeXComputeY(parameters);
+                        case GraphicsFileConstants.GenerateFigureLines.DefaultName:
+                        case GraphicsFileConstants.GenerateFigureLines.ComputeXComputeY:
+                        case GraphicsFileConstants.GenerateFigureLines.cxcy:
+                        case GraphicsFileConstants.GenerateFigureLines.cpx_cpy:
+                            GenerateFigureLines(parameters);
                             break;
 
                         case GraphicsFileConstants.Cycle.DefaultName:
@@ -324,7 +325,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Graphics generator methods
 
-        public void ComputeXComputeY(string s)
+        public void GenerateFigureLines(string s)
         {
             if (string.IsNullOrEmpty(s))
                 return;
@@ -340,7 +341,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                     _radius = double.Parse(words[0]);
                     _iterations = int.Parse(words[1]);
                     _computeType = words.Length == 3 ? (ComputeType)int.Parse(words[2]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
-                    ParseLines(_graphicsProvider.GenerateFigureLines(_radius, _iterations, _computeType).Distinct().ToArray());
+                    ParseLines(_graphicsFileRecursiveGenerator.GenerateFigureLines(_radius, _iterations, _computeType).Distinct().ToArray());
                     break;
 
                 case 7:
@@ -353,7 +354,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                     var _number = int.Parse(words[5]);
                     _iterations = int.Parse(words[6]);
                     _computeType = words.Length == 8 ? (ComputeType)int.Parse(words[7]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
-                    ParseLines(_graphicsProvider.GenerateFigureLines(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
+                    ParseLines(_graphicsFileRecursiveGenerator.GenerateFigureLines(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
                     break;
             }
         }
