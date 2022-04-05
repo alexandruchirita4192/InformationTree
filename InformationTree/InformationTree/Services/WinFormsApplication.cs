@@ -102,7 +102,7 @@ namespace InformationTree.Render.WinForms.Services
             }
 
             // TODO: Show error message in pop-up using new service
-            MessageBox.Show(ex.Message + Environment.NewLine + Environment.NewLine + "Check log file Exception.txt", "Exception occured");
+            MessageBox.Show(ex.Message + Environment.NewLine + Environment.NewLine + "Check log file Log.txt", "Exception occured");
         }
 
         private static void GlobalUnhandledException(object sender, UnhandledExceptionEventArgs e)
