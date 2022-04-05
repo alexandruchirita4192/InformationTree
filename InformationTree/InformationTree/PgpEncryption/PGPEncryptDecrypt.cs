@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Bcpg;
+﻿using NLog;
+using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities.IO;
@@ -13,6 +14,8 @@ namespace InformationTree.PgpEncryption
     // TODO: break into class with encryption/decryption, move class related to UI (using OpenFileDialog), maybe have a facade to hide subsystem complexity and expose only required encryption/decryption methods
     public static class PGPEncryptDecrypt
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         #region Constants
 
         private const int BufferSize = 0x10000; // should always be power of 2
@@ -73,8 +76,10 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
-                // TODO: log exception, show generic error message in some pop-up
-                //MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // TODO: Show error message in pop-up using new service
+                var errorNotDecryptedMessage = "The message was not decrypted.";
+                MessageBox.Show(ex.Message, errorNotDecryptedMessage, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _logger.Error(ex, errorNotDecryptedMessage);
                 return encryptedText;
             }
         }
@@ -90,8 +95,10 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
-                // TODO: log exception, show generic error message in some pop-up
-                //MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // TODO: Show error message in pop-up using new service
+                var errorNotDecryptedMessage = "The message was not decrypted.";
+                _logger.Error(ex, errorNotDecryptedMessage);
+                MessageBox.Show(ex.Message, errorNotDecryptedMessage, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return encryptedText;
             }
         }
@@ -104,7 +111,7 @@ namespace InformationTree.PgpEncryption
                 {
                     using (var outputStream = new MemoryStream())
                     {
-                        PGPEncryptDecrypt.Decrypt(inputStream,
+                        Decrypt(inputStream,
                             privateKeyStream,
                             pgpPassword,
                             outputStream);
@@ -120,8 +127,11 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
-                // TODO: log exception, show generic error message in some pop-up
-                //MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // TODO: Show error message in pop-up using new service
+                var errorNotDecryptedMessage = "The message was not decrypted.";
+                _logger.Error(ex, errorNotDecryptedMessage);
+                MessageBox.Show(ex.Message, errorNotDecryptedMessage, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                
                 return encryptedText;
             }
         }
@@ -134,7 +144,7 @@ namespace InformationTree.PgpEncryption
             if (!File.Exists(privateKeyFile))
                 throw new FileNotFoundException(String.Format("Private Key File [{0}] not found.", privateKeyFile));
 
-            if (String.IsNullOrEmpty(outputFile))
+            if (string.IsNullOrEmpty(outputFile))
                 throw new ArgumentNullException("Invalid Output file path.");
 
             using (Stream inputStream = File.OpenRead(inputfile))
@@ -175,8 +185,10 @@ namespace InformationTree.PgpEncryption
 
                 if (enc == null)
                 {
-                    // TODO: log exception, show generic error message in some pop-up
-                    MessageBox.Show("No encrypted message", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // TODO: Show error message in pop-up using new service
+                    var noEncryptedDataMessage = "Encrypted data not found.";
+                    _logger.Warn($"{nameof(PgpEncryptedDataList)} is null. {noEncryptedDataMessage}");
+                    MessageBox.Show(noEncryptedDataMessage, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -197,16 +209,16 @@ namespace InformationTree.PgpEncryption
 
                 PgpObjectFactory plainFact = null;
 
-                using (Stream clear = pbe.GetDataStream(sKey))
+                using (var clear = pbe.GetDataStream(sKey))
                 {
                     plainFact = new PgpObjectFactory(clear);
                 }
-
-                PgpObject message = plainFact.NextPgpObject();
+                
+                var message = plainFact.NextPgpObject();
 
                 if (message is PgpCompressedData)
                 {
-                    PgpCompressedData cData = (PgpCompressedData)message;
+                    var cData = (PgpCompressedData)message;
                     PgpObjectFactory of = null;
 
                     using (Stream compDataIn = cData.GetDataStream())
@@ -231,12 +243,11 @@ namespace InformationTree.PgpEncryption
                         Streams.PipeAll(unc, outputStream);
                     }
                 }
-                else if (message is PgpLiteralData)
+                else if (message is PgpLiteralData ld)
                 {
-                    PgpLiteralData ld = (PgpLiteralData)message;
-                    string outFileName = ld.FileName;
+                    var outFileName = ld.FileName;
 
-                    Stream unc = ld.GetInputStream();
+                    var unc = ld.GetInputStream();
                     Streams.PipeAll(unc, outputStream);
                 }
                 else if (message is PgpOnePassSignatureList)
@@ -247,16 +258,33 @@ namespace InformationTree.PgpEncryption
                 if (pbe.IsIntegrityProtected())
                 {
                     if (!pbe.Verify())
-                        MessageBox.Show("Message failed integrity check.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    //else
-                    //    MessageBox.Show("Message integrity check passed.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    {
+                        // TODO: Show error message in pop-up using new service
+                        var integrityCheckFailedMessage = "Message failed integrity check.";
+                        MessageBox.Show(integrityCheckFailedMessage, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        _logger.Warn($"{nameof(pbe)}.{nameof(pbe.Verify)}() failed. {integrityCheckFailedMessage}");
+                    }
+                    else
+                    {
+                        // TODO: Show error message in pop-up using new service
+                        var messageIntegrityCheckPassed = "Message integrity check passed.";
+                        _logger.Info($"{nameof(pbe)}.{nameof(pbe.Verify)}() succeeded. {messageIntegrityCheckPassed}");
+                        MessageBox.Show(messageIntegrityCheckPassed, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
-                //else
-                //    MessageBox.Show("No message integrity check.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                else
+                {
+                    // TODO: Show error message in pop-up using new service
+                    var noMessageIntegrityCheck = "No message integrity check.";
+                    _logger.Warn($"{nameof(pbe)}.{nameof(pbe.IsIntegrityProtected)}() returned false. {noMessageIntegrityCheck}");
+                    MessageBox.Show(noMessageIntegrityCheck, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (PgpException ex)
             {
-                throw ex;
+                // TODO: Show error message in pop-up using new service
+                MessageBox.Show(ex.Message, "Error");
+                _logger.Error(ex);
             }
         }
 
@@ -277,10 +305,12 @@ namespace InformationTree.PgpEncryption
             }
             catch (PgpException ex)
             {
+                _logger.Error(ex);
                 if (ex.Message == "Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKeyRing found where PgpSecretKeyRing expected")
                     return false;
                 else
                 {
+                    // TODO: Show error message in pop-up using new service
                     MessageBox.Show(ex.Message, "Error");
                     return false;
                 }
@@ -323,6 +353,8 @@ namespace InformationTree.PgpEncryption
             }
             catch (PgpException ex)
             {
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
                 if (ex.Message == "Org.BouncyCastle.Bcpg.OpenPgp.PgpPublicKeyRing found where PgpSecretKeyRing expected")
                     MessageBox.Show("Public key given instead of private key", "Error");
                 else if (!ex.Message.StartsWith("Checksum mismatch at "))
@@ -335,6 +367,7 @@ namespace InformationTree.PgpEncryption
         {
             if (string.IsNullOrEmpty(privateKeyFile))
             {
+                // TODO: Show error message in pop-up using new service
                 MessageBox.Show("Private key file is missing (not chosen)", "Error");
                 return false;
             }
@@ -357,6 +390,8 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
                 MessageBox.Show(ex.Message, "Message not decrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return decryptedText;
             }
@@ -370,7 +405,7 @@ namespace InformationTree.PgpEncryption
                 {
                     using (var outputStream = new MemoryStream())
                     {
-                        PGPEncryptDecrypt.EncryptFromStream(
+                        EncryptFromStream(
                             inputStream,
                             outputStream,
                             publicKeyStream,
@@ -388,33 +423,17 @@ namespace InformationTree.PgpEncryption
             }
             catch (Exception ex)
             {
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
                 MessageBox.Show(ex.Message, "Message not encrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return File.ReadAllText(inputFile);
             }
         }
 
-        public static void Encrypt(string inputFile, string outputFile, string publicKeyFile, bool armor, bool withIntegrityCheck)
-        {
-            try
-            {
-                using (Stream publicKeyStream = File.OpenRead(publicKeyFile))
-                {
-                    using (Stream outputStream = File.Create(outputFile))
-                    {
-                        Encrypt(inputFile, outputFile, publicKeyFile, armor, withIntegrityCheck);
-                    }
-                }
-            }
-            catch (PgpException e)
-            {
-                throw e;
-            }
-        }
-
         public static void WriteStringToLiteralData(Stream outp, char fileType, String name, String buffer)
         {
-            PgpLiteralDataGenerator lData = new PgpLiteralDataGenerator();
-            Stream pOut = lData.Open(outp, fileType, name, buffer.Length, DateTime.Now);
+            var lData = new PgpLiteralDataGenerator();
+            var pOut = lData.Open(outp, fileType, name, buffer.Length, DateTime.Now);
             pOut.Write(Encoding.UTF8.GetBytes(buffer), 0, buffer.Length);
         }
 
@@ -427,9 +446,11 @@ namespace InformationTree.PgpEncryption
                     EncryptFromStream(inputStream, outputStream, publicKeyStreamReader.BaseStream, armor, withIntegrityCheck);
                 }
             }
-            catch (PgpException e)
+            catch (PgpException ex)
             {
-                throw e;
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
+                MessageBox.Show(ex.Message, "Message not encrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -473,9 +494,11 @@ namespace InformationTree.PgpEncryption
                     }
                 }
             }
-            catch (PgpException e)
+            catch (PgpException ex)
             {
-                throw e;
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
+                MessageBox.Show(ex.Message, "Message not encrypted because of error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

@@ -7,11 +7,14 @@ using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.Tree;
+using NLog;
 
 namespace InformationTree.Render.WinForms.Services
 {
     public class WinFormsApplication : IApplication
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly ICommandLineParser _commandLineParser;
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpConfirmation _popUpConfirmation;
@@ -91,13 +94,14 @@ namespace InformationTree.Render.WinForms.Services
             // Log to file
             try
             {
-                File.WriteAllText("Exception.txt", ex.ToString());
+                _logger.Error(ex);
             }
             catch
             {
                 // silent crash
             }
 
+            // TODO: Show error message in pop-up using new service
             MessageBox.Show(ex.Message + Environment.NewLine + Environment.NewLine + "Check log file Exception.txt", "Exception occured");
         }
 

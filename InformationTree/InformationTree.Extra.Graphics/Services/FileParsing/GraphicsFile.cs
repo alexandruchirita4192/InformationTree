@@ -6,12 +6,15 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Domain.Entities.Graphics;
 using System.Timers;
+using NLog;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
     [Obsolete("Break into many classes later")] // TODO: file parsing in one file, figures drawing in another
     public class GraphicsFile : IGraphicsFile, IDisposable
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private IGraphicsFileFactory _graphicsFileRecursiveGenerator;
 
         #region Properties
@@ -248,12 +251,14 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 RunTimer.Interval = interval;
                 RunTimer.Enabled = true;                
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // Stop timer
                 RunTimer.Enabled = false;
 
-                // TODO: Log exception, maybe even show a pop-up with generic message
+                _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(Cycle)} parsing '{s}' issue.");
+                // TODO: Show error message in pop-up using new service
+                MessageBox.Show(ex.Message, $"{nameof(FrameRelativeToPoint)} Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -263,7 +268,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             try
             {
                 var words = parameters.Split(' ');
-                D.Point oldPoint = new D.Point(), newPoint = new D.Point();
+                var oldPoint = new Point();
+                var newPoint = new Point();
 
                 switch (words.Length)
                 {
@@ -278,8 +284,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             }
             catch (Exception ex)
             {
-                // TODO: Create a logger or a UI error issue show (error handling)
-                //MessageBox.Show("parameters=" + parameters + ";" + Environment.NewLine + ex.ToString());
+                _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(FrameRelativeToPoint)}: '{parameters}' splitting and parsing issue: {ex.Message}.");
+                // TODO: Show error message in pop-up using new service
+                MessageBox.Show(ex.Message, $"{nameof(FrameRelativeToPoint)} Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -306,8 +313,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             }
             catch (Exception ex)
             {
-                // TODO: Create a logger or a UI error issue show (error handling)
-                //MessageBox.Show("parameters=" + parameters + ";" + Environment.NewLine + ex.ToString());
+                _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(AllRelativeToPoint)}: '{parameters}' splitting and parsing issue: {ex.Message}.");
+                // TODO: Show error message in pop-up using new service
+                MessageBox.Show("parameters=" + parameters + ";" + Environment.NewLine + ex.ToString());
             }
         }
 
