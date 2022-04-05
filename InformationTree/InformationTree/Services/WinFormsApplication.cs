@@ -133,6 +133,7 @@ namespace InformationTree.Render.WinForms.Services
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, $"Exception occured while setting up global exception handlers {ex.Message}");
                 MessageBox.Show(ex.ToString());
             }
 

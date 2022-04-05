@@ -56,7 +56,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 if (string.IsNullOrEmpty(line))
                     continue;
 
-                //MessageBox.Show(GetDebugText());
+                _logger.Debug(GetDebugText());
 
                 var words = line.Split(' ');
                 var firstWord = words[0];
@@ -175,8 +175,10 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Create a logger or a UI error issue show (error handling)
-                    //MessageBox.Show("firstWord: " + firstWord + ";parameters=" + parameters + ";" + Environment.NewLine + ex.ToString());
+                    // TODO: Show error message in pop-up using new service
+                    var errorWhileProcessingLine = $"Error while processing line: {line}";
+                    _logger.Error(ex, errorWhileProcessingLine);
+                    MessageBox.Show(errorWhileProcessingLine);
                 }
 
                 if (breakFromLoop)

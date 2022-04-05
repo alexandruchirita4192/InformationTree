@@ -1,4 +1,5 @@
 ﻿using InformationTree.PgpEncryption;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,8 @@ namespace InformationTree.TextProcessing
     // TODO: Split class into it's purposes: TreeNodeData (or text) processing (like an extension of TreeNodeData??), Compression/Decompression feature
     public static class TextProcessingHelper
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         public static string GetTextAndProcentCompleted(string attrText, ref decimal attrPercentCompleted, bool getTextWithoutProgress = false)
         {
             // The format of text is:
@@ -101,7 +104,10 @@ namespace InformationTree.TextProcessing
                 else
                     return string.Join(Environment.NewLine, lines) + Environment.NewLine;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
 
             if (text.Length <= charsCount)
                 return text;
@@ -124,7 +130,10 @@ namespace InformationTree.TextProcessing
                 using (var sr = new StreamReader(outputStream))
                     return sr.ReadToEnd();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
 
             return data;
         }
@@ -145,7 +154,10 @@ namespace InformationTree.TextProcessing
                         return urlEncodedResult;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
 
             return data;
         }

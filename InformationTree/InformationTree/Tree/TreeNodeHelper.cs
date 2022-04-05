@@ -3,6 +3,7 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,6 +21,8 @@ namespace InformationTree.Tree
     // TODO: file reading/writing purpose (XML), Tree state (Composite/Object tree with it's state), some configuration file with colors, some constant file with attributes of XML parsing
     public static class TreeNodeHelper
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         #region Constants
 
         #region Colors
@@ -220,11 +223,11 @@ namespace InformationTree.Tree
             var convertedDateTime = (DateTime?)null;
             if (!string.IsNullOrEmpty(s))
             {
-                try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithDot, CultureInfo.InvariantCulture); } catch { }
+                try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithDot, CultureInfo.InvariantCulture); } catch (Exception ex) { _logger.Error(ex); }
                 if (convertedDateTime == null)
-                    try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithSlash, CultureInfo.InvariantCulture); } catch { }
+                    try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithSlash, CultureInfo.InvariantCulture); } catch (Exception ex) { _logger.Error(ex); }
                 if (convertedDateTime == null)
-                    try { convertedDateTime = DateTime.Parse(s); } catch { }
+                    try { convertedDateTime = DateTime.Parse(s); } catch (Exception ex) { _logger.Error(ex); }
             }
             return convertedDateTime;
         }
@@ -233,7 +236,7 @@ namespace InformationTree.Tree
         {
             var convertedColor = (Color?)null;
             if (!string.IsNullOrEmpty(s))
-                try { convertedColor = Color.FromName(s); } catch (Exception ex) { WinFormsApplication.GlobalExceptionHandling(ex); }
+                convertedColor = Color.FromName(s);
             return convertedColor;
         }
 
@@ -293,7 +296,11 @@ namespace InformationTree.Tree
                     var newIteration = int.Parse(extension) + 1;
                     return GetNewFileName(fileName.Replace(extension, newIteration.ToString()));
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    MessageBox.Show("Error while trying to get new file name.\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             return null;
         }
@@ -481,11 +488,6 @@ namespace InformationTree.Tree
                     }
                 }
                 tv.ExpandAll();
-            }
-            catch (XmlException xExc)
-            {
-                WinFormsApplication.GlobalExceptionHandling(xExc);
-                MessageBox.Show(xExc.Message);
             }
             finally
             {

@@ -6,6 +6,7 @@ using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
+using NLog;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -19,6 +20,8 @@ namespace InformationTree.Forms
     public partial class MainForm : Form
     {
         #region Fields
+
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
@@ -605,6 +608,8 @@ namespace InformationTree.Forms
             }
             catch (Exception ex)
             {
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
                 MessageBox.Show(ex.Message, "Exception caught");
             }
 
@@ -1083,19 +1088,13 @@ namespace InformationTree.Forms
             {
                 var searchText = tbSearchBox.Text;
 
-                try
-                {
-                    TreeNodeHelper.ClearStyleAdded(tvTaskList.Nodes);
-                }
-                catch (Exception ex)
-                {
-                    WinFormsApplication.GlobalExceptionHandling(ex);
-                }
-
+                TreeNodeHelper.ClearStyleAdded(tvTaskList.Nodes);
+                
+                
                 if (searchText.Length < 3)
                     return;
 
-                if (!String.IsNullOrEmpty(searchText))
+                if (!string.IsNullOrEmpty(searchText))
                 {
                     TreeNodeHelper.SetStyleForSearch(tvTaskList.Nodes, searchText);
                 }

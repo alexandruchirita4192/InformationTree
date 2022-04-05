@@ -8,6 +8,7 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
+using NLog;
 
 namespace InformationTree.Forms
 {
@@ -27,6 +28,7 @@ namespace InformationTree.Forms
 
         #region Fields
 
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly ICanvasFormFactory _canvasFormFactory;
         private ICanvasForm _canvasForm;
         
@@ -88,8 +90,9 @@ namespace InformationTree.Forms
             {
                 tbData.Rtf = data;
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
+                _logger.Error(ex, $"RTF data is not valid: {data}");
                 tbData.Text = data;
             }
 

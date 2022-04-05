@@ -3,11 +3,14 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using NLog;
 
 namespace RicherTextBox.Controls
 {
     public partial class RicherTextBox : UserControl
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         #region Settings
 
         private int indent = 10;
@@ -427,12 +430,23 @@ namespace RicherTextBox.Controls
         [Description("RicherTextBox content in rich-text format")]
         public string Rtf
         {
-            get { return rtbDocument.Rtf; }
+            get
+            {
+                return rtbDocument.Rtf;
+            }
             set
             {
                 if (IsRichText(value))
                 {
-                    try { rtbDocument.Rtf = value; } catch (ArgumentException) { rtbDocument.Text = value; }
+                    try
+                    {
+                        rtbDocument.Rtf = value;
+                    } 
+                    catch (ArgumentException ex)
+                    {
+                        _logger.Error(ex); 
+                        rtbDocument.Text = value;
+                    }
                 }
                 else
                     rtbDocument.Text = value;
@@ -502,28 +516,21 @@ namespace RicherTextBox.Controls
         private void tsbtnBIUS_Click(object sender, EventArgs e)
         {
             // bold, italic, underline, strikeout
-            try
+            if (rtbDocument.SelectionFont != null)
             {
-                if (rtbDocument.SelectionFont != null)
-                {
-                    Font currentFont = rtbDocument.SelectionFont;
-                    FontStyle newFontStyle = rtbDocument.SelectionFont.Style;
-                    string txt = (sender as ToolStripButton).Name;
-                    if (txt.IndexOf("Bold") >= 0)
-                        newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Bold;
-                    else if (txt.IndexOf("Italic") >= 0)
-                        newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Italic;
-                    else if (txt.IndexOf("Underline") >= 0)
-                        newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Underline;
-                    else if (txt.IndexOf("Strikeout") >= 0)
-                        newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Strikeout;
+                Font currentFont = rtbDocument.SelectionFont;
+                FontStyle newFontStyle = rtbDocument.SelectionFont.Style;
+                string txt = (sender as ToolStripButton).Name;
+                if (txt.IndexOf("Bold") >= 0)
+                    newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Bold;
+                else if (txt.IndexOf("Italic") >= 0)
+                    newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Italic;
+                else if (txt.IndexOf("Underline") >= 0)
+                    newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Underline;
+                else if (txt.IndexOf("Strikeout") >= 0)
+                    newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Strikeout;
 
-                    rtbDocument.SelectionFont = new Font(currentFont.FontFamily, currentFont.Size, newFontStyle);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString(), "Error");
+                rtbDocument.SelectionFont = new Font(currentFont.FontFamily, currentFont.Size, newFontStyle);
             }
         }
 
@@ -585,127 +592,86 @@ namespace RicherTextBox.Controls
         private void tsbtnAlignment_Click(object sender, EventArgs e)
         {
             // alignment: left, center, right
-            try
+            string txt = (sender as ToolStripButton).Name;
+            if (txt.IndexOf("Left") >= 0)
             {
-                string txt = (sender as ToolStripButton).Name;
-                if (txt.IndexOf("Left") >= 0)
-                {
-                    rtbDocument.SelectionAlignment = HorizontalAlignment.Left;
-                    tsbtnAlignLeft.Checked = true;
-                    tsbtnAlignCenter.Checked = false;
-                    tsbtnAlignRight.Checked = false;
-                }
-                else if (txt.IndexOf("Center") >= 0)
-                {
-                    rtbDocument.SelectionAlignment = HorizontalAlignment.Center;
-                    tsbtnAlignLeft.Checked = false;
-                    tsbtnAlignCenter.Checked = true;
-                    tsbtnAlignRight.Checked = false;
-                }
-                else if (txt.IndexOf("Right") >= 0)
-                {
-                    rtbDocument.SelectionAlignment = HorizontalAlignment.Right;
-                    tsbtnAlignLeft.Checked = false;
-                    tsbtnAlignCenter.Checked = false;
-                    tsbtnAlignRight.Checked = true;
-                }
+                rtbDocument.SelectionAlignment = HorizontalAlignment.Left;
+                tsbtnAlignLeft.Checked = true;
+                tsbtnAlignCenter.Checked = false;
+                tsbtnAlignRight.Checked = false;
             }
-            catch (Exception ex)
+            else if (txt.IndexOf("Center") >= 0)
             {
-                MessageBox.Show(ex.Message.ToString(), "Error");
+                rtbDocument.SelectionAlignment = HorizontalAlignment.Center;
+                tsbtnAlignLeft.Checked = false;
+                tsbtnAlignCenter.Checked = true;
+                tsbtnAlignRight.Checked = false;
+            }
+            else if (txt.IndexOf("Right") >= 0)
+            {
+                rtbDocument.SelectionAlignment = HorizontalAlignment.Right;
+                tsbtnAlignLeft.Checked = false;
+                tsbtnAlignCenter.Checked = false;
+                tsbtnAlignRight.Checked = true;
             }
         }
 
         private void tsbtnFontColor_Click(object sender, EventArgs e)
         {
             // font color
-            try
+            using (ColorDialog dlg = new ColorDialog())
             {
-                using (ColorDialog dlg = new ColorDialog())
+                dlg.Color = rtbDocument.SelectionColor;
+                if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    dlg.Color = rtbDocument.SelectionColor;
-                    if (dlg.ShowDialog() == DialogResult.OK)
-                    {
-                        rtbDocument.SelectionColor = dlg.Color;
-                    }
+                    rtbDocument.SelectionColor = dlg.Color;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString(), "Error");
             }
         }
 
         private void tsbtnBulletsAndNumbering_Click(object sender, EventArgs e)
         {
             // bullets, indentation
-            try
-            {
-                string name = (sender as ToolStripButton).Name;
-                if (name.IndexOf("Bullets") >= 0)
-                    rtbDocument.SelectionBullet = tsbtnBullets.Checked;
-                else if (name.IndexOf("Indent") >= 0)
-                    rtbDocument.SelectionIndent += INDENT;
-                else if (name.IndexOf("Outdent") >= 0)
-                    rtbDocument.SelectionIndent -= INDENT;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString(), "Error");
-            }
+            string name = (sender as ToolStripButton).Name;
+            if (name.IndexOf("Bullets") >= 0)
+                rtbDocument.SelectionBullet = tsbtnBullets.Checked;
+            else if (name.IndexOf("Indent") >= 0)
+                rtbDocument.SelectionIndent += INDENT;
+            else if (name.IndexOf("Outdent") >= 0)
+                rtbDocument.SelectionIndent -= INDENT;
+
         }
 
         private void tscmbFontSize_Click(object sender, EventArgs e)
         {
             // font size
-            try
+            if (!(rtbDocument.SelectionFont == null))
             {
-                if (!(rtbDocument.SelectionFont == null))
-                {
-                    Font currentFont = rtbDocument.SelectionFont;
-                    float newSize = Convert.ToSingle(tscmbFontSize.SelectedItem.ToString());
-                    rtbDocument.SelectionFont = new Font(currentFont.FontFamily, newSize, currentFont.Style);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString(), "Error");
+                Font currentFont = rtbDocument.SelectionFont;
+                float newSize = Convert.ToSingle(tscmbFontSize.SelectedItem.ToString());
+                rtbDocument.SelectionFont = new Font(currentFont.FontFamily, newSize, currentFont.Style);
             }
         }
 
         private void tscmbFontSize_TextChanged(object sender, EventArgs e)
         {
             // font size custom
-            try
+            if (!(rtbDocument.SelectionFont == null))
             {
-                if (!(rtbDocument.SelectionFont == null))
-                {
-                    Font currentFont = rtbDocument.SelectionFont;
-                    float newSize = Convert.ToSingle(tscmbFontSize.Text);
-                    rtbDocument.SelectionFont = new Font(currentFont.FontFamily, newSize, currentFont.Style);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString(), "Error");
+                Font currentFont = rtbDocument.SelectionFont;
+                float newSize = Convert.ToSingle(tscmbFontSize.Text);
+                rtbDocument.SelectionFont = new Font(currentFont.FontFamily, newSize, currentFont.Style);
             }
         }
 
         private void tscmbFont_Click(object sender, EventArgs e)
         {
             // font
-            try
+            if (!(rtbDocument.SelectionFont == null))
             {
-                if (!(rtbDocument.SelectionFont == null))
-                {
-                    Font currentFont = rtbDocument.SelectionFont;
-                    FontFamily newFamily = new FontFamily(tscmbFont.SelectedItem.ToString());
-                    rtbDocument.SelectionFont = new Font(newFamily, currentFont.Size, currentFont.Style);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString(), "Error");
+                Font currentFont = rtbDocument.SelectionFont;
+                FontFamily newFamily = new FontFamily(tscmbFont.SelectedItem.ToString());
+                rtbDocument.SelectionFont = new Font(newFamily, currentFont.Size, currentFont.Style);
             }
         }
 
@@ -733,8 +699,8 @@ namespace RicherTextBox.Controls
                 {
                     try
                     {
-                        string strImagePath = dlg.FileName;
-                        Image img = Image.FromFile(strImagePath);
+                        var strImagePath = dlg.FileName;
+                        var img = Image.FromFile(strImagePath);
                         Clipboard.SetDataObject(img);
                         DataFormats.Format df;
                         df = DataFormats.GetFormat(DataFormats.Bitmap);
@@ -742,8 +708,10 @@ namespace RicherTextBox.Controls
                         if (this.rtbDocument.CanPaste(df))
                             this.rtbDocument.Paste(df);
                     }
-                    catch
+                    catch(Exception ex)
                     {
+                        _logger.Error(ex);
+                        // TODO: Show error message in pop-up using new service
                         MessageBox.Show("Unable to insert image.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -768,13 +736,17 @@ namespace RicherTextBox.Controls
                     {
                         rtbDocument.SaveFile(dlg.FileName, RichTextBoxStreamType.RichText);
                     }
-                    catch (IOException exc)
+                    catch (IOException ex)
                     {
-                        MessageBox.Show("Error writing file: \n" + exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // TODO: Show error message in pop-up using new service
+                        _logger.Error(ex);
+                        MessageBox.Show("Error writing file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    catch (ArgumentException exc_a)
+                    catch (ArgumentException ex)
                     {
-                        MessageBox.Show("Error writing file: \n" + exc_a.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // TODO: Show error message in pop-up using new service
+                        _logger.Error(ex);
+                        MessageBox.Show("Error writing file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -797,13 +769,17 @@ namespace RicherTextBox.Controls
                     {
                         rtbDocument.LoadFile(dlg.FileName, RichTextBoxStreamType.RichText);
                     }
-                    catch (IOException exc)
+                    catch (IOException ex)
                     {
-                        MessageBox.Show("Error reading file: \n" + exc.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // TODO: Show error message in pop-up using new service
+                        _logger.Error(ex);
+                        MessageBox.Show("Error reading file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    catch (ArgumentException exc_a)
+                    catch (ArgumentException ex)
                     {
-                        MessageBox.Show("Error reading file: \n" + exc_a.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // TODO: Show error message in pop-up using new service
+                        _logger.Error(ex);
+                        MessageBox.Show("Error reading file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -838,20 +814,26 @@ namespace RicherTextBox.Controls
             {
                 rtbDocument.ZoomFactor = Convert.ToSingle(tstxtZoomFactor.Text) / 100.0f;
             }
-            catch (FormatException)
+            catch (FormatException ex)
             {
+                _logger.Error(ex);
+                // TODO: Show error message in pop-up using new service
                 MessageBox.Show("Enter valid number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tstxtZoomFactor.Focus();
                 tstxtZoomFactor.SelectAll();
             }
-            catch (OverflowException)
+            catch (OverflowException ex)
             {
+                _logger.Error(ex);
+                // TODO: Show error message in pop-up using new service
                 MessageBox.Show("Enter valid number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tstxtZoomFactor.Focus();
                 tstxtZoomFactor.SelectAll();
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
+                // TODO: Show error message in pop-up using new service
+                _logger.Error(ex);
                 MessageBox.Show("Zoom factor should be between 20% and 6400%", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tstxtZoomFactor.Focus();
                 tstxtZoomFactor.SelectAll();
@@ -917,7 +899,7 @@ namespace RicherTextBox.Controls
                 if (IsRichText(rtfString))
                 {
                     // Put body into a RichTextBox so we can strip RTF
-                    using (System.Windows.Forms.RichTextBox rtfTemp = new System.Windows.Forms.RichTextBox())
+                    using (var rtfTemp = new RichTextBox())
                     {
                         rtfTemp.Rtf = rtfString;
                         result = rtfTemp.Text;
@@ -928,8 +910,9 @@ namespace RicherTextBox.Controls
                     result = rtfString;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Error(ex);
             }
 
             return result;

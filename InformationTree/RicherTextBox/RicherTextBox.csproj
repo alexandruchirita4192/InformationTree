@@ -20,5 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
+    <PackageReference Include="NLog" Version="4.7.15" />
   </ItemGroup>
 </Project>
