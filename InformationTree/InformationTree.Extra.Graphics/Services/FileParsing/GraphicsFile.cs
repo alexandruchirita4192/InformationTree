@@ -56,7 +56,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 if (string.IsNullOrEmpty(line))
                     continue;
 
-                _logger.Debug(GetDebugText());
+                _logger.Debug($"{nameof(GraphicsFile)}: Parsing line: {line}");
 
                 var words = line.Split(' ');
                 var firstWord = words[0];
@@ -469,18 +469,6 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
         }
 
         #endregion Config figure methods
-
-        #region Debug methods
-
-        public string GetDebugText()
-        {
-            var stringBuilder = new StringBuilder();
-            foreach (var f in Frame.Figures.FigureList)
-                stringBuilder.AppendLine("figure(" + f.GetDebugText() + ");");
-            return stringBuilder.ToString();
-        }
-
-        #endregion Debug methods
 
         void IDisposable.Dispose()
         {

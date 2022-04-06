@@ -1,10 +1,4 @@
-﻿using InformationTree.Domain.Entities;
-using InformationTree.Domain.Services.Graphics;
-using InformationTree.Forms;
-using InformationTree.Render.WinForms.Services;
-using InformationTree.TextProcessing;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -14,11 +8,15 @@ using System.Linq;
 using System.Web;
 using System.Windows.Forms;
 using System.Xml;
+using InformationTree.Domain.Entities;
+using InformationTree.Domain.Services.Graphics;
+using InformationTree.Forms;
+using InformationTree.TextProcessing;
+using NLog;
 
 namespace InformationTree.Tree
 {
-    [Obsolete("Break into many classes with many purposes")] 
-    // TODO: file reading/writing purpose (XML), Tree state (Composite/Object tree with it's state), some configuration file with colors, some constant file with attributes of XML parsing
+    [Obsolete("Break into many classes with many purposes")]
     public static class TreeNodeHelper
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
