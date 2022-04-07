@@ -17,7 +17,7 @@ namespace InformationTree.Render.WinForms.Services
 
         private readonly ICommandLineParser _commandLineParser;
         private readonly IConfigurationReader _configurationReader;
-        private readonly IPopUpConfirmation _popUpConfirmation;
+        private readonly IPopUpService _popUpService;
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
@@ -25,14 +25,14 @@ namespace InformationTree.Render.WinForms.Services
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
             IConfigurationReader configurationReader,
-            IPopUpConfirmation popUpConfirmation,
+            IPopUpService popUpService,
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
-            _popUpConfirmation = popUpConfirmation;
+            _popUpService = popUpService;
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
@@ -157,7 +157,7 @@ namespace InformationTree.Render.WinForms.Services
                     var title = $"Do you want to save your work? {alreadySavedMessage}{unchangedMessage}{notSafeToChangeCaption}";
                     var message = $"There are unsaved changes in {TreeNodeHelper.FileName}.";
 
-                    var result = _popUpConfirmation.Confirm(message, title);
+                    var result = _popUpService.Confirm(message, title);
 
                     if (result == PopUpResult.Confirm)
                     {
@@ -175,7 +175,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

@@ -26,6 +26,7 @@ namespace InformationTree.Forms
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
+        private readonly IPopUpService _popUpService;
 
         #endregion Fields
 
@@ -34,11 +35,13 @@ namespace InformationTree.Forms
         public MainForm(
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
-            ICanvasFormFactory canvasFormFactory)
+            ICanvasFormFactory canvasFormFactory,
+            IPopUpService popUpService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
+            _popUpService = popUpService;
             
             InitializeComponent();
 
@@ -557,8 +560,12 @@ namespace InformationTree.Forms
 
             if (deletedItemsWithName != 0)
             {
-                var result = MessageBox.Show("Deleted " + deletedItemsWithName.ToString() + (deletedItemsWithName == 1 ? " item" : " items") + " with name " + taskName, "Deleted " + deletedItemsWithName.ToString() + (deletedItemsWithName == 1 ? " item" : " items"), MessageBoxButtons.OKCancel);
-                if (result == DialogResult.OK)
+                var itemOrItems = deletedItemsWithName == 1 ? " item" : " items";
+                var messageBoxText = $"Delete {deletedItemsWithName} {itemOrItems} with name {taskName}?";
+                var messageBoxCaption = $"Delete";
+                
+                var result = _popUpService.ShowQuestion(messageBoxText, messageBoxCaption);
+                if (result)
                 {
                     ParseToDelete(selectedTask, taskName, false);
 
@@ -608,9 +615,8 @@ namespace InformationTree.Forms
             }
             catch (Exception ex)
             {
-                // TODO: Show error message in pop-up using new service
                 _logger.Error(ex);
-                MessageBox.Show(ex.Message, "Exception caught");
+                _popUpService.ShowError(ex.Message, "Exception caught in stop counting handler");
             }
 
             gbTask.Enabled = true;
@@ -791,7 +797,7 @@ namespace InformationTree.Forms
                     tvTaskList.SelectedNode = selectedNode;
                 }
                 else
-                    MessageBox.Show("Cannot move task up! [selectedIndex=" + selectedIndex.ToString() + "]");
+                    _popUpService.ShowMessage($"Cannot move task up! Current index is {selectedIndex}.");
             }
             else if (selectedNode != null && selectedNode.Parent == null)
             {
@@ -803,7 +809,7 @@ namespace InformationTree.Forms
                     tvTaskList.SelectedNode = selectedNode;
                 }
                 else
-                    MessageBox.Show("Cannot move task up! [selectedIndex=" + selectedIndex.ToString() + "]");
+                    _popUpService.ShowMessage($"Cannot move task up! Current index is {selectedIndex}.");
             }
 
             TreeNodeHelper.TreeUnchanged = false;
@@ -824,7 +830,7 @@ namespace InformationTree.Forms
                     tvTaskList.SelectedNode = selectedNode;
                 }
                 else
-                    MessageBox.Show("Cannot move task down! [selectedIndex=" + selectedIndex.ToString() + "]");
+                    _popUpService.ShowMessage($"Cannot move task down! Current index is {selectedIndex}.");
             }
             else if (selectedNode != null && selectedNode.Parent == null)
             {
@@ -837,7 +843,7 @@ namespace InformationTree.Forms
                     tvTaskList.SelectedNode = selectedNode;
                 }
                 else
-                    MessageBox.Show("Cannot move task down! [selectedIndex=" + selectedIndex.ToString() + "]");
+                    _popUpService.ShowMessage($"Cannot move task down! Current index is {selectedIndex}.");
             }
 
             TreeNodeHelper.TreeUnchanged = false;

@@ -72,12 +72,12 @@ namespace InformationTree.Forms
         {
             InitializeComponent();
 
-            this.FormClosing += tbExitPopUpAndSave_Click;
+            FormClosing += tbExitPopUpAndSave_Click;
 
             if (tbData != null && tbData.TextBox != null)
                 tbData.TextBox.AllowDrop = true;
 
-            this.tbData.TextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PopUpEditForm_KeyUp);
+            tbData.TextBox.KeyUp += new KeyEventHandler(PopUpEditForm_KeyUp);
             _canvasFormFactory = canvasFormFactory;
         }
 
@@ -340,6 +340,7 @@ namespace InformationTree.Forms
 
         private void btnCalculate_Click(object sender, EventArgs e)
         {
+            // TODO: Hide unfinished feature using a flag
             MessageBox.Show("Not supported");
         }
 
