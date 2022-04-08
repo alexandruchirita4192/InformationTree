@@ -60,5 +60,28 @@ namespace InformationTree.Render.WinForms.Services
         {
             MessageBox.Show(text, caption ?? "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
+
+        public string GetPrivateKeyFile()
+        {
+            return GetKeyFile("Private");
+        }
+
+        public string GetPublicKeyFile()
+        {
+            return GetKeyFile("Public");
+        }
+
+        private string GetKeyFile(string keyType)
+        {
+            var lowerFileType = keyType.ToLower();
+            var dlg = new OpenFileDialog
+            {
+                Title = $"Open {lowerFileType} key file",
+                Filter = $"{keyType} Key Files|*.asc;*.skr;*.{lowerFileType}|All files (*.*)|*.*",
+                InitialDirectory = Application.StartupPath
+            };
+
+            return dlg.ShowDialog() == DialogResult.OK ? dlg.FileName : null;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Extra.Graphics.Services.FileParsing;
@@ -7,7 +8,14 @@ namespace InformationTree.Extra.Graphics.Computation
 {
     public class GraphicsFileFactory : IGraphicsFileFactory
     {
-        #region Properties
+        private readonly IPopUpService _popUpService;
+
+        public GraphicsFileFactory(IPopUpService popUpService)
+        {
+            _popUpService = popUpService;
+        }
+
+        #region Constants
 
         public const double DefaultX = 200d;
         public const double DefaultY = 200d;
@@ -15,14 +23,14 @@ namespace InformationTree.Extra.Graphics.Computation
         public const int DefaultPoints = 0;
         public const double DefaultTheta = 0d;
         public const double DefaultTreshold = 0.01d;
-        
-        #endregion Properties
+
+        #endregion Constants
 
         #region Methods
 
         public IGraphicsFile CreateGraphicsFile()
         {
-            var graphicsFile = new GraphicsFile(this);
+            var graphicsFile = new GraphicsFile(this, _popUpService);
             return graphicsFile;
         }
 
@@ -68,13 +76,13 @@ namespace InformationTree.Extra.Graphics.Computation
 
         public IGraphicsFile GetDefaultGraphicsFile(int screenBoundsHeight, int screenBoundsWidth)
         {
-            var ret = new GraphicsFile(this);
-            
+            var ret = new GraphicsFile(this, _popUpService);
+
             var y = screenBoundsHeight / 2;
             var x = screenBoundsWidth / 2;
             var maxScreen = screenBoundsHeight > screenBoundsWidth ? screenBoundsHeight : screenBoundsWidth;
             var max = (maxScreen / 2.0) * Math.Sqrt(2.0d);
-            
+
             var lines = new List<string>
             {
                 "ComputeXComputeY 4 200 200 45 0 0 -1 0"
@@ -87,7 +95,7 @@ namespace InformationTree.Extra.Graphics.Computation
             }
             lines.Add($"AllCenter 200 200 {x} {y}");
             lines.Add("Cycle 1");
-            
+
             ret.ParseLines(lines.ToArray());
 
             return ret;
@@ -97,9 +105,9 @@ namespace InformationTree.Extra.Graphics.Computation
         {
             var y = screenBoundsHeight / 2;
             var x = screenBoundsWidth / 2;
-            
-            var graphicsFile = new GraphicsFile(this);
-            
+
+            var graphicsFile = new GraphicsFile(this, _popUpService);
+
             var lines = new List<string>
             {
                 "ComputeXComputeY 4 200 200 50 0 0 -1 0",
@@ -118,9 +126,10 @@ namespace InformationTree.Extra.Graphics.Computation
             };
 
             graphicsFile.ParseLines(lines.ToArray());
-            
+
             return graphicsFile;
         }
+
         #endregion Methods
 
         #region IGraphicsFileRecursiveGenerator

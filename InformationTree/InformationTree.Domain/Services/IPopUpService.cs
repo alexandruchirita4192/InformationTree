@@ -15,5 +15,9 @@ namespace InformationTree.Domain.Services
         void ShowError(string text, string caption = null);
 
         PopUpResult Confirm(string text, string caption = null);
+
+        string GetPrivateKeyFile();
+
+        string GetPublicKeyFile();
     }
 }

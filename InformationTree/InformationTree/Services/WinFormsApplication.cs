@@ -21,6 +21,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
+        private readonly IPGPEncryptionProvider _encryptionProvider;
 
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
@@ -28,7 +29,8 @@ namespace InformationTree.Render.WinForms.Services
             IPopUpService popUpService,
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
-            ICanvasFormFactory canvasFormFactory)
+            ICanvasFormFactory canvasFormFactory,
+            IPGPEncryptionProvider encryptionProvider)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
@@ -36,6 +38,7 @@ namespace InformationTree.Render.WinForms.Services
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
+            _encryptionProvider = encryptionProvider;
         }
 
         #region extern
@@ -89,7 +92,7 @@ namespace InformationTree.Render.WinForms.Services
             }
         }
 
-        public static void GlobalExceptionHandling(Exception ex)
+        public void GlobalExceptionHandling(Exception ex)
         {
             // Log to file
             try
@@ -101,16 +104,15 @@ namespace InformationTree.Render.WinForms.Services
                 // silent crash
             }
 
-            // TODO: Show error message in pop-up using new service
-            MessageBox.Show(ex.Message + Environment.NewLine + Environment.NewLine + "Check log file Log.txt", "Exception occured");
+            _popUpService.ShowWarning($"{ex.Message}{Environment.NewLine}{Environment.NewLine}Check log file Log.txt", "Error occured");
         }
 
-        private static void GlobalUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void GlobalUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             GlobalExceptionHandling(e.ExceptionObject as Exception ?? new Exception("Unknown exception"));
         }
 
-        private static void GlobalThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        private void GlobalThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
             GlobalExceptionHandling(e.Exception ?? new Exception("Unknown exception"));
         }
@@ -134,7 +136,7 @@ namespace InformationTree.Render.WinForms.Services
             catch (Exception ex)
             {
                 _logger.Error(ex, $"Exception occured while setting up global exception handlers {ex.Message}");
-                MessageBox.Show(ex.ToString());
+                _popUpService.ShowError($"Exception '{ex.Message}' occured while setting up global exception handlers. Check logs.");
             }
 
             if (AutoSaveTimer == null)
@@ -175,7 +177,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionProvider));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

@@ -4,6 +4,8 @@ using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
@@ -14,22 +16,12 @@ namespace InformationTree.Forms
 {
     public partial class PopUpEditForm : Form
     {
-        #region constants
-
-        private const int WM_COPY = 0x301;
-        private const int WM_CUT = 0x300;
-        private const int WM_PASTE = 0x302;
-        private const int WM_CLEAR = 0x303;
-        private const int WM_UNDO = 0x304;
-        private const int EM_UNDO = 0xC7;
-        private const int EM_CANUNDO = 0xC6;
-
-        #endregion constants
-
         #region Fields
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly ICanvasFormFactory _canvasFormFactory;
+        private readonly IPopUpService _popUpService;
+        private readonly IPGPEncryptionProvider _encryptionProvider;
         private ICanvasForm _canvasForm;
         
         #endregion Fields
@@ -68,7 +60,10 @@ namespace InformationTree.Forms
 
         #region Constructor
 
-        public PopUpEditForm(ICanvasFormFactory canvasFormFactory)
+        private PopUpEditForm(
+            ICanvasFormFactory canvasFormFactory,
+            IPopUpService popUpService,
+            IPGPEncryptionProvider encryptionProvider)
         {
             InitializeComponent();
 
@@ -79,12 +74,19 @@ namespace InformationTree.Forms
 
             tbData.TextBox.KeyUp += new KeyEventHandler(PopUpEditForm_KeyUp);
             _canvasFormFactory = canvasFormFactory;
+            _popUpService = popUpService;
+            _encryptionProvider = encryptionProvider;
         }
 
-        public PopUpEditForm(ICanvasFormFactory canvasFormFactory, string title, string data)
-            : this(canvasFormFactory)
+        public PopUpEditForm(
+            ICanvasFormFactory canvasFormFactory,
+            IPopUpService popUpService,
+            IPGPEncryptionProvider encryptionProvider,
+            string title,
+            string data)
+            : this(canvasFormFactory, popUpService, encryptionProvider)
         {
-            this.Text += ": " + title;
+            Text += $": {title}";
 
             try
             {
@@ -198,9 +200,10 @@ namespace InformationTree.Forms
             else
                 data = null;
 
-            if (DataIsPgpEncrypted || (MessageBox.Show("Data seems to be decrypted. Try to decrypt anyway?", string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
+            if (DataIsPgpEncrypted ||
+                _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?"))
             {
-                PgpDecrypt form = new PgpDecrypt(cbFromFile.Checked);
+                var form = new PgpDecrypt(_popUpService, _encryptionProvider, cbFromFile.Checked);
                 if (!form.IsDisposed)
                 {
                     WinFormsApplication.CenterForm(form, this);
@@ -225,12 +228,12 @@ namespace InformationTree.Forms
                 var result = string.Empty;
                 if (FromFile)
                 {
-                    result = PGPEncryptDecrypt.GetDecryptedStringFromFile(tbData.Text, PgpKeyFile, PgpPassword);
+                    result = _encryptionProvider.GetDecryptedStringFromFile(tbData.Text, PgpKeyFile, PgpPassword);
                     lblEncryption.Text = "Decrypted with key: " + PgpKeyFile;
                 }
                 else
                 {
-                    result = PGPEncryptDecrypt.GetDecryptedStringFromString(tbData.Text, PgpKeyText, PgpPassword);
+                    result = _encryptionProvider.GetDecryptedStringFromString(tbData.Text, PgpKeyText, PgpPassword);
                     lblEncryption.Text = "Decrypted with node key";
                 }
 
@@ -242,23 +245,18 @@ namespace InformationTree.Forms
         {
             FromFile = cbFromFile.Checked;
 
-            var result = MessageBox.Show("Encrypt RTF? (else get only plaintext)", "Encrypt RTF?", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-            var decryptedData = string.Empty;
-
-            if (result == DialogResult.Yes)
-                decryptedData = tbData.Rtf;
-            else
-                decryptedData = tbData.Text;
-
+            var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", false);
+            string decryptedData = result ? tbData.Rtf : tbData.Text;
+            
             if (FromFile)
             {
-                PgpKeyFile = PGPEncryptDecrypt.GetPublicKeyFile();
+                PgpKeyFile = _popUpService.GetPublicKeyFile();
 
-                using (var decryptedStream = PGPEncryptDecrypt.GenerateStreamFromString(decryptedData))
+                using (var decryptedStream = decryptedData.ToStream())
                 {
                     using (var outputStream = new MemoryStream())
                     {
-                        PGPEncryptDecrypt.EncryptFromFile(decryptedStream, outputStream, PgpKeyFile, true, true);
+                        _encryptionProvider.EncryptFromFile(decryptedStream, outputStream, PgpKeyFile, true, true);
                         using (var reader = new StreamReader(outputStream))
                         {
                             var resultedText = reader.ReadToEnd();
@@ -276,7 +274,7 @@ namespace InformationTree.Forms
             {
                 FindNodeWithPublicKey();
 
-                var resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(PGPEncryptDecrypt.GetEncryptedStringFromString(tbData.Rtf, PgpKeyText, true, true));
+                var resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(_encryptionProvider.GetEncryptedStringFromString(tbData.Rtf, PgpKeyText, true, true));
                 if (tbData.Text != resultedText)
                 {
                     data = null;
@@ -288,7 +286,7 @@ namespace InformationTree.Forms
 
         private void FindNodeWithPublicKey()
         {
-            var form = new SearchForm();
+            var form = new SearchForm(_popUpService);
 
             WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
 
@@ -314,13 +312,12 @@ namespace InformationTree.Forms
                     {
                         PgpKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
 
-                        MessageBox.Show("Public key taken from data of node " + node.Text, "Node " + node.Text + " used", MessageBoxButtons.OK);
+                        _popUpService.ShowMessage($"Public key taken from data of node {node.Text}", $"Node {node.Text} used");
                     }
                 }
 
-                //if (string.IsNullOrEmpty(PgpPrivateKeyText) &&
-                //    MessageBox.Show("You did not select a valid private key node. Try to select again?", string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                //    FindNodeWithPublicKey();
+                if (string.IsNullOrEmpty(PgpKeyText) && _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?"))
+                    FindNodeWithPublicKey();
             }
         }
 
@@ -341,7 +338,7 @@ namespace InformationTree.Forms
         private void btnCalculate_Click(object sender, EventArgs e)
         {
             // TODO: Hide unfinished feature using a flag
-            MessageBox.Show("Not supported");
+            _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
         }
 
         // TODO: hide or show this button based on graphics feature?

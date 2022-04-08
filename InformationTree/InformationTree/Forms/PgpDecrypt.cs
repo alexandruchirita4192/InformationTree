@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Services;
 using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
@@ -9,6 +10,13 @@ namespace InformationTree.Forms
 {
     public partial class PgpDecrypt : Form
     {
+        #region Fields
+
+        private readonly IPopUpService _popUpService;
+        private readonly IPGPEncryptionProvider _encryptionProvider;
+
+        #endregion Fields
+
         #region Properties
 
         public string PgpPassword
@@ -26,24 +34,27 @@ namespace InformationTree.Forms
 
         #endregion Properties
 
-        public PgpDecrypt()
+        private PgpDecrypt()
         {
             InitializeComponent();
 
             mtbPgpDecrypt.PasswordChar = '#';
         }
 
-        public PgpDecrypt(bool fromFile)
+        public PgpDecrypt(IPopUpService popUpService, IPGPEncryptionProvider encryptionProvider, bool fromFile)
             : this()
         {
+            _popUpService = popUpService;
+            _encryptionProvider = encryptionProvider;
+
             DecryptFromFile = fromFile;
 
             if (DecryptFromFile)
             {
-                PgpPrivateKeyFile = PGPEncryptDecrypt.GetPrivateKeyFile();
+                PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
                 while (string.IsNullOrEmpty(PgpPrivateKeyFile) &&
-                    MessageBox.Show("You did not select a private key file. Try to select again?", string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    PgpPrivateKeyFile = PGPEncryptDecrypt.GetPrivateKeyFile();
+                    _popUpService.ShowQuestion("You did not select a private key file. Try to select again?"))
+                    PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
 
                 if (string.IsNullOrEmpty(PgpPrivateKeyFile))
                 {
@@ -59,7 +70,7 @@ namespace InformationTree.Forms
 
         private void FindNodeWithPrivateKey()
         {
-            var form = new SearchForm();
+            var form = new SearchForm(_popUpService);
 
             WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
 
@@ -85,13 +96,13 @@ namespace InformationTree.Forms
                     {
                         PgpPrivateKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
 
-                        MessageBox.Show("Private key taken from data of node " + node.Text, "Node " + node.Text + " used", MessageBoxButtons.OK);
+                        _popUpService.ShowMessage($"Private key taken from data of node {node.Text}", $"Node {node.Text} used");
                     }
                 }
 
-                //if (string.IsNullOrEmpty(PgpPrivateKeyText) &&
-                //    MessageBox.Show("You did not select a valid private key node. Try to select again?", string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                //    FindNodeWithPrivateKey();
+                if (string.IsNullOrEmpty(PgpPrivateKeyText) &&
+                    _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?"))
+                    FindNodeWithPrivateKey();
             }
         }
 
@@ -101,6 +112,7 @@ namespace InformationTree.Forms
             {
                 var password = mtbPgpDecrypt.Text;
 
+                // TODO: Show that something is wrong with the password length and return
                 //if (password.Length == 0)
                 //    return;
 
@@ -108,17 +120,17 @@ namespace InformationTree.Forms
                 {
                     if (DecryptFromFile)
                     {
-                        if (PGPEncryptDecrypt.ExistsPassword(PgpPrivateKeyFile, password.ToCharArray()))
-                            this.Close();
-                        //else
-                        //    MessageBox.Show("Password is not valid with the selected PGP file", "Invalid password", MessageBoxButtons.OK);
+                        if (_encryptionProvider.ExistsPassword(PgpPrivateKeyFile, password.ToCharArray()))
+                            Close();
+                        else
+                            _popUpService.ShowMessage("Password is not valid for the selected PGP file", "Invalid password");
                     }
                     else
                     {
-                        if (PGPEncryptDecrypt.ExistsPasswordFromString(PgpPrivateKeyText, password.ToCharArray()))
-                            this.Close();
-                        //else
-                        //    MessageBox.Show("Password is not valid with the selected PGP key", "Invalid password", MessageBoxButtons.OK);
+                        if (_encryptionProvider.ExistsPasswordFromString(PgpPrivateKeyText, password.ToCharArray()))
+                            Close();
+                        else
+                            _popUpService.ShowMessage("Password is not valid for the selected PGP key", "Invalid password");
                     }
                 }
             }
@@ -126,7 +138,7 @@ namespace InformationTree.Forms
 
         private void lblDecryptingPassword_Click(object sender, EventArgs e)
         {
-            PgpPrivateKeyFile = PGPEncryptDecrypt.GetPrivateKeyFile();
+            PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
         }
     }
 }

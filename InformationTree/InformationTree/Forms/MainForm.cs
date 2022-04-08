@@ -27,6 +27,7 @@ namespace InformationTree.Forms
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
+        private readonly IPGPEncryptionProvider _encryptionProvider;
 
         #endregion Fields
 
@@ -36,12 +37,14 @@ namespace InformationTree.Forms
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
-            IPopUpService popUpService)
+            IPopUpService popUpService,
+            IPGPEncryptionProvider encryptionProvider)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
+            _encryptionProvider = encryptionProvider;
             
             InitializeComponent();
 
@@ -943,7 +946,7 @@ namespace InformationTree.Forms
                 if (tagData != null)
                     data = tagData.Data;
 
-                var form = new PopUpEditForm(_canvasFormFactory, selectedNode.Text, data);
+                var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionProvider, selectedNode.Text, data);
 
                 WinFormsApplication.CenterForm(form, this);
 
@@ -1068,7 +1071,7 @@ namespace InformationTree.Forms
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)
         {
-            var form = new SearchForm(tbSearchBox.Text);
+            var form = new SearchForm(_popUpService, tbSearchBox.Text);
 
             WinFormsApplication.CenterForm(form, this);
 

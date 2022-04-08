@@ -58,7 +58,6 @@ namespace InformationTree.Forms
             base.Dispose(disposing);
         }
 
-        //static int ticks;
         private void RunTimer_Tick(object? sender, ElapsedEventArgs e)
         {
             if (this.IsDisposed)
@@ -70,13 +69,6 @@ namespace InformationTree.Forms
             if (RunTimer != null)
                 RunTimer.Enabled = false;
             
-            //if (ticks == 20)
-            //{
-            //    //MessageBox.Show(GraphicsFile.GetDebugText());
-            //    ticks = 0;
-            //}
-            //ticks++;
-
             if (grafx != null && !IsDisposed)
             {
                 UpdateGraphics(grafx.Graphics);
@@ -105,10 +97,10 @@ namespace InformationTree.Forms
 
         private void CanvasPopUpForm_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (this.FormBorderStyle == System.Windows.Forms.FormBorderStyle.Sizable)
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            if (FormBorderStyle == System.Windows.Forms.FormBorderStyle.Sizable)
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             else
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
         }
 
         private void CanvasPopUpForm_Paint(object sender, PaintEventArgs e)

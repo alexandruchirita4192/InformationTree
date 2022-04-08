@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Windows.Forms;
+using InformationTree.Domain.Services;
 
 namespace InformationTree.Forms
 {
     public partial class SearchForm : Form
     {
-        public string TextToFind
-        { get { return tbFind.Text.Replace("\n", "").Replace("\r", ""); } set { tbFind.Text = value; } }
+        private readonly IPopUpService _popUpService;
 
-        public SearchForm(string text = null)
+        public string TextToFind
+        { get { return tbFind.Text?.Replace("\n", "")?.Replace("\r", ""); } set { tbFind.Text = value; } }
+
+        public SearchForm(IPopUpService popUpService, string text = null)
         {
+            _popUpService = popUpService;
+            
             InitializeComponent();
             TextToFind = text;
 
@@ -21,9 +26,11 @@ namespace InformationTree.Forms
         {
             if (tbFind.Text.Length > 3)
             {
-                //MessageBox.Show(tbFind.Text);
+                _popUpService.ShowMessage($"Found {tbFind.Text}");
+                
+                // TODO: Investigate if this works so this zombie code is not needed
                 //tbFind.Text = string.Empty;
-                this.Close();
+                Close();
             }
         }
 

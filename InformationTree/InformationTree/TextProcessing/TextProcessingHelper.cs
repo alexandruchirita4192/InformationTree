@@ -1,4 +1,5 @@
-﻿using InformationTree.PgpEncryption;
+﻿using InformationTree.Domain.Extensions;
+using InformationTree.PgpEncryption;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -145,7 +146,7 @@ namespace InformationTree.TextProcessing
 
             try
             {
-                using (var inputStream = PGPEncryptDecrypt.GenerateStreamFromString(data))
+                using (var inputStream = data.ToStream())
                 {
                     var result = Compress(inputStream);
                     var urlEncodedResult = UrlTokenEncode(result);

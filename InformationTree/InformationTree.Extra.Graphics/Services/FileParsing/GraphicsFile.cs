@@ -7,6 +7,7 @@ using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Domain.Entities.Graphics;
 using System.Timers;
 using NLog;
+using InformationTree.Domain.Services;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
@@ -15,7 +16,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private IGraphicsFileFactory _graphicsFileRecursiveGenerator;
+        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
+        private readonly IPopUpService _popUpService;
 
         #region Properties
 
@@ -26,9 +28,10 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Constructor
 
-        public GraphicsFile(IGraphicsFileFactory graphicsProvider)
+        public GraphicsFile(IGraphicsFileFactory graphicsProvider, IPopUpService popUpService)
         {
             _graphicsFileRecursiveGenerator = graphicsProvider;
+            _popUpService = popUpService;
 
             Frame = new Frame();
             var interval = GraphicsComputation.MillisecondsPerFrame;
@@ -175,10 +178,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Show error message in pop-up using new service
                     var errorWhileProcessingLine = $"Error while processing line: {line}";
                     _logger.Error(ex, errorWhileProcessingLine);
-                    MessageBox.Show(errorWhileProcessingLine);
+                    _popUpService.ShowError(errorWhileProcessingLine);
                 }
 
                 if (breakFromLoop)
@@ -259,12 +261,10 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 RunTimer.Enabled = false;
 
                 _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(Cycle)} parsing '{s}' issue.");
-                // TODO: Show error message in pop-up using new service
-                MessageBox.Show(ex.Message, $"{nameof(FrameRelativeToPoint)} Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _popUpService.ShowError(ex.Message, $"{nameof(FrameRelativeToPoint)} Error");
             }
         }
 
-        // TODO: Remove showing issues to UI directly
         public void FrameRelativeToPoint(string parameters)
         {
             try
@@ -287,8 +287,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             catch (Exception ex)
             {
                 _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(FrameRelativeToPoint)}: '{parameters}' splitting and parsing issue: {ex.Message}.");
-                // TODO: Show error message in pop-up using new service
-                MessageBox.Show(ex.Message, $"{nameof(FrameRelativeToPoint)} Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _popUpService.ShowError(ex.Message, $"{nameof(FrameRelativeToPoint)} Error");
             }
         }
 
@@ -316,8 +315,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             catch (Exception ex)
             {
                 _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(AllRelativeToPoint)}: '{parameters}' splitting and parsing issue: {ex.Message}.");
-                // TODO: Show error message in pop-up using new service
-                MessageBox.Show("parameters=" + parameters + ";" + Environment.NewLine + ex.ToString());
+                _popUpService.ShowError($"Error '{ex.Message}' occured while parsing '{parameters}' in {nameof(AllRelativeToPoint)} method");
             }
         }
 

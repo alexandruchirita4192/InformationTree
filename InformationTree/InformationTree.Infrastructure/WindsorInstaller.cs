@@ -6,6 +6,7 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Computation;
 using InformationTree.Extra.Graphics.Services;
 using InformationTree.Extra.Sound;
+using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
 
 namespace InformationTree.Infrastructure
@@ -26,6 +27,7 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<IGraphicsFileFactory>().ImplementedBy<GraphicsFileFactory>().LifeStyle.Singleton);
             container.Register(Component.For<ICanvasFormFactory>().ImplementedBy<CanvasPopUpFormFactory>().LifeStyle.Singleton);
             container.Register(Component.For<IPopUpService>().ImplementedBy<WinFormsPopUpService>().LifeStyle.Singleton);
+            container.Register(Component.For<IPGPEncryptionProvider>().ImplementedBy<PGPEncryptionProvider>().LifeStyle.Singleton);
         }
     }
 }
