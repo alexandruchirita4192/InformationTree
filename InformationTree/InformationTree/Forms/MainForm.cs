@@ -28,6 +28,7 @@ namespace InformationTree.Forms
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly ICompressionProvider _compressionProvider;
 
         #endregion Fields
 
@@ -38,14 +39,16 @@ namespace InformationTree.Forms
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionProvider encryptionProvider)
+            IPGPEncryptionProvider encryptionProvider,
+            ICompressionProvider compressionProvider)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
             _encryptionProvider = encryptionProvider;
-            
+            _compressionProvider = compressionProvider;
+
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -85,7 +88,7 @@ namespace InformationTree.Forms
             TreeNodeHelper.TreeUnchanged = true;
             TreeNodeHelper.IsSafeToSave = true;
 
-            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService);
+            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
             if (loadedExisting)
             {
                 tvTaskList.CollapseAll();
@@ -247,7 +250,7 @@ namespace InformationTree.Forms
 
         public void SaveTree()
         {
-            TreeNodeHelper.SaveTree(tvTaskList);
+            TreeNodeHelper.SaveTree(tvTaskList, _compressionProvider);
         }
 
         public void ClearStyleAdded()
@@ -989,7 +992,7 @@ namespace InformationTree.Forms
                 var tagData = node.Tag as TreeNodeData;
                 if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
                 {
-                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService);
+                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
                 }
             }
             else
@@ -1050,7 +1053,7 @@ namespace InformationTree.Forms
 
                 var auxFileName = TreeNodeHelper.FileName;
                 TreeNodeHelper.FileName = tagData.Link;
-                TreeNodeHelper.SaveTree(treeView);
+                TreeNodeHelper.SaveTree(treeView, _compressionProvider);
                 TreeNodeHelper.FileName = auxFileName;
                 node.Nodes.Clear();
             }
@@ -1066,7 +1069,7 @@ namespace InformationTree.Forms
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService);
+            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)

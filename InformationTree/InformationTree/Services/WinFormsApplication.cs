@@ -22,6 +22,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly ICompressionProvider _compressionProvider;
 
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
@@ -30,7 +31,8 @@ namespace InformationTree.Render.WinForms.Services
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
-            IPGPEncryptionProvider encryptionProvider)
+            IPGPEncryptionProvider encryptionProvider,
+            ICompressionProvider compressionProvider)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
@@ -39,6 +41,7 @@ namespace InformationTree.Render.WinForms.Services
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
             _encryptionProvider = encryptionProvider;
+            _compressionProvider = compressionProvider;
         }
 
         #region extern
@@ -177,7 +180,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionProvider));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionProvider, _compressionProvider));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

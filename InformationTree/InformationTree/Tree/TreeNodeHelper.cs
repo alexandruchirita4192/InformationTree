@@ -240,7 +240,7 @@ namespace InformationTree.Tree
             return convertedColor;
         }
 
-        public static bool LoadTree(Form t, TreeView tv, string fileName, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService)
+        public static bool LoadTree(Form t, TreeView tv, string fileName, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService, ICompressionProvider compressionProvider)
         {
             var fileNameExists = File.Exists(fileName);
             if (fileNameExists)
@@ -249,7 +249,7 @@ namespace InformationTree.Tree
                 if (result == PopUpResult.Yes)
                 {
                     FileName = fileName;
-                    LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider);
+                    LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider, compressionProvider);
                     return true;
                 }
                 else if (result == PopUpResult.Cancel)
@@ -264,7 +264,7 @@ namespace InformationTree.Tree
             if (!string.IsNullOrWhiteSpace(selectedFile))
             {
                 FileName = selectedFile;
-                LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider);
+                LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider, compressionProvider);
                 return true;
             }
 
@@ -367,7 +367,7 @@ namespace InformationTree.Tree
 
         #endregion CopyNode, CopyNodes
 
-        public static TreeNode GetNewNodeFromTextNameAttr(XmlAttributeCollection attributes)
+        public static TreeNode GetNewNodeFromTextNameAttr(XmlAttributeCollection attributes, ICompressionProvider compressionProvider)
         {
             var attrText = String.Empty;
             var attrName = String.Empty;
@@ -414,7 +414,7 @@ namespace InformationTree.Tree
                 else if (attr.Name == XmlAttrPercentCompleted)
                     attrPercentCompleted = decimal.Parse(HttpUtility.HtmlDecode(attr.Value));
                 else if (attr.Name == XmlAttrData)
-                    attrData = HttpUtility.HtmlDecode(TextProcessingHelper.GetDecompressedData(attr.Value));
+                    attrData = HttpUtility.HtmlDecode(compressionProvider.Decompress(attr.Value));
                 else if (attr.Name == XmlAttrAddedNumber)
                     attrAddedNumber = Int32.Parse(HttpUtility.HtmlDecode(attr.Value));
                 else if (attr.Name == XmlAttrAddedDate)
@@ -460,7 +460,7 @@ namespace InformationTree.Tree
         }
 
         // TODO: Extract loading and saving XML to separate class
-        public static void LoadXML(Form t, TreeView tv, IGraphicsFileFactory graphicsFileRecursiveGenerator , ISoundProvider soundProvider)
+        public static void LoadXML(Form t, TreeView tv, IGraphicsFileFactory graphicsFileRecursiveGenerator , ISoundProvider soundProvider, ICompressionProvider compressionProvider)
         {
             try
             {
@@ -474,11 +474,11 @@ namespace InformationTree.Tree
                 {
                     foreach (XmlElement child in xDoc.DocumentElement.ChildNodes)
                     {
-                        var newNode = TreeNodeHelper.GetNewNodeFromTextNameAttr(child.Attributes);
+                        var newNode = TreeNodeHelper.GetNewNodeFromTextNameAttr(child.Attributes, compressionProvider);
                         tv.Nodes.Add(newNode);
 
                         if (child.HasChildNodes)
-                            LoadTreeNodes(child, newNode);
+                            LoadTreeNodes(child, newNode, compressionProvider);
                     }
                 }
                 tv.ExpandAll();
@@ -491,15 +491,15 @@ namespace InformationTree.Tree
             }
         }
 
-        public static void LoadTreeNodes(XmlNode xmlNode, TreeNode treeNode)
+        public static void LoadTreeNodes(XmlNode xmlNode, TreeNode treeNode, ICompressionProvider compressionProvider)
         {
             if (xmlNode.HasChildNodes)
                 foreach (XmlElement child in xmlNode.ChildNodes)
                 {
-                    var newNode = TreeNodeHelper.GetNewNodeFromTextNameAttr(child.Attributes);
+                    var newNode = TreeNodeHelper.GetNewNodeFromTextNameAttr(child.Attributes, compressionProvider);
                     treeNode.Nodes.Add(newNode);
                     if (child.HasChildNodes)
-                        LoadTreeNodes(child, newNode);
+                        LoadTreeNodes(child, newNode, compressionProvider);
                 }
         }
 
@@ -564,7 +564,7 @@ namespace InformationTree.Tree
             return convertedString;
         }
 
-        public static void SaveTree(TreeView tv)
+        public static void SaveTree(TreeView tv, ICompressionProvider compressionProvider)
         {
             if (ReadOnlyState)
             {
@@ -579,7 +579,7 @@ namespace InformationTree.Tree
                 streamWriter.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
                 //Write our root node
                 streamWriter.WriteLine("<root>");
-                SaveNode(tv.Nodes, 1);
+                SaveNode(tv.Nodes, compressionProvider, 1);
                 streamWriter.WriteLine("</root>");
                 streamWriter.Close();
 
@@ -605,7 +605,7 @@ namespace InformationTree.Tree
                 (attribute + "=\"" + HttpUtility.HtmlEncode(value) + "\"" + (spaceAfterAttribute ? " " : string.Empty));
         }
 
-        public static void SaveNode(TreeNodeCollection tnc, int indentTabs = 1)
+        public static void SaveNode(TreeNodeCollection tnc, ICompressionProvider compressionProvider, int indentTabs = 1)
         {
             foreach (TreeNode node in tnc)
             {
@@ -629,7 +629,7 @@ namespace InformationTree.Tree
                 var attrFontSize = node.NodeFont != null ? node.NodeFont.Size.ToString() : string.Empty;
                 var attrText = node.Text;
                 var attrPercentCompleted = tag == null ? 0.0M : tag.PercentCompleted;
-                var attrData = tag == null ? string.Empty : TextProcessingHelper.GetCompressedData(tag.Data);
+                var attrData = tag == null ? string.Empty : compressionProvider.Compress(tag.Data);
                 var attrAddedNumber = tag == null ? 0 : tag.AddedNumber;
                 var attrAddedDate = (DateTime?)(tag == null ? (DateTime?)null : (DateTime?)tag.AddedDate);
                 var attrLastChangeDate = (DateTime?)(tag == null ? (DateTime?)null : (DateTime?)tag.LastChangeDate);
@@ -670,7 +670,7 @@ namespace InformationTree.Tree
                 {
                     tagNodeLine = tagNodeLine.Substring(0, tagNodeLine.Length - 1) + ">"; // remove a space before ">"
                     streamWriter.WriteLine(tagNodeLine);
-                    SaveNode(node.Nodes, indentTabs + 1);
+                    SaveNode(node.Nodes, compressionProvider, indentTabs + 1);
                     streamWriter.WriteLine(GetTabsByIndent(indentTabs) + "</node>");
                 }
                 else
@@ -685,11 +685,11 @@ namespace InformationTree.Tree
 
         #region Load & save
 
-        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService)
+        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService, ICompressionProvider compressionProvider)
         {
-            SaveTree(tv);
+            SaveTree(tv, compressionProvider);
             FileName = fileName;
-            LoadTree(t, tv, FileName, graphicsFileRecursiveGenerator, soundProvider, popUpService);
+            LoadTree(t, tv, FileName, graphicsFileRecursiveGenerator, soundProvider, popUpService, compressionProvider);
             tv.CollapseAll();
             tv.Refresh();
 
