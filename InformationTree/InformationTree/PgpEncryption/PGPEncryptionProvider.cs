@@ -8,7 +8,6 @@ using Org.BouncyCastle.Utilities.IO;
 using System;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 namespace InformationTree.PgpEncryption
 {
@@ -29,10 +28,6 @@ namespace InformationTree.PgpEncryption
             _popUpService = popUpService;
         }
         
-        #region GenerateStreamFromString
-
-        #endregion GenerateStreamFromString
-
         #region Decrypt
 
         public string GetDecryptedStringFromString(string encryptedText, string privateKey, string pgpPassword)
@@ -72,7 +67,7 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        public string GetDecryptedStringFromStream(string encryptedText, Stream privateKeyStream, string pgpPassword)
+        private string GetDecryptedStringFromStream(string encryptedText, Stream privateKeyStream, string pgpPassword)
         {
             try
             {
@@ -127,7 +122,7 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        public void Decrypt(Stream inputStream, Stream privateKeyStream, string passPhrase, Stream outputStream)
+        private void Decrypt(Stream inputStream, Stream privateKeyStream, string passPhrase, Stream outputStream)
         {
             try
             {
@@ -428,11 +423,9 @@ namespace InformationTree.PgpEncryption
                 {
                     var comData = new PgpCompressedDataGenerator(CompressionAlgorithmTag.Zip);
 
-                    // TODO: Check if this zombie code is really needed and delete it or uncomment it
-                    ////PgpUtilities.WriteFileToLiteralData(comData.Open(bOut), PgpLiteralData.Binary, new FileInfo(publicKeyFile));
                     using (var reader = new StreamReader(inputStream))
                     {
-                        WriteStringToLiteralData(comData.Open(bOut), PgpLiteralData.Binary, /*to do: check if ok*/ string.Empty, reader.ReadToEnd());
+                        WriteStringToLiteralData(comData.Open(bOut), PgpLiteralData.Binary, string.Empty, reader.ReadToEnd());
                     }
                     comData.Close();
                     PgpEncryptedDataGenerator cPk = new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Cast5, withIntegrityCheck, new SecureRandom());
@@ -470,22 +463,18 @@ namespace InformationTree.PgpEncryption
 
         #region Encrypt and Sign
 
-        /*
-         * Encrypt and sign the file pointed to by unencryptedFileInfo and
-         */
-
         public void EncryptAndSign(string inputFile, string outputFile, string publicKeyFile, string privateKeyFile, string passPhrase, bool armor)
         {
             PGPEncryptionKeys encryptionKeys = new PGPEncryptionKeys(publicKeyFile, privateKeyFile, passPhrase);
 
             if (!File.Exists(inputFile))
-                throw new FileNotFoundException(String.Format("Input file [{0}] does not exist.", inputFile));
+                throw new FileNotFoundException($"Input file [{inputFile}] does not exist.");
 
             if (!File.Exists(publicKeyFile))
-                throw new FileNotFoundException(String.Format("Public Key file [{0}] does not exist.", publicKeyFile));
+                throw new FileNotFoundException($"Public Key file [{publicKeyFile}] does not exist.");
 
             if (!File.Exists(privateKeyFile))
-                throw new FileNotFoundException(String.Format("Private Key file [{0}] does not exist.", privateKeyFile));
+                throw new FileNotFoundException($"Private Key file [{privateKeyFile}] does not exist.");
 
             if (String.IsNullOrEmpty(passPhrase))
                 throw new ArgumentNullException("Invalid Pass Phrase.");

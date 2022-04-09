@@ -35,14 +35,14 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.Add(figure);
         }
 
-        public void AddFigure(string s)
+        public void AddFigure(string figureLine)
         {
-            AddFigure(FigureFactory.GetFigure(s));
+            AddFigure(FigureFactory.GetFigure(figureLine));
         }
 
-        public void AddText(string s)
+        public void AddText(string textLine)
         {
-            AddFigure(FigureFactory.GetFigure(s));
+            AddFigure(FigureFactory.GetFigure(textLine));
         }
 
         public void AddFigureOnce(BaseFigure figure)
@@ -51,9 +51,9 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.Add(figure);
         }
 
-        public void AddFigureOnce(string s)
+        public void AddFigureOnce(string figureLine)
         {
-            AddFigureOnce(FigureFactory.GetFigure(s));
+            AddFigureOnce(FigureFactory.GetFigure(figureLine));
         }
 
         // GoToNr(int nr) { iterates figures and gets figures with position "nr" }
@@ -71,9 +71,12 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(_position).InitRotate(_rotation);
         }
 
-        public void InitRotate(string s)
+        public void InitRotate(string parameters)
         {
-            var words = s.Split(' ');
+            if (string.IsNullOrEmpty(parameters))
+                return;
+            
+            var words = parameters.Split(' ');
             switch (words.Length)
             {
                 case 2:
@@ -90,9 +93,9 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(_position).Rotate();
         }
 
-        public void Rotate(string s)
+        public void Rotate(string positionStr)
         {
-            Rotate(int.Parse(s));
+            Rotate(int.Parse(positionStr));
         }
 
         public void RotateAround(int _position)
@@ -118,12 +121,15 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(_position).AddRotateAround(_r, _addRotation, _angle);
         }
 
-        public void AddRotateAround(string s)
+        public void AddRotateAround(string parameters)
         {
+            if (string.IsNullOrEmpty(parameters))
+                return;
+            
             int _position;
             double _r, _addRotation;
 
-            var words = s.Split(' ');
+            var words = parameters.Split(' ');
             switch (words.Length)
             {
                 case 3:
@@ -190,9 +196,9 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(_position).Points = _points;
         }
 
-        public void SetPoints(string s)
+        public void SetPoints(string parameters)
         {
-            var words = s.Split(' ');
+            var words = parameters.Split(' ');
             switch (words.Length)
             {
                 case 2:
@@ -209,9 +215,9 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(_position).SetColor(_r, _g, _b);
         }
 
-        public void SetColor(string s)
+        public void SetColor(string parameters)
         {
-            var words = s.Split(' ');
+            var words = parameters.Split(' ');
             switch (words.Length)
             {
                 case 4:

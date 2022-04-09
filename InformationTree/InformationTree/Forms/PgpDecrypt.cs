@@ -112,11 +112,12 @@ namespace InformationTree.Forms
             {
                 var password = mtbPgpDecrypt.Text;
 
-                // TODO: Show that something is wrong with the password length and return
-                //if (password.Length == 0)
-                //    return;
+                if (password.Length == 0)
+                {
+                    _popUpService.ShowWarning("You did not enter a password. Trying to decrypt without password.");
+                }
 
-                if (object.ReferenceEquals(sender, mtbPgpDecrypt))
+                if (ReferenceEquals(sender, mtbPgpDecrypt))
                 {
                     if (DecryptFromFile)
                     {

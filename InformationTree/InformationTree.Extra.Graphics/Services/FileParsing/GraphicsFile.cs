@@ -1,5 +1,4 @@
-﻿using System.Text;
-using InformationTree.Extra.Graphics.Computation;
+﻿using InformationTree.Extra.Graphics.Computation;
 using InformationTree.Graphics;
 using D = System.Drawing;
 using InformationTree.Domain.Services.Graphics;
@@ -206,18 +205,18 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             Frame.NewFrame();
         }
 
-        public void GoToFrame(string s)
+        public void GoToFrame(string positionStr)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(positionStr))
                 return;
-            Frame.GoToFrame(int.Parse(s));
+            Frame.GoToFrame(int.Parse(positionStr));
         }
 
-        public void ChangeToNextFrame(string s)
+        public void ChangeToNextFrame(string addNextFrameIfNextFrameIsNullStr)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(addNextFrameIfNextFrameIsNullStr))
                 return;
-            Frame.ChangeToNextFrame(bool.Parse(s));
+            Frame.ChangeToNextFrame(bool.Parse(addNextFrameIfNextFrameIsNullStr));
         }
 
         public void ChangeToPreviousFrame()
@@ -240,18 +239,18 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             Frame.Clean();
         }
 
-        public void Cycle(string s)
+        public void Cycle(string intervalStr)
         {
             if (RunTimer == null)
                 return;
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(intervalStr))
                 return;
 
             try
             {
                 // Start timer
                 RunTimer.Enabled = false;
-                var interval = int.Parse(s);
+                var interval = int.Parse(intervalStr);
                 RunTimer.Interval = interval;
                 RunTimer.Enabled = true;                
             }
@@ -260,26 +259,33 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 // Stop timer
                 RunTimer.Enabled = false;
 
-                _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(Cycle)} parsing '{s}' issue.");
+                _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(Cycle)} parsing '{intervalStr}' issue.");
                 _popUpService.ShowError(ex.Message, $"{nameof(FrameRelativeToPoint)} Error");
             }
         }
 
         public void FrameRelativeToPoint(string parameters)
         {
+            if (string.IsNullOrEmpty(parameters))
+                return;
             try
             {
                 var words = parameters.Split(' ');
-                var oldPoint = new Point();
-                var newPoint = new Point();
 
                 switch (words.Length)
                 {
                     case 4:
-                        oldPoint.X = int.Parse(words[0]);
-                        oldPoint.Y = int.Parse(words[1]);
-                        newPoint.X = int.Parse(words[2]);
-                        newPoint.Y = int.Parse(words[3]);
+                        var oldPoint = new Point
+                        {
+                            X = int.Parse(words[0]),
+                            Y = int.Parse(words[1])
+                        };
+                        var newPoint = new Point
+                        {
+                            X = int.Parse(words[2]),
+                            Y = int.Parse(words[3])
+                        };
+                        
                         Frame.TranslateCenter(oldPoint, newPoint);
                         break;
                 }
@@ -298,16 +304,21 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             try
             {
                 var words = parameters.Split(' ');
-                var oldPoint = new Point();
-                var newPoint = new Point();
 
                 switch (words.Length)
                 {
                     case 4:
-                        oldPoint.X = int.Parse(words[0]);
-                        oldPoint.Y = int.Parse(words[1]);
-                        newPoint.X = int.Parse(words[2]);
-                        newPoint.Y = int.Parse(words[3]);
+                        var oldPoint = new Point
+                        {
+                            X = int.Parse(words[0]),
+                            Y = int.Parse(words[1])
+                        };
+                        var newPoint = new Point
+                        {
+                            X = int.Parse(words[2]),
+                            Y = int.Parse(words[3])
+                        };
+                        
                         Frame.TranslateCenterAllFrames(oldPoint, newPoint);
                         break;
                 }
@@ -333,11 +344,11 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Graphics generator methods
 
-        public void GenerateFigureLines(string s)
+        public void GenerateFigureLines(string parameters)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(parameters))
                 return;
-            var words = s.Split(' ');
+            var words = parameters.Split(' ');
             double _radius;
             int _iterations;
             ComputeType _computeType;
@@ -371,99 +382,99 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Add figure methods
 
-        public void AddFigure(string s)
+        public void AddFigure(string figureLine)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(figureLine))
                 return;
-            Frame.GetActiveFrameOrThis().Figures.AddFigure(FigureFactory.GetFigure(s));
+            Frame.GetActiveFrameOrThis().Figures.AddFigure(FigureFactory.GetFigure(figureLine));
         }
 
-        public void AddText(string s)
+        public void AddText(string textLine)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(textLine))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.AddText(s);
+            figures.AddText(textLine);
         }
 
-        public void AddFigureOnce(string s)
+        public void AddFigureOnce(string figureLine)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(figureLine))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.AddFigureOnce(FigureFactory.GetFigure(s));
+            figures.AddFigureOnce(FigureFactory.GetFigure(figureLine));
         }
 
         #endregion Add figure methods
 
         #region Config figure methods
 
-        public void InitRotate(string s)
+        public void InitRotate(string parameters)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(parameters))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.InitRotate(s);
+            figures.InitRotate(parameters);
         }
 
-        public void Rotate(string s)
+        public void Rotate(string positionStr)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(positionStr))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.Rotate(s);
+            figures.Rotate(positionStr);
         }
 
-        public void AddRotateAround(string s)
+        public void AddRotateAround(string parameters)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(parameters))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.AddRotateAround(s);
+            figures.AddRotateAround(parameters);
         }
 
-        public void SetPoints(string s)
+        public void SetPoints(string parameters)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(parameters))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.SetPoints(s);
+            figures.SetPoints(parameters);
         }
 
-        public void SetColor(string s)
+        public void SetColor(string parameters)
         {
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(parameters))
                 return;
             if (Frame == null)
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
                 return;
-            figures.SetColor(s);
+            figures.SetColor(parameters);
         }
 
         #endregion Config figure methods
