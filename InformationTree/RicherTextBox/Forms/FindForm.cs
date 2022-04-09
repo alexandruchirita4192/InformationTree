@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Windows.Forms;
+using InformationTree.Domain.Services;
 
 namespace RicherTextBox
 {
     public partial class FindForm : Form
     {
+        private readonly IPopUpService _popUpService;
+        
         private int lastFound = 0;
         private RichTextBox rtbInstance = null;
 
@@ -23,9 +26,15 @@ namespace RicherTextBox
         public FindForm()
         {
             InitializeComponent();
-            this.TopMost = true;
+            TopMost = true;
         }
 
+        public FindForm(IPopUpService popUpService)
+            : this()
+        {
+            _popUpService = popUpService;
+        }
+        
         private void rtbInstance_SelectionChanged(object sender, EventArgs e)
         {
             lastFound = rtbInstance.SelectionStart;
@@ -51,7 +60,7 @@ namespace RicherTextBox
             }
             else
             {
-                MessageBox.Show("Search string not found", "Find", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                _popUpService.ShowInfo("Search string not found", "Find");
                 lastFound = 0;
             }
         }

@@ -14,9 +14,6 @@
     <Reference Include="BouncyCastle.Crypto">
       <HintPath>DevPath\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
-    <Reference Include="RicherTextBox">
-      <HintPath>..\RicherTextBox\bin\Debug\RicherTextBox.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\FormsGame.Forms.SearchForm.datasource" />
@@ -39,5 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformationTree.Domain\InformationTree.Domain.csproj" />
+    <ProjectReference Include="..\RicherTextBox\RicherTextBox.csproj" />
   </ItemGroup>
 </Project>

@@ -201,7 +201,7 @@ namespace InformationTree.Forms
                 data = null;
 
             if (DataIsPgpEncrypted ||
-                _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?"))
+                _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?") == PopUpResult.Yes)
             {
                 var form = new PgpDecrypt(_popUpService, _encryptionProvider, cbFromFile.Checked);
                 if (!form.IsDisposed)
@@ -245,8 +245,8 @@ namespace InformationTree.Forms
         {
             FromFile = cbFromFile.Checked;
 
-            var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", false);
-            string decryptedData = result ? tbData.Rtf : tbData.Text;
+            var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
+            string decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
             
             if (FromFile)
             {
@@ -316,7 +316,7 @@ namespace InformationTree.Forms
                     }
                 }
 
-                if (string.IsNullOrEmpty(PgpKeyText) && _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?"))
+                if (string.IsNullOrEmpty(PgpKeyText) && _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?") == PopUpResult.Yes)
                     FindNodeWithPublicKey();
             }
         }

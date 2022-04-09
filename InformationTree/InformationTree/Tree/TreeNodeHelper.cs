@@ -9,6 +9,7 @@ using System.Web;
 using System.Windows.Forms;
 using System.Xml;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.TextProcessing;
@@ -16,6 +17,7 @@ using NLog;
 
 namespace InformationTree.Tree
 {
+    // TODO: Change from static to service (facade hiding subsystem complexity with an interface) with instance and get services in constructor and remove them from static methods
     [Obsolete("Break into many classes with many purposes")]
     public static class TreeNodeHelper
     {
@@ -238,66 +240,60 @@ namespace InformationTree.Tree
             return convertedColor;
         }
 
-        public static bool LoadTree(Form t, TreeView tv, string fileName, IGraphicsFileFactory graphicsFileRecursiveGenerator)
+        public static bool LoadTree(Form t, TreeView tv, string fileName, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService)
         {
             var fileNameExists = File.Exists(fileName);
             if (fileNameExists)
             {
-                var result = MessageBox.Show("Use default XML file [" + fileName + "]?", "Data file", MessageBoxButtons.YesNoCancel);
-                if (result == DialogResult.Yes)
+                var result = popUpService.ShowCancelableQuestion($"Use default XML file {fileName}?", "Choose data file");
+                if (result == PopUpResult.Yes)
                 {
                     FileName = fileName;
-                    LoadXML(t, tv, graphicsFileRecursiveGenerator);
+                    LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider);
                     return true;
                 }
-                else if (result == DialogResult.Cancel)
+                else if (result == PopUpResult.Cancel)
                 {
                     if (fileNameExists)
-                        FileName = GetNewFileName(fileName);
+                        FileName = GetNewFileName(fileName, popUpService);
                     return false;
                 }
             }
 
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Title = "Open XML Document";
-            dlg.Filter = "XML Files (*.xml)|*.xml*|All files (*.*)|*.*";
-            if (fileNameExists)
-                dlg.FileName = fileName;
-            dlg.InitialDirectory = Application.StartupPath;
-
-            if (dlg.ShowDialog() == DialogResult.OK)
+            var selectedFile = popUpService.GetXmlDataFile(fileName, fileNameExists);
+            if (!string.IsNullOrWhiteSpace(selectedFile))
             {
-                FileName = dlg.FileName;
-                LoadXML(t, tv, graphicsFileRecursiveGenerator);
+                FileName = selectedFile;
+                LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider);
                 return true;
             }
 
             if (fileNameExists)
-                FileName = GetNewFileName(fileName);
+                FileName = GetNewFileName(fileName, popUpService);
 
             return true;
         }
 
-        private static string GetNewFileName(string fileName)
+        private static string GetNewFileName(string fileName, IPopUpService popUpService)
         {
             var fileNameExists = File.Exists(fileName);
             if (!fileNameExists)
                 return fileName;
             var extension = Path.GetExtension(fileName);
             if (extension == ".xml")
-                return GetNewFileName(fileName + ".1");
+                return GetNewFileName($"{fileName}.1", popUpService);
             else
             {
                 try
                 {
                     extension = extension.Replace(".", "");
                     var newIteration = int.Parse(extension) + 1;
-                    return GetNewFileName(fileName.Replace(extension, newIteration.ToString()));
+                    return GetNewFileName(fileName.Replace(extension, newIteration.ToString()), popUpService);
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex);
-                    MessageBox.Show("Error while trying to get new file name.\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    popUpService.ShowError($"Error while trying to get new file name from file name '{fileName}'. Error occured: {ex.Message}");
                 }
             }
             return null;
@@ -464,7 +460,7 @@ namespace InformationTree.Tree
         }
 
         // TODO: Extract loading and saving XML to separate class
-        public static void LoadXML(Form t, TreeView tv, IGraphicsFileFactory graphicsFileRecursiveGenerator)
+        public static void LoadXML(Form t, TreeView tv, IGraphicsFileFactory graphicsFileRecursiveGenerator , ISoundProvider soundProvider)
         {
             try
             {
@@ -491,8 +487,7 @@ namespace InformationTree.Tree
             {
                 SplashForm.CloseForm();
                 t.Cursor = Cursors.Default;
-                // TODO: This might use the ISoundProvider later, if required
-                //SoundHelper.PlaySystemSound(4);
+                soundProvider.PlaySystemSound(4);
             }
         }
 
@@ -690,11 +685,11 @@ namespace InformationTree.Tree
 
         #region Load & save
 
-        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber, IGraphicsFileFactory graphicsFileRecursiveGenerator)
+        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService)
         {
             SaveTree(tv);
             FileName = fileName;
-            LoadTree(t, tv, FileName, graphicsFileRecursiveGenerator);
+            LoadTree(t, tv, FileName, graphicsFileRecursiveGenerator, soundProvider, popUpService);
             tv.CollapseAll();
             tv.Refresh();
 

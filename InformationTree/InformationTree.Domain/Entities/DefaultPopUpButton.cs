@@ -1,9 +1,7 @@
 ﻿namespace InformationTree.Domain.Entities
 {
-    public enum PopUpResult
+    public enum DefaultPopUpButton
     {
-        Confirm,
-        NotConfirm,
         Yes,
         No,
         Cancel

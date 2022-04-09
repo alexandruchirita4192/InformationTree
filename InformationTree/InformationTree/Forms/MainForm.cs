@@ -85,7 +85,7 @@ namespace InformationTree.Forms
             TreeNodeHelper.TreeUnchanged = true;
             TreeNodeHelper.IsSafeToSave = true;
 
-            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName, _graphicsFileRecursiveGenerator);
+            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService);
             if (loadedExisting)
             {
                 tvTaskList.CollapseAll();
@@ -568,7 +568,7 @@ namespace InformationTree.Forms
                 var messageBoxCaption = $"Delete";
                 
                 var result = _popUpService.ShowQuestion(messageBoxText, messageBoxCaption);
-                if (result)
+                if (result == PopUpResult.Yes)
                 {
                     ParseToDelete(selectedTask, taskName, false);
 
@@ -989,7 +989,7 @@ namespace InformationTree.Forms
                 var tagData = node.Tag as TreeNodeData;
                 if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
                 {
-                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator);
+                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService);
                 }
             }
             else
@@ -1066,7 +1066,7 @@ namespace InformationTree.Forms
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator);
+            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)

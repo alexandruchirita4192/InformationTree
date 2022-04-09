@@ -53,7 +53,7 @@ namespace InformationTree.Forms
             {
                 PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
                 while (string.IsNullOrEmpty(PgpPrivateKeyFile) &&
-                    _popUpService.ShowQuestion("You did not select a private key file. Try to select again?"))
+                    _popUpService.ShowQuestion("You did not select a private key file. Try to select again?") == PopUpResult.Yes)
                     PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
 
                 if (string.IsNullOrEmpty(PgpPrivateKeyFile))
@@ -101,7 +101,7 @@ namespace InformationTree.Forms
                 }
 
                 if (string.IsNullOrEmpty(PgpPrivateKeyText) &&
-                    _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?"))
+                    _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?") == PopUpResult.Yes)
                     FindNodeWithPrivateKey();
             }
         }

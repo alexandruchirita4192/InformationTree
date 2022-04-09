@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using InformationTree.Domain.Services;
 using NLog;
 
 namespace RicherTextBox.Controls
@@ -10,6 +11,7 @@ namespace RicherTextBox.Controls
     public partial class RicherTextBox : UserControl
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly IPopUpService _popUpService;
 
         #region Settings
 
@@ -441,10 +443,10 @@ namespace RicherTextBox.Controls
                     try
                     {
                         rtbDocument.Rtf = value;
-                    } 
+                    }
                     catch (ArgumentException ex)
                     {
-                        _logger.Error(ex); 
+                        _logger.Error(ex);
                         rtbDocument.Text = value;
                     }
                 }
@@ -492,6 +494,12 @@ namespace RicherTextBox.Controls
                 ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // TODO: change here to see the table in RTF
                 return target;
             };
+        }
+
+        public RicherTextBox(IPopUpService popUpService)
+            : this()
+        {
+            _popUpService = popUpService;
         }
 
         private void RicherTextBox_Load(object sender, EventArgs e)
@@ -639,7 +647,6 @@ namespace RicherTextBox.Controls
                 rtbDocument.SelectionIndent += INDENT;
             else if (name.IndexOf("Outdent") >= 0)
                 rtbDocument.SelectionIndent -= INDENT;
-
         }
 
         private void tscmbFontSize_Click(object sender, EventArgs e)
@@ -689,31 +696,24 @@ namespace RicherTextBox.Controls
 
         public void InsertPicture()
         {
-            using (OpenFileDialog dlg = new OpenFileDialog())
+            var selectedFileName = _popUpService.GetImageFile();
+            
+            if (!string.IsNullOrWhiteSpace(selectedFileName))
             {
-                dlg.Title = "Insert picture";
-                dlg.DefaultExt = "jpg";
-                dlg.Filter = "PNG Files|*.png|JPEG Files|*.jpg|Bitmap Files|*.bmp|GIF Files|*.gif|All files|*.*";
-                dlg.FilterIndex = 1;
-                if (dlg.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    try
-                    {
-                        var strImagePath = dlg.FileName;
-                        var img = Image.FromFile(strImagePath);
-                        Clipboard.SetDataObject(img);
-                        DataFormats.Format df;
-                        df = DataFormats.GetFormat(DataFormats.Bitmap);
+                    var img = Image.FromFile(selectedFileName);
+                    Clipboard.SetDataObject(img);
+                    DataFormats.Format df;
+                    df = DataFormats.GetFormat(DataFormats.Bitmap);
 
-                        if (this.rtbDocument.CanPaste(df))
-                            this.rtbDocument.Paste(df);
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.Error(ex);
-                        // TODO: Show error message in pop-up using new service
-                        MessageBox.Show("Unable to insert image.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    if (rtbDocument.CanPaste(df))
+                        rtbDocument.Paste(df);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    _popUpService.ShowError("Unable to insert image.");
                 }
             }
         }
@@ -725,29 +725,23 @@ namespace RicherTextBox.Controls
 
         public void SaveFile()
         {
-            using (SaveFileDialog dlg = new SaveFileDialog())
+            var selectedFileName = _popUpService.SaveRtfFile();
+            
+            if (!string.IsNullOrWhiteSpace(selectedFileName))
             {
-                dlg.Filter = "Rich text format|*.rtf";
-                dlg.FilterIndex = 0;
-                dlg.OverwritePrompt = true;
-                if (dlg.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    try
-                    {
-                        rtbDocument.SaveFile(dlg.FileName, RichTextBoxStreamType.RichText);
-                    }
-                    catch (IOException ex)
-                    {
-                        // TODO: Show error message in pop-up using new service
-                        _logger.Error(ex);
-                        MessageBox.Show("Error writing file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        // TODO: Show error message in pop-up using new service
-                        _logger.Error(ex);
-                        MessageBox.Show("Error writing file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    rtbDocument.SaveFile(selectedFileName, RichTextBoxStreamType.RichText);
+                }
+                catch (IOException ex)
+                {
+                    _logger.Error(ex);
+                    _popUpService.ShowError($"Error writing file: \n{ex.Message}");
+                }
+                catch (ArgumentException ex)
+                {
+                    _logger.Error(ex);
+                    _popUpService.ShowError($"Error writing file: \n{ex.Message}");
                 }
             }
         }
@@ -759,28 +753,23 @@ namespace RicherTextBox.Controls
 
         public void OpenFile()
         {
-            using (OpenFileDialog dlg = new OpenFileDialog())
+            var selectedFileName = _popUpService.GetRtfFile();
+            
+            if (!string.IsNullOrEmpty(selectedFileName))
             {
-                dlg.Filter = "Rich text format|*.rtf";
-                dlg.FilterIndex = 0;
-                if (dlg.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    try
-                    {
-                        rtbDocument.LoadFile(dlg.FileName, RichTextBoxStreamType.RichText);
-                    }
-                    catch (IOException ex)
-                    {
-                        // TODO: Show error message in pop-up using new service
-                        _logger.Error(ex);
-                        MessageBox.Show("Error reading file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        // TODO: Show error message in pop-up using new service
-                        _logger.Error(ex);
-                        MessageBox.Show("Error reading file: \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    rtbDocument.LoadFile(selectedFileName, RichTextBoxStreamType.RichText);
+                }
+                catch (IOException ex)
+                {
+                    _logger.Error(ex);
+                    _popUpService.ShowError($"Error reading file: \n{ex.Message}");
+                }
+                catch (ArgumentException ex)
+                {
+                    _logger.Error(ex);
+                    _popUpService.ShowError($"Error reading file: \n{ex.Message}");
                 }
             }
         }
@@ -817,24 +806,21 @@ namespace RicherTextBox.Controls
             catch (FormatException ex)
             {
                 _logger.Error(ex);
-                // TODO: Show error message in pop-up using new service
-                MessageBox.Show("Enter valid number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _popUpService.ShowError($"Enter a valid number: \n{ex.Message}");
                 tstxtZoomFactor.Focus();
                 tstxtZoomFactor.SelectAll();
             }
             catch (OverflowException ex)
             {
                 _logger.Error(ex);
-                // TODO: Show error message in pop-up using new service
-                MessageBox.Show("Enter valid number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _popUpService.ShowError($"Enter a valid number: \n{ex.Message}");
                 tstxtZoomFactor.Focus();
                 tstxtZoomFactor.SelectAll();
             }
             catch (ArgumentException ex)
             {
-                // TODO: Show error message in pop-up using new service
                 _logger.Error(ex);
-                MessageBox.Show("Zoom factor should be between 20% and 6400%", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _popUpService.ShowError("Zoom factor should be between 20% and 6400%");
                 tstxtZoomFactor.Focus();
                 tstxtZoomFactor.SelectAll();
             }
@@ -881,7 +867,7 @@ namespace RicherTextBox.Controls
 
         #endregion Toolstrip items handling
 
-        #region Public methods for accessing the functionality of the RicherTextBox
+        #region Public methods
 
         public Func<string, string> EncryptFunction, DecryptFunction, CalculateFunction, TableFunction;
 
@@ -1004,7 +990,7 @@ namespace RicherTextBox.Controls
             rtbDocument.WordWrap = activated;
         }
 
-        #endregion Public methods for accessing the functionality of the RicherTextBox
+        #endregion Public methods
 
         #region Overrides
 

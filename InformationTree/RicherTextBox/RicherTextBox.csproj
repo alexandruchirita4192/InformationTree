@@ -22,4 +22,7 @@
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
     <PackageReference Include="NLog" Version="4.7.15" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InformationTree.Domain\InformationTree.Domain.csproj" />
+  </ItemGroup>
 </Project>
