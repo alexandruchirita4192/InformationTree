@@ -18,6 +18,28 @@
             {
                 components.Dispose();
             }
+
+            if (disposing && tbExitPopUpAndSave != null)
+            {
+                tbExitPopUpAndSave.Click -= tbExitPopUpAndSave_Click;
+                tbExitPopUpAndSave.Dispose();
+            }
+
+            if (disposing && tbData != null)
+            {
+                tbData.LinkClicked -= tbData_LinkClicked;
+                tbData.DocumentKeyUp -= tbData_KeyUp;
+                tbData.KeyUp -= PopUpEditForm_KeyUp;
+                
+                if (tbData.TextBox != null)
+                {
+                    tbData.TextBox.KeyUp -= PopUpEditForm_KeyUp;
+                    tbData.TextBox = null;
+                }
+                
+                tbData.Dispose();
+            }
+
             base.Dispose(disposing);
         }
 
@@ -30,7 +52,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PopUpEditForm));
-            this.tbExitPopUpAndSave = new System.Windows.Forms.Button();
             this.btnPgpEncryptData = new System.Windows.Forms.Button();
             this.btnPgpDecryptData = new System.Windows.Forms.Button();
             this.lblEncryption = new System.Windows.Forms.Label();
@@ -38,21 +59,7 @@
             this.cbKeepCrypt = new System.Windows.Forms.CheckBox();
             this.btnCalculate = new System.Windows.Forms.Button();
             this.btnShowGraphics = new System.Windows.Forms.Button();
-            this.tbData = new RicherTextBox.Controls.RicherTextBox();
             this.SuspendLayout();
-            // 
-            // tbExitPopUpAndSave
-            // 
-            this.tbExitPopUpAndSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbExitPopUpAndSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.tbExitPopUpAndSave.Location = new System.Drawing.Point(778, 557);
-            this.tbExitPopUpAndSave.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tbExitPopUpAndSave.Name = "tbExitPopUpAndSave";
-            this.tbExitPopUpAndSave.Size = new System.Drawing.Size(168, 27);
-            this.tbExitPopUpAndSave.TabIndex = 1;
-            this.tbExitPopUpAndSave.Text = "Exit Pop-Up and Save";
-            this.tbExitPopUpAndSave.UseVisualStyleBackColor = true;
-            this.tbExitPopUpAndSave.Click += new System.EventHandler(this.tbExitPopUpAndSave_Click);
             // 
             // btnPgpEncryptData
             // 
@@ -145,69 +152,6 @@
             this.btnShowGraphics.UseVisualStyleBackColor = true;
             this.btnShowGraphics.Click += new System.EventHandler(this.btnShowGraphics_Click);
             // 
-            // tbData
-            // 
-            this.tbData.AlignCenterVisible = true;
-            this.tbData.AlignLeftVisible = true;
-            this.tbData.AlignRightVisible = true;
-            this.tbData.AllowDrop = true;
-            this.tbData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbData.AutoScroll = true;
-            this.tbData.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tbData.BoldVisible = true;
-            this.tbData.BulletsVisible = true;
-            this.tbData.CalculateVisible = false; // TODO: Use feature from configuration to hide this
-            this.tbData.ChooseFontVisible = true;
-            this.tbData.DecryptVisible = true; // TODO: Use feature from configuration to show/hide this
-            this.tbData.EncryptDecryptCategoryVisible = true; // TODO: Show this category if encrypt or decrypt is enabled from configuration
-            this.tbData.EncryptVisible = true; // TODO: Use feature from configuration to show/hide this
-            this.tbData.FindReplaceVisible = true;
-            this.tbData.FontColorVisible = true;
-            this.tbData.FontFamilyVisible = true;
-            this.tbData.FontSizeVisible = true;
-            this.tbData.GlobalVisibility = true;
-            this.tbData.GroupAlignmentVisible = true;
-            this.tbData.GroupBoldUnderlineItalicVisible = true;
-            this.tbData.GroupFontColorVisible = true;
-            this.tbData.GroupFontNameAndSizeVisible = true;
-            this.tbData.GroupIndentationAndBulletsVisible = true;
-            this.tbData.GroupInsertVisible = true;
-            this.tbData.GroupSaveAndLoadVisible = true;
-            this.tbData.GroupZoomVisible = true;
-            this.tbData.INDENT = 10;
-            this.tbData.IndentVisible = true;
-            this.tbData.InsertPictureVisible = true;
-            this.tbData.ItalicVisible = true;
-            this.tbData.LoadVisible = true;
-            this.tbData.Location = new System.Drawing.Point(15, 15);
-            this.tbData.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.tbData.Name = "tbData";
-            this.tbData.OutdentVisible = true;
-            this.tbData.Rtf = resources.GetString("tbData.Rtf");
-            this.tbData.SaveVisible = true;
-            this.tbData.SeparatorAlignVisible = true;
-            this.tbData.SeparatorBoldUnderlineItalicVisible = true;
-            this.tbData.SeparatorFontColorVisible = true;
-            this.tbData.SeparatorFontVisible = true;
-            this.tbData.SeparatorIndentAndBulletsVisible = true;
-            this.tbData.SeparatorInsertVisible = true;
-            this.tbData.SeparatorNewButtonsVisible = false; // TODO: Set as visible if any new features from configuration are shown (investigate more about this)
-            this.tbData.SeparatorSaveLoadVisible = true;
-            this.tbData.Size = new System.Drawing.Size(931, 497);
-            this.tbData.TabIndex = 0;
-            this.tbData.TableVisible = true; // TODO: Use feature from configuration to show/hide this
-            this.tbData.ToolStripVisible = true;
-            this.tbData.UnderlineVisible = true;
-            this.tbData.WordWrapVisible = true;
-            this.tbData.ZoomFactorTextVisible = true;
-            this.tbData.ZoomInVisible = true;
-            this.tbData.ZoomOutVisible = true;
-            this.tbData.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.tbData_LinkClicked);
-            this.tbData.DocumentKeyUp += new System.Windows.Forms.KeyEventHandler(this.tbData_KeyUp);
-            this.tbData.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PopUpEditForm_KeyUp);
-            // 
             // PopUpEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -220,8 +164,6 @@
             this.Controls.Add(this.lblEncryption);
             this.Controls.Add(this.btnPgpDecryptData);
             this.Controls.Add(this.btnPgpEncryptData);
-            this.Controls.Add(this.tbData);
-            this.Controls.Add(this.tbExitPopUpAndSave);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "PopUpEditForm";
@@ -234,8 +176,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button tbExitPopUpAndSave;
-        private RicherTextBox.Controls.RicherTextBox tbData;
         private System.Windows.Forms.Button btnPgpEncryptData;
         private System.Windows.Forms.Button btnPgpDecryptData;
         private System.Windows.Forms.Label lblEncryption;

@@ -180,7 +180,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionProvider, _compressionProvider));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionProvider, _compressionProvider, _configurationReader));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

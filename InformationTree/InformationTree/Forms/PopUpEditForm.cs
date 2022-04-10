@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
@@ -7,10 +6,10 @@ using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
-using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
 using NLog;
+using RicherTextBox.Controls;
 
 namespace InformationTree.Forms
 {
@@ -19,11 +18,16 @@ namespace InformationTree.Forms
         #region Fields
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly IConfigurationReader _configurationReader;
+
         private ICanvasForm _canvasForm;
-        
+        private Button tbExitPopUpAndSave;
+        private RicherTextBox.Controls.RicherTextBox tbData;
+
         #endregion Fields
 
         #region Properties
@@ -60,31 +64,41 @@ namespace InformationTree.Forms
 
         #region Constructor
 
+        [Obsolete("Designer use only")]
+        public PopUpEditForm()
+        {
+            InitializeComponent();
+            InitializeRicherTextBoxControlAndSaveAndCloseButton();
+        }
+
         private PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionProvider encryptionProvider)
+            IPGPEncryptionProvider encryptionProvider,
+            IConfigurationReader configurationReader)
         {
+            _canvasFormFactory = canvasFormFactory;
+            _popUpService = popUpService;
+            _encryptionProvider = encryptionProvider;
+            _configurationReader = configurationReader;
+
             InitializeComponent();
+            InitializeRicherTextBoxControlAndSaveAndCloseButton();
 
             FormClosing += tbExitPopUpAndSave_Click;
 
             if (tbData != null && tbData.TextBox != null)
                 tbData.TextBox.AllowDrop = true;
-
-            tbData.TextBox.KeyUp += new KeyEventHandler(PopUpEditForm_KeyUp);
-            _canvasFormFactory = canvasFormFactory;
-            _popUpService = popUpService;
-            _encryptionProvider = encryptionProvider;
         }
 
         public PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
             IPGPEncryptionProvider encryptionProvider,
+            IConfigurationReader configurationReader,
             string title,
             string data)
-            : this(canvasFormFactory, popUpService, encryptionProvider)
+            : this(canvasFormFactory, popUpService, encryptionProvider, configurationReader)
         {
             Text += $": {title}";
 
@@ -106,7 +120,7 @@ namespace InformationTree.Forms
             if (richTextBoxBackColor != TreeNodeHelper.DefaultBackGroundColor)
                 tbData.BackColor = TreeNodeHelper.DefaultBackGroundColor;
 
-            if (tbData != null && tbData.TextBox != null && tbData.TextBox.Text != null)
+            if (tbData?.TextBox?.Text != null)
             {
                 for (int i = 0; i < tbData.TextBox.Text.Length; i++)
                 {
@@ -118,6 +132,117 @@ namespace InformationTree.Forms
                         tbData.TextBox.SelectionBackColor = TreeNodeHelper.DefaultBackGroundColor;
                 }
             }
+        }
+
+        private void InitializeRicherTextBoxControlAndSaveAndCloseButton()
+        {
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(PopUpEditForm));
+
+            tbExitPopUpAndSave = new Button
+            {
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                Location = new System.Drawing.Point(778, 557),
+                Margin = new Padding(4, 3, 4, 3),
+                Name = "tbExitPopUpAndSave",
+                Size = new System.Drawing.Size(168, 27),
+                TabIndex = 1,
+                Text = "Exit Pop-Up and Save",
+                UseVisualStyleBackColor = true
+            };
+            tbExitPopUpAndSave.Click += tbExitPopUpAndSave_Click;
+
+            // Note: CalculateVisible, EncryptDecryptCategoryVisible, DecryptVisible, EncryptVisible, SeparatorNewButtonsVisible, TableVisible
+            // shouldn't be set manually in here because RicherTextBox constructor uses _configurationReader.GetConfiguration()
+            // to set the values based on configuration (visible and enabled set too).
+
+            tbData = new RicherTextBox.Controls.RicherTextBox(_popUpService, _configurationReader)
+            {
+                AlignCenterVisible = true,
+                AlignLeftVisible = true,
+                AlignRightVisible = true,
+                AllowDrop = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                AutoScroll = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                BoldVisible = true,
+                BulletsVisible = true,
+                ChooseFontVisible = true,
+                FindReplaceVisible = true,
+                FontColorVisible = true,
+                FontFamilyVisible = true,
+                FontSizeVisible = true,
+                GlobalVisibility = true,
+                GroupAlignmentVisible = true,
+                GroupBoldUnderlineItalicVisible = true,
+                GroupFontColorVisible = true,
+                GroupFontNameAndSizeVisible = true,
+                GroupIndentationAndBulletsVisible = true,
+                GroupInsertVisible = true,
+                GroupSaveAndLoadVisible = true,
+                GroupZoomVisible = true,
+                INDENT = 10,
+                IndentVisible = true,
+                InsertPictureVisible = true,
+                ItalicVisible = true,
+                LoadVisible = true,
+                Location = new System.Drawing.Point(15, 15),
+                Margin = new Padding(5, 5, 5, 5),
+                Name = "tbData",
+                OutdentVisible = true,
+                Rtf = resources.GetString("tbData.Rtf"),
+                SaveVisible = true,
+                SeparatorAlignVisible = true,
+                SeparatorBoldUnderlineItalicVisible = true,
+                SeparatorFontColorVisible = true,
+                SeparatorFontVisible = true,
+                SeparatorIndentAndBulletsVisible = true,
+                SeparatorInsertVisible = true,
+                SeparatorSaveLoadVisible = true,
+                Size = new System.Drawing.Size(931, 497),
+                TabIndex = 0,
+                ToolStripVisible = true,
+                UnderlineVisible = true,
+                WordWrapVisible = true,
+                ZoomFactorTextVisible = true,
+                ZoomInVisible = true,
+                ZoomOutVisible = true
+            };
+            tbData.LinkClicked += tbData_LinkClicked;
+            tbData.DocumentKeyUp += tbData_KeyUp;
+            tbData.KeyUp += PopUpEditForm_KeyUp;
+            tbData.TextBox.KeyUp += PopUpEditForm_KeyUp;
+
+            tbData.TableFunction = (target) =>
+            {
+                var tableControl = new TableControl(target, tbData);
+
+                ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // TODO: change here to see the table in RTF
+                return target;
+            };
+
+            tbData.EncryptFunction = (target) =>
+            {
+                if (btnPgpEncryptData != null)
+                    btnPgpEncryptData.PerformClick();
+
+                // Data should be already set by btnPgpEncryptData.PerformClick() if everything was ok
+                return tbData.Rtf;
+            };
+
+            tbData.DecryptFunction = (target) =>
+            {
+                if (btnPgpDecryptData != null)
+                    btnPgpDecryptData.PerformClick();
+
+                // Data should be already set by btnPgpDecryptData.PerformClick() if everything was ok
+                return tbData.Rtf;
+            };
+
+            // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service
+
+            Controls.Add(tbData);
+            Controls.Add(tbExitPopUpAndSave);
         }
 
         #endregion Constructor
@@ -247,7 +372,7 @@ namespace InformationTree.Forms
 
             var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
             string decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
-            
+
             if (FromFile)
             {
                 PgpKeyFile = _popUpService.GetPublicKeyFile();
@@ -316,7 +441,7 @@ namespace InformationTree.Forms
                     }
                 }
 
-                if (string.IsNullOrEmpty(PgpKeyText) && _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?") == PopUpResult.Yes)
+                if (string.IsNullOrEmpty(PgpKeyText) && _popUpService.ShowQuestion("You did not select a valid public key node. Try to select again?") == PopUpResult.Yes)
                     FindNodeWithPublicKey();
             }
         }
@@ -357,7 +482,7 @@ namespace InformationTree.Forms
                 _canvasForm.GraphicsFile.ParseLines(new[] { text });
                 _canvasForm.RunTimer.Start();
             }
-            
+
             _canvasForm.Show();
         }
     }

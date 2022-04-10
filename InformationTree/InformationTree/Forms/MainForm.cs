@@ -29,6 +29,7 @@ namespace InformationTree.Forms
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionProvider _encryptionProvider;
         private readonly ICompressionProvider _compressionProvider;
+        private readonly IConfigurationReader _configurationReader;
 
         #endregion Fields
 
@@ -40,7 +41,8 @@ namespace InformationTree.Forms
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
             IPGPEncryptionProvider encryptionProvider,
-            ICompressionProvider compressionProvider)
+            ICompressionProvider compressionProvider,
+            IConfigurationReader configurationReader)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -48,7 +50,8 @@ namespace InformationTree.Forms
             _popUpService = popUpService;
             _encryptionProvider = encryptionProvider;
             _compressionProvider = compressionProvider;
-
+            _configurationReader = configurationReader;
+            
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -949,7 +952,7 @@ namespace InformationTree.Forms
                 if (tagData != null)
                     data = tagData.Data;
 
-                var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionProvider, selectedNode.Text, data);
+                var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionProvider, _configurationReader, selectedNode.Text, data);
 
                 WinFormsApplication.CenterForm(form, this);
 

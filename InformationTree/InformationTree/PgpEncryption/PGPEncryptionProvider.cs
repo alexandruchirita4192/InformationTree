@@ -343,6 +343,9 @@ namespace InformationTree.PgpEncryption
 
         public string GetEncryptedStringFromString(string decryptedText, string publicKeyText, bool armor, bool withIntegrityCheck)
         {
+            if (string.IsNullOrEmpty(publicKeyText))
+                return decryptedText;
+            
             try
             {
                 using (var publicKeyStream = publicKeyText.ToStream())

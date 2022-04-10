@@ -490,52 +490,56 @@ namespace RicherTextBox.Controls
         #endregion Events
 
         #region Construction and initial loading
-
+        
+        [Obsolete("Designer use only")]
         public RicherTextBox()
         {
             InitializeComponent();
-
-            TableFunction = (target) =>
-            {
-                var tableControl = new TableControl(target, this);
-
-                ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // TODO: change here to see the table in RTF
-                return target;
-            };
         }
 
         public RicherTextBox(IPopUpService popUpService, IConfigurationReader configurationReader)
-            : this()
         {
+            InitializeComponent();
+
             _popUpService = popUpService;
             _configurationReader = configurationReader;
 
-            _configuration = _configurationReader.GetConfiguration();
-
+            _configuration = _configurationReader?.GetConfiguration();
+            
             HideComponentsBasedOnFeatures();
         }
 
         private void HideComponentsBasedOnFeatures()
         {
-            var enableManualEncryption = _configuration.TreeFeatures.EnableManualEncryption;
+            if (_configuration == null)
+                return;
+
+            SetVisibleAndEnabled(tsbtnOpen, _configuration.RicherTextBoxFeatures.EnableRtfLoading);
+            SetVisibleAndEnabled(tsbtnSave, _configuration.RicherTextBoxFeatures.EnableRtfSaving);
             
-            SetVisibility(encryptDecryptToolStripMenuItem, enableManualEncryption);
-            SetVisibility(encryptToolStripMenuItem, enableManualEncryption);
-            SetVisibility(decryptToolStripMenuItem, enableManualEncryption);
-            SetVisibility(tsbtnEncrypt, enableManualEncryption);
-            SetVisibility(tsbtnDecrypt, enableManualEncryption);
-            SetVisibility(tsbtnOpen, _configuration.RicherTextBoxFeatures.EnableRtfLoading);
-            SetVisibility(tsbtnSave, _configuration.RicherTextBoxFeatures.EnableRtfSaving);
-            SetVisibility(tsbtnTable, _configuration.RicherTextBoxFeatures.EnableTable);
-            SetVisibility(tsbtnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
+            var enableManualEncryption = _configuration.TreeFeatures.EnableManualEncryption;
+
+            SetVisibleAndEnabled(encryptDecryptToolStripMenuItem, enableManualEncryption);
+            SetVisibleAndEnabled(encryptToolStripMenuItem, enableManualEncryption);
+            SetVisibleAndEnabled(decryptToolStripMenuItem, enableManualEncryption);
+            SetVisibleAndEnabled(tsbtnEncrypt, enableManualEncryption);
+            SetVisibleAndEnabled(tsbtnDecrypt, enableManualEncryption);
+
+            var anyOfNewFeatures = _configuration.RicherTextBoxFeatures.EnableTable
+                || _configuration.RicherTextBoxFeatures.EnableCalculation
+                || enableManualEncryption;
+            
+            SetVisibleAndEnabled(toolStripMenuItem5, anyOfNewFeatures);
+            SetVisibleAndEnabled(tsbtnTable, _configuration.RicherTextBoxFeatures.EnableTable);
+            SetVisibleAndEnabled(tsbtnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
         }
 
-        private void SetVisibility(ToolStripItem toolStripItem, bool visible)
+        private void SetVisibleAndEnabled(ToolStripItem toolStripItem, bool visibleAndEnabled)
         {
             if (toolStripItem == null)
                 return;
-            toolStripItem.Visible = visible;
-            toolStripItem.Enabled = visible; // Disable tool strip item too when it's not visible
+            toolStripItem.Visible = visibleAndEnabled;
+            toolStripItem.Enabled = visibleAndEnabled;
         }
         
         private void RicherTextBox_Load(object sender, EventArgs e)

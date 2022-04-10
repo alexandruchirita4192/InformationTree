@@ -53,12 +53,13 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             if (lines.Length <= 0)
                 return;
 
+            var debugMessage = lines.Length <= 50 ? $"Parsing lines: {lines}" : $"Parsing too many lines: {lines.Length} lines. Printing them to log is skipped.";
+            _logger.Debug(debugMessage);
+            
             foreach (var line in lines)
             {
                 if (string.IsNullOrEmpty(line))
                     continue;
-
-                _logger.Debug($"{nameof(GraphicsFile)}: Parsing line: {line}");
 
                 var words = line.Split(' ');
                 var firstWord = words[0];

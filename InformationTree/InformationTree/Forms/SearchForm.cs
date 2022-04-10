@@ -26,10 +26,8 @@ namespace InformationTree.Forms
         {
             if (tbFind.Text.Length > 3)
             {
-                _popUpService.ShowMessage($"Found {tbFind.Text}");
+                _popUpService.ShowMessage($"Searching for a node with text '{TextToFind}'");
                 
-                // TODO: Investigate if this works so this zombie code is not needed
-                //tbFind.Text = string.Empty;
                 Close();
             }
         }
