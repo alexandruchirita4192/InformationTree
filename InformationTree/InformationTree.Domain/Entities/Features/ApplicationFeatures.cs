@@ -2,7 +2,13 @@
 {
     public class ApplicationFeatures
     {
-        public bool EnableExtraSound { get; set; }
-        public bool EnableExtraGraphics { get; set; }
+        public ApplicationFeatures(bool enableExtraSound, bool enableExtraGraphics)
+        {
+            EnableExtraSound = enableExtraSound;
+            EnableExtraGraphics = enableExtraGraphics;
+        }
+
+        public bool EnableExtraSound { get; private set; }
+        public bool EnableExtraGraphics { get; private set; }
     }
 }

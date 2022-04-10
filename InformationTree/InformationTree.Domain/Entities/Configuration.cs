@@ -1,4 +1,5 @@
-﻿using InformationTree.Domain.Entities.Features;
+﻿using System;
+using InformationTree.Domain.Entities.Features;
 
 namespace InformationTree.Domain.Entities
 {
@@ -8,11 +9,14 @@ namespace InformationTree.Domain.Entities
         public RicherTextBoxFeatures RicherTextBoxFeatures { get; private set; }
         public TreeFeatures TreeFeatures { get; private set; }
         
-        public Configuration()
+        public Configuration(
+            ApplicationFeatures applicationFeatures,
+            RicherTextBoxFeatures richerTextBoxFeatures,
+            TreeFeatures treeFeatures)
         {
-            ApplicationFeatures = new ApplicationFeatures();
-            RicherTextBoxFeatures = new RicherTextBoxFeatures();
-            TreeFeatures = new TreeFeatures();
+            ApplicationFeatures = applicationFeatures ?? throw new ArgumentNullException(nameof(applicationFeatures));
+            RicherTextBoxFeatures = richerTextBoxFeatures ?? throw new ArgumentNullException(nameof(richerTextBoxFeatures));
+            TreeFeatures = treeFeatures ?? throw new ArgumentNullException(nameof(treeFeatures));
         }
     }
 }

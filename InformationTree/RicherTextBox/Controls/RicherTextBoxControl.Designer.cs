@@ -462,7 +462,7 @@ namespace RicherTextBox.Controls
             this.tsbtnSave.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnSave.Image")));
             this.tsbtnSave.Name = "tsbtnSave";
             this.tsbtnSave.Size = new System.Drawing.Size(23, 26);
-            this.tsbtnSave.Text = "toolStripButton1";
+            this.tsbtnSave.Text = "tsbtnSave";
             this.tsbtnSave.ToolTipText = "Save Document";
             this.tsbtnSave.Click += new System.EventHandler(this.tsbtnSave_Click);
             // 
@@ -472,7 +472,7 @@ namespace RicherTextBox.Controls
             this.tsbtnOpen.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnOpen.Image")));
             this.tsbtnOpen.Name = "tsbtnOpen";
             this.tsbtnOpen.Size = new System.Drawing.Size(23, 26);
-            this.tsbtnOpen.Text = "toolStripButton2";
+            this.tsbtnOpen.Text = "tsbtnOpen";
             this.tsbtnOpen.ToolTipText = "Load Document";
             this.tsbtnOpen.Click += new System.EventHandler(this.tsbtnOpen_Click);
             // 

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using InformationTree.Domain.Entities;
 using InformationTree.Domain.Services;
 using NLog;
 
@@ -10,8 +11,15 @@ namespace RicherTextBox.Controls
 {
     public partial class RicherTextBox : UserControl
     {
+        #region Fields
+
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly IPopUpService _popUpService;
+        private readonly IConfigurationReader _configurationReader;
+        private readonly Configuration _configuration;
+
+        #endregion Fields
 
         #region Settings
 
@@ -496,16 +504,44 @@ namespace RicherTextBox.Controls
             };
         }
 
-        public RicherTextBox(IPopUpService popUpService)
+        public RicherTextBox(IPopUpService popUpService, IConfigurationReader configurationReader)
             : this()
         {
             _popUpService = popUpService;
+            _configurationReader = configurationReader;
+
+            _configuration = _configurationReader.GetConfiguration();
+
+            HideComponentsBasedOnFeatures();
         }
 
+        private void HideComponentsBasedOnFeatures()
+        {
+            var enableManualEncryption = _configuration.TreeFeatures.EnableManualEncryption;
+            
+            SetVisibility(encryptDecryptToolStripMenuItem, enableManualEncryption);
+            SetVisibility(encryptToolStripMenuItem, enableManualEncryption);
+            SetVisibility(decryptToolStripMenuItem, enableManualEncryption);
+            SetVisibility(tsbtnEncrypt, enableManualEncryption);
+            SetVisibility(tsbtnDecrypt, enableManualEncryption);
+            SetVisibility(tsbtnOpen, _configuration.RicherTextBoxFeatures.EnableRtfLoading);
+            SetVisibility(tsbtnSave, _configuration.RicherTextBoxFeatures.EnableRtfSaving);
+            SetVisibility(tsbtnTable, _configuration.RicherTextBoxFeatures.EnableTable);
+            SetVisibility(tsbtnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
+        }
+
+        private void SetVisibility(ToolStripItem toolStripItem, bool visible)
+        {
+            if (toolStripItem == null)
+                return;
+            toolStripItem.Visible = visible;
+            toolStripItem.Enabled = visible; // Disable tool strip item too when it's not visible
+        }
+        
         private void RicherTextBox_Load(object sender, EventArgs e)
         {
             // load system fonts
-            foreach (FontFamily family in FontFamily.Families)
+            foreach (var family in FontFamily.Families)
             {
                 tscmbFont.Items.Add(family.Name);
             }
@@ -526,8 +562,8 @@ namespace RicherTextBox.Controls
             // bold, italic, underline, strikeout
             if (rtbDocument.SelectionFont != null)
             {
-                Font currentFont = rtbDocument.SelectionFont;
-                FontStyle newFontStyle = rtbDocument.SelectionFont.Style;
+                var currentFont = rtbDocument.SelectionFont;
+                var newFontStyle = rtbDocument.SelectionFont.Style;
                 string txt = (sender as ToolStripButton).Name;
                 if (txt.IndexOf("Bold") >= 0)
                     newFontStyle = rtbDocument.SelectionFont.Style ^ FontStyle.Bold;
@@ -697,7 +733,7 @@ namespace RicherTextBox.Controls
         public void InsertPicture()
         {
             var selectedFileName = _popUpService.GetImageFile();
-            
+
             if (!string.IsNullOrWhiteSpace(selectedFileName))
             {
                 try
@@ -726,7 +762,7 @@ namespace RicherTextBox.Controls
         public void SaveFile()
         {
             var selectedFileName = _popUpService.SaveRtfFile();
-            
+
             if (!string.IsNullOrWhiteSpace(selectedFileName))
             {
                 try
@@ -754,7 +790,7 @@ namespace RicherTextBox.Controls
         public void OpenFile()
         {
             var selectedFileName = _popUpService.GetRtfFile();
-            
+
             if (!string.IsNullOrEmpty(selectedFileName))
             {
                 try
@@ -833,35 +869,29 @@ namespace RicherTextBox.Controls
 
         private void tsbtnDecrypt_Click(object sender, EventArgs e)
         {
-            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (DecryptFunction == null)
-                return;// throw new NotImplementedException();
+                _popUpService.ShowError("Decryption is not implemented yet.");
             rtbDocument.Rtf = DecryptFunction(rtbDocument.Rtf);
         }
 
         private void tsbtnEncrypt_Click(object sender, EventArgs e)
         {
-            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (EncryptFunction == null)
-                return;// throw new NotImplementedException();
+                _popUpService.ShowError("Encryption is not implemented yet.");
             rtbDocument.Rtf = EncryptFunction(rtbDocument.Rtf);
         }
 
         private void tsbtnCalculate_Click(object sender, EventArgs e)
         {
-            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (CalculateFunction == null)
-                return;// throw new NotImplementedException();
+                _popUpService.ShowError("Calculation is not implemented yet.");
             rtbDocument.Rtf = CalculateFunction(rtbDocument.Rtf);
         }
 
         private void tsbtnTable_Click(object sender, EventArgs e)
         {
-            // TODO: Create a feature and activate/deactivate this button based on that feature
             if (TableFunction == null)
-                return;// throw new NotImplementedException();
-
-            //var selectedString = IsRichText(rtbDocument.SelectedRtf) ? rtbDocument.SelectedRtf : rtbDocument.SelectedText;
+                _popUpService.ShowError("Table showing is not implemented yet.");
             TableFunction(rtbDocument.SelectedText);
         }
 
@@ -1206,17 +1236,21 @@ namespace RicherTextBox.Controls
 
         private void tsbtnFind_Click(object sender, EventArgs e)
         {
-            FindForm findForm = new FindForm();
-            findForm.RtbInstance = this.rtbDocument;
-            findForm.InitialText = this.tstxtSearchText.Text;
+            var findForm = new FindForm
+            {
+                RtbInstance = rtbDocument,
+                InitialText = tstxtSearchText.Text
+            };
             findForm.Show();
         }
 
         private void tsbtnReplace_Click(object sender, EventArgs e)
         {
-            ReplaceForm replaceForm = new ReplaceForm();
-            replaceForm.RtbInstance = this.rtbDocument;
-            replaceForm.InitialText = this.tstxtSearchText.Text;
+            var replaceForm = new ReplaceForm
+            {
+                RtbInstance = rtbDocument,
+                InitialText = tstxtSearchText.Text
+            };
             replaceForm.Show();
         }
 
