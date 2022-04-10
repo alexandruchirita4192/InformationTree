@@ -124,14 +124,14 @@ namespace InformationTree.Forms
                         if (_encryptionProvider.ExistsPassword(PgpPrivateKeyFile, password.ToCharArray()))
                             Close();
                         else
-                            _popUpService.ShowMessage("Password is not valid for the selected PGP file", "Invalid password");
+                            _popUpService.ShowMessage("Password is not valid for the selected PGP file", "Invalid password or PGP file");
                     }
                     else
                     {
                         if (_encryptionProvider.ExistsPasswordFromString(PgpPrivateKeyText, password.ToCharArray()))
                             Close();
                         else
-                            _popUpService.ShowMessage("Password is not valid for the selected PGP key", "Invalid password");
+                            _popUpService.ShowMessage("Password is not valid for the selected PGP key", "Invalid password or PGP file");
                     }
                 }
             }

@@ -320,10 +320,13 @@ namespace InformationTree.Forms
 
         private void btnPgpDecryptData_Click(object sender, EventArgs e)
         {
-            if (cbKeepCrypt.Checked)
-                data = Data;
-            else
-                data = null;
+            data = cbKeepCrypt.Checked ? Data : null;
+
+            if (string.IsNullOrWhiteSpace(tbData.Text))
+            {
+                _popUpService.ShowError("No data to decrypt.");
+                return;
+            }
 
             if (DataIsPgpEncrypted ||
                 _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?") == PopUpResult.Yes)
@@ -371,8 +374,14 @@ namespace InformationTree.Forms
             FromFile = cbFromFile.Checked;
 
             var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
-            string decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
-
+            var decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
+            
+            if (string.IsNullOrWhiteSpace(decryptedData))
+            {
+                _popUpService.ShowError("No data to encrypt.");
+                return;
+            }
+            
             if (FromFile)
             {
                 PgpKeyFile = _popUpService.GetPublicKeyFile();

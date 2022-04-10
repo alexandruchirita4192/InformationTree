@@ -11,7 +11,7 @@ using System.Text;
 
 namespace InformationTree.PgpEncryption
 {
-    [Obsolete("Break into many classes")]
+    [Obsolete("Break into many classes")] // TODO: Break into encryption (used) and encryption and signing (unused yet)
     public class PGPEncryptionProvider : IPGPEncryptionProvider
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -32,6 +32,15 @@ namespace InformationTree.PgpEncryption
 
         public string GetDecryptedStringFromString(string encryptedText, string privateKey, string pgpPassword)
         {
+            if (string.IsNullOrWhiteSpace(encryptedText))
+                return string.Empty;
+            if (string.IsNullOrWhiteSpace(privateKey))
+            {
+                _logger.Error("Private key is empty. Cannot decrypt.");
+                _popUpService.ShowError("Private key is empty. Keeping text encrypted.");
+                return encryptedText;
+            }
+            
             try
             {
                 using (var privateKeyStream = privateKey.ToStream())
@@ -51,6 +60,15 @@ namespace InformationTree.PgpEncryption
 
         public string GetDecryptedStringFromFile(string encryptedText, string privateKeyFile, string pgpPassword)
         {
+            if (string.IsNullOrWhiteSpace(encryptedText))
+                return string.Empty;
+            if (string.IsNullOrWhiteSpace(privateKeyFile))
+            {
+                _logger.Error("Private key file is empty. Cannot decrypt.");
+                _popUpService.ShowError("Private key file is empty. Keeping text encrypted.");
+                return encryptedText;
+            }
+            
             try
             {
                 using (Stream privateKeyStream = File.OpenRead(privateKeyFile))
@@ -69,6 +87,9 @@ namespace InformationTree.PgpEncryption
 
         private string GetDecryptedStringFromStream(string encryptedText, Stream privateKeyStream, string pgpPassword)
         {
+            if (string.IsNullOrWhiteSpace(encryptedText))
+                return string.Empty;
+            
             try
             {
                 using (var inputStream = encryptedText.ToStream())
@@ -102,23 +123,19 @@ namespace InformationTree.PgpEncryption
         public void Decrypt(string inputfile, string privateKeyFile, string passPhrase, string outputFile)
         {
             if (!File.Exists(inputfile))
-                throw new FileNotFoundException(String.Format("Encrypted File [{0}] not found.", inputfile));
+                throw new FileNotFoundException($"Encrypted File [{inputfile}] not found.");
 
             if (!File.Exists(privateKeyFile))
-                throw new FileNotFoundException(String.Format("Private Key File [{0}] not found.", privateKeyFile));
+                throw new FileNotFoundException($"Private Key File [{privateKeyFile}] not found.");
 
             if (string.IsNullOrEmpty(outputFile))
                 throw new ArgumentNullException("Invalid Output file path.");
 
             using (Stream inputStream = File.OpenRead(inputfile))
+            using (Stream keyIn = File.OpenRead(privateKeyFile))
+            using (Stream outputStream = File.Create(outputFile))
             {
-                using (Stream keyIn = File.OpenRead(privateKeyFile))
-                {
-                    using (Stream outputStream = File.Create(outputFile))
-                    {
-                        Decrypt(inputStream, keyIn, passPhrase, outputStream);
-                    }
-                }
+                Decrypt(inputStream, keyIn, passPhrase, outputStream);
             }
         }
 
@@ -252,6 +269,9 @@ namespace InformationTree.PgpEncryption
 
         public bool IsPgpSecretKey(string privateKeyFile)
         {
+            if (string.IsNullOrWhiteSpace(privateKeyFile))
+                return false;
+            
             var privateKeyStream = File.OpenRead(privateKeyFile);
 
             if (privateKeyStream == null)
@@ -296,6 +316,12 @@ namespace InformationTree.PgpEncryption
 
         public bool ExistsPasswordFromString(string privateKeyString, char[] password)
         {
+            if (string.IsNullOrEmpty(privateKeyString))
+            {
+                _popUpService.ShowError("Private key is missing. No private key selected.");
+                return false;
+            }
+            
             using (var privateKeyStream = new MemoryStream(Encoding.UTF8.GetBytes(privateKeyString)))
             {
                 return ExistsPasswordFromStream(privateKeyStream, password);
@@ -361,8 +387,11 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        public string GetEncryptedStringFromStream(string inputFile, Stream publicKeyStream, bool armor, bool withIntegrityCheck)
+        private string GetEncryptedStringFromStream(string inputFile, Stream publicKeyStream, bool armor, bool withIntegrityCheck)
         {
+            if (string.IsNullOrWhiteSpace(inputFile))
+                return string.Empty;
+
             try
             {
                 using (var inputStream = inputFile.ToStream())
@@ -393,7 +422,7 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        public void WriteStringToLiteralData(Stream outp, char fileType, String name, String buffer)
+        private void WriteStringToLiteralData(Stream outp, char fileType, string name, string buffer)
         {
             var lData = new PgpLiteralDataGenerator();
             var pOut = lData.Open(outp, fileType, name, buffer.Length, DateTime.Now);
@@ -402,6 +431,12 @@ namespace InformationTree.PgpEncryption
 
         public void EncryptFromFile(Stream inputStream, Stream outputStream, string publicKeyFile, bool armor, bool withIntegrityCheck)
         {
+            if (string.IsNullOrWhiteSpace(publicKeyFile))
+            {
+                _popUpService.ShowError("Public key file is missing. Cannot encrypt.");
+                return;
+            }
+            
             try
             {
                 using (var publicKeyStreamReader = new StreamReader(publicKeyFile))
@@ -412,17 +447,17 @@ namespace InformationTree.PgpEncryption
             catch (PgpException ex)
             {
                 _logger.Error(ex);
-                _popUpService.ShowWarning(ex.Message, "Message not decrypted because of error");
+                _popUpService.ShowWarning(ex.Message, "Message not encrypted because of error");
             }
         }
 
-        public void EncryptFromStream(Stream inputStream, Stream outputStream, Stream publicKeyStream, bool armor, bool withIntegrityCheck)
+        private void EncryptFromStream(Stream inputStream, Stream outputStream, Stream publicKeyStream, bool armor, bool withIntegrityCheck)
         {
             try
             {
                 var encKey = ReadPublicKey(publicKeyStream);
 
-                using (MemoryStream bOut = new MemoryStream())
+                using (var bOut = new MemoryStream())
                 {
                     var comData = new PgpCompressedDataGenerator(CompressionAlgorithmTag.Zip);
 
@@ -431,14 +466,14 @@ namespace InformationTree.PgpEncryption
                         WriteStringToLiteralData(comData.Open(bOut), PgpLiteralData.Binary, string.Empty, reader.ReadToEnd());
                     }
                     comData.Close();
-                    PgpEncryptedDataGenerator cPk = new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Cast5, withIntegrityCheck, new SecureRandom());
+                    var cPk = new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Cast5, withIntegrityCheck, new SecureRandom());
 
                     cPk.AddMethod(encKey);
                     byte[] bytes = bOut.ToArray();
 
                     if (armor)
                     {
-                        using (ArmoredOutputStream armoredStream = new ArmoredOutputStream(outputStream))
+                        using (var armoredStream = new ArmoredOutputStream(outputStream))
                         {
                             using (Stream cOut = cPk.Open(armoredStream, bytes.Length))
                             {
@@ -458,7 +493,7 @@ namespace InformationTree.PgpEncryption
             catch (PgpException ex)
             {
                 _logger.Error(ex);
-                _popUpService.ShowWarning(ex.Message, "Message not decrypted because of error");
+                _popUpService.ShowWarning(ex.Message, "Message not encrypted because of error");
             }
         }
 
