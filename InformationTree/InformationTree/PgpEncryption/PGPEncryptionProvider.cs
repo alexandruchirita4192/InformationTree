@@ -11,15 +11,14 @@ using System.Text;
 
 namespace InformationTree.PgpEncryption
 {
-    [Obsolete("Break into many classes")] // TODO: Break into encryption (used) and encryption and signing (unused yet)
     public class PGPEncryptionProvider : IPGPEncryptionProvider
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly IPopUpService _popUpService;
+        protected readonly IPopUpService _popUpService;
 
         #region Constants
 
-        private const int BufferSize = 0x10000; // should always be power of 2
+        protected const int BufferSize = 0x10000; // should always be power of 2
 
         #endregion Constants
 
@@ -328,7 +327,7 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        public bool ExistsPasswordFromStream(Stream privateKeyStream, char[] password)
+        private bool ExistsPasswordFromStream(Stream privateKeyStream, char[] password)
         {
             if (privateKeyStream == null)
                 return false;
@@ -498,112 +497,6 @@ namespace InformationTree.PgpEncryption
         }
 
         #endregion Encrypt
-
-        #region Encrypt and Sign
-
-        public void EncryptAndSign(string inputFile, string outputFile, string publicKeyFile, string privateKeyFile, string passPhrase, bool armor)
-        {
-            PGPEncryptionKeys encryptionKeys = new PGPEncryptionKeys(publicKeyFile, privateKeyFile, passPhrase);
-
-            if (!File.Exists(inputFile))
-                throw new FileNotFoundException($"Input file [{inputFile}] does not exist.");
-
-            if (!File.Exists(publicKeyFile))
-                throw new FileNotFoundException($"Public Key file [{publicKeyFile}] does not exist.");
-
-            if (!File.Exists(privateKeyFile))
-                throw new FileNotFoundException($"Private Key file [{privateKeyFile}] does not exist.");
-
-            if (String.IsNullOrEmpty(passPhrase))
-                throw new ArgumentNullException("Invalid Pass Phrase.");
-
-            if (encryptionKeys == null)
-                throw new ArgumentNullException("Encryption Key not found.");
-
-            using (Stream outputStream = File.Create(outputFile))
-            {
-                if (armor)
-                    using (ArmoredOutputStream armoredOutputStream = new ArmoredOutputStream(outputStream))
-                    {
-                        OutputEncrypted(inputFile, armoredOutputStream, encryptionKeys);
-                    }
-                else
-                    OutputEncrypted(inputFile, outputStream, encryptionKeys);
-            }
-        }
-
-        private void OutputEncrypted(string inputFile, Stream outputStream, PGPEncryptionKeys encryptionKeys)
-        {
-            using (Stream encryptedOut = ChainEncryptedOut(outputStream, encryptionKeys))
-            {
-                FileInfo unencryptedFileInfo = new FileInfo(inputFile);
-                using (Stream compressedOut = ChainCompressedOut(encryptedOut))
-                {
-                    PgpSignatureGenerator signatureGenerator = InitSignatureGenerator(compressedOut, encryptionKeys);
-                    using (Stream literalOut = ChainLiteralOut(compressedOut, unencryptedFileInfo))
-                    {
-                        using (FileStream inputFileStream = unencryptedFileInfo.OpenRead())
-                        {
-                            WriteOutputAndSign(compressedOut, literalOut, inputFileStream, signatureGenerator);
-                            inputFileStream.Close();
-                        }
-                    }
-                }
-            }
-        }
-
-        private void WriteOutputAndSign(Stream compressedOut, Stream literalOut, FileStream inputFile, PgpSignatureGenerator signatureGenerator)
-        {
-            int length = 0;
-            byte[] buf = new byte[BufferSize];
-            while ((length = inputFile.Read(buf, 0, buf.Length)) > 0)
-            {
-                literalOut.Write(buf, 0, length);
-                signatureGenerator.Update(buf, 0, length);
-            }
-            signatureGenerator.Generate().Encode(compressedOut);
-        }
-
-        private Stream ChainEncryptedOut(Stream outputStream, PGPEncryptionKeys m_encryptionKeys)
-        {
-            PgpEncryptedDataGenerator encryptedDataGenerator;
-            encryptedDataGenerator = new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.TripleDes, new SecureRandom());
-            encryptedDataGenerator.AddMethod(m_encryptionKeys.PublicKey);
-            return encryptedDataGenerator.Open(outputStream, new byte[BufferSize]);
-        }
-
-        private Stream ChainCompressedOut(Stream encryptedOut)
-        {
-            PgpCompressedDataGenerator compressedDataGenerator = new PgpCompressedDataGenerator(CompressionAlgorithmTag.Zip);
-            return compressedDataGenerator.Open(encryptedOut);
-        }
-
-        private Stream ChainLiteralOut(Stream compressedOut, FileInfo file)
-        {
-            PgpLiteralDataGenerator pgpLiteralDataGenerator = new PgpLiteralDataGenerator();
-            return pgpLiteralDataGenerator.Open(compressedOut, PgpLiteralData.Binary, file);
-        }
-
-        private PgpSignatureGenerator InitSignatureGenerator(Stream compressedOut, PGPEncryptionKeys m_encryptionKeys)
-        {
-            const bool IsCritical = false;
-            const bool IsNested = false;
-            PublicKeyAlgorithmTag tag = m_encryptionKeys.SecretKey.PublicKey.Algorithm;
-            PgpSignatureGenerator pgpSignatureGenerator = new PgpSignatureGenerator(tag, HashAlgorithmTag.Sha1);
-            pgpSignatureGenerator.InitSign(PgpSignature.BinaryDocument, m_encryptionKeys.PrivateKey);
-            foreach (string userId in m_encryptionKeys.SecretKey.PublicKey.GetUserIds())
-            {
-                PgpSignatureSubpacketGenerator subPacketGenerator = new PgpSignatureSubpacketGenerator();
-                subPacketGenerator.SetSignerUserId(IsCritical, userId);
-                pgpSignatureGenerator.SetHashedSubpackets(subPacketGenerator.Generate());
-                // Just the first one!
-                break;
-            }
-            pgpSignatureGenerator.GenerateOnePassVersion(IsNested).Encode(compressedOut);
-            return pgpSignatureGenerator;
-        }
-
-        #endregion Encrypt and Sign
 
         #region Private helpers
 
