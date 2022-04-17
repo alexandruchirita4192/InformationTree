@@ -27,7 +27,7 @@ namespace InformationTree.Forms
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
-        private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly ICompressionProvider _compressionProvider;
         private readonly IConfigurationReader _configurationReader;
 
@@ -40,7 +40,7 @@ namespace InformationTree.Forms
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionProvider encryptionProvider,
+            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             ICompressionProvider compressionProvider,
             IConfigurationReader configurationReader)
         {
@@ -48,7 +48,7 @@ namespace InformationTree.Forms
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
-            _encryptionProvider = encryptionProvider;
+            _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _compressionProvider = compressionProvider;
             _configurationReader = configurationReader;
             
@@ -952,7 +952,7 @@ namespace InformationTree.Forms
                 if (tagData != null)
                     data = tagData.Data;
 
-                var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionProvider, _configurationReader, selectedNode.Text, data);
+                var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _configurationReader, selectedNode.Text, data);
 
                 WinFormsApplication.CenterForm(form, this);
 

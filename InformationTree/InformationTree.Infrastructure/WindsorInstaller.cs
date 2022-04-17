@@ -28,6 +28,7 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<ICanvasFormFactory>().ImplementedBy<CanvasPopUpFormFactory>().LifeStyle.Singleton);
             container.Register(Component.For<IPopUpService>().ImplementedBy<WinFormsPopUpService>().LifeStyle.Singleton);
             container.Register(Component.For<IPGPEncryptionProvider>().ImplementedBy<PGPEncryptionProvider>().LifeStyle.Singleton);
+            container.Register(Component.For<IPGPEncryptionAndSigningProvider>().ImplementedBy<PGPEncryptionAndSigningProvider>().LifeStyle.Singleton);
             container.Register(Component.For<ICompressionProvider>().ImplementedBy<CompressionProvider>().LifeStyle.Singleton);
         }
     }

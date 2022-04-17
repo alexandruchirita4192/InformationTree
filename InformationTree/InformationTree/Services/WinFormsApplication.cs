@@ -21,7 +21,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
-        private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly ICompressionProvider _compressionProvider;
 
         public WinFormsApplication(
@@ -31,7 +31,7 @@ namespace InformationTree.Render.WinForms.Services
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
-            IPGPEncryptionProvider encryptionProvider,
+            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             ICompressionProvider compressionProvider)
         {
             _commandLineParser = commandLineParser;
@@ -40,7 +40,7 @@ namespace InformationTree.Render.WinForms.Services
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
-            _encryptionProvider = encryptionProvider;
+            _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _compressionProvider = compressionProvider;
         }
 
@@ -180,7 +180,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionProvider, _compressionProvider, _configurationReader));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _compressionProvider, _configurationReader));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

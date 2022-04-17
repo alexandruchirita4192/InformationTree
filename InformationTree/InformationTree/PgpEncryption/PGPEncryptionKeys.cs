@@ -6,6 +6,8 @@ using System.Windows.Forms;
 
 namespace InformationTree.PgpEncryption
 {
+    // TODO: Use private key only to sign data (public key can be generated based on private key, in C# it's a property of the private key)
+    // TODO: Integrate this class inside PGPEncryptionAndSigningProvider
     public class PGPEncryptionKeys
     {
         public PgpPublicKey PublicKey { get; private set; }

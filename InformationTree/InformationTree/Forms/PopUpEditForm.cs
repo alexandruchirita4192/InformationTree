@@ -21,9 +21,10 @@ namespace InformationTree.Forms
 
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
-        private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly IConfigurationReader _configurationReader;
-
+        private readonly Configuration _configuration;
+        
         private ICanvasForm _canvasForm;
         private Button tbExitPopUpAndSave;
         private RicherTextBox.Controls.RicherTextBox tbData;
@@ -74,13 +75,14 @@ namespace InformationTree.Forms
         private PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionProvider encryptionProvider,
+            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             IConfigurationReader configurationReader)
         {
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
-            _encryptionProvider = encryptionProvider;
+            _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _configurationReader = configurationReader;
+            _configuration = _configurationReader.GetConfiguration();
 
             InitializeComponent();
             InitializeRicherTextBoxControlAndSaveAndCloseButton();
@@ -94,11 +96,11 @@ namespace InformationTree.Forms
         public PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionProvider encryptionProvider,
+            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             IConfigurationReader configurationReader,
             string title,
             string data)
-            : this(canvasFormFactory, popUpService, encryptionProvider, configurationReader)
+            : this(canvasFormFactory, popUpService, encryptionAndSigningProvider, configurationReader)
         {
             Text += $": {title}";
 
@@ -331,7 +333,7 @@ namespace InformationTree.Forms
             if (DataIsPgpEncrypted ||
                 _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?") == PopUpResult.Yes)
             {
-                var form = new PgpDecrypt(_popUpService, _encryptionProvider, cbFromFile.Checked);
+                var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, cbFromFile.Checked);
                 if (!form.IsDisposed)
                 {
                     WinFormsApplication.CenterForm(form, this);
@@ -356,12 +358,12 @@ namespace InformationTree.Forms
                 var result = string.Empty;
                 if (FromFile)
                 {
-                    result = _encryptionProvider.GetDecryptedStringFromFile(tbData.Text, PgpKeyFile, PgpPassword);
+                    result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(tbData.Text, PgpKeyFile, PgpPassword);
                     lblEncryption.Text = "Decrypted with key: " + PgpKeyFile;
                 }
                 else
                 {
-                    result = _encryptionProvider.GetDecryptedStringFromString(tbData.Text, PgpKeyText, PgpPassword);
+                    result = _encryptionAndSigningProvider.GetDecryptedStringFromString(tbData.Text, PgpKeyText, PgpPassword);
                     lblEncryption.Text = "Decrypted with node key";
                 }
 
@@ -386,19 +388,39 @@ namespace InformationTree.Forms
             {
                 PgpKeyFile = _popUpService.GetPublicKeyFile();
 
-                using (var decryptedStream = decryptedData.ToStream())
+                if (_configuration.TreeFeatures.EnableEncryptionSigning)
                 {
-                    using (var outputStream = new MemoryStream())
+                    PgpKeyText = File.ReadAllText(PgpKeyFile);
+
+                    // TODO: Get the private key and password also, for encryption with signing, and do not get both because is redundant
+
+                    var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, PgpKeyText, string.Empty, string.Empty, true);
+                    resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
+
+                    if (tbData.Text != resultedText)
                     {
-                        _encryptionProvider.EncryptFromFile(decryptedStream, outputStream, PgpKeyFile, true, true);
-                        using (var reader = new StreamReader(outputStream))
+                        data = null;
+                        tbData.Text = resultedText;
+                        lblEncryption.Text = "Encrypted with key: " + PgpKeyFile;
+                    }
+                }
+                else
+                {
+                    using (var decryptedStream = decryptedData.ToStream())
+                    {
+                        using (var outputStream = new MemoryStream())
                         {
-                            var resultedText = reader.ReadToEnd();
-                            if (tbData.Text != resultedText)
+                            _encryptionAndSigningProvider.EncryptFromFile(decryptedStream, outputStream, PgpKeyFile, true, true);
+
+                            using (var reader = new StreamReader(outputStream))
                             {
-                                data = null;
-                                tbData.Text = resultedText;
-                                lblEncryption.Text = "Encrypted with key: " + PgpKeyFile;
+                                var resultedText = reader.ReadToEnd();
+                                if (tbData.Text != resultedText)
+                                {
+                                    data = null;
+                                    tbData.Text = resultedText;
+                                    lblEncryption.Text = "Encrypted with key: " + PgpKeyFile;
+                                }
                             }
                         }
                     }
@@ -408,7 +430,19 @@ namespace InformationTree.Forms
             {
                 FindNodeWithPublicKey();
 
-                var resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(_encryptionProvider.GetEncryptedStringFromString(tbData.Rtf, PgpKeyText, true, true));
+                var  resultedText = string.Empty;
+                if (_configuration.TreeFeatures.EnableEncryptionSigning)
+                {
+                    // TODO: Get the private key and password also, for encryption with signing, and do not get both because is redundant
+
+                    resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, PgpKeyText, string.Empty, string.Empty, true);
+                }
+                else
+                {
+                    resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(tbData.Rtf, PgpKeyText, true, true);
+                }
+                resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
+
                 if (tbData.Text != resultedText)
                 {
                     data = null;

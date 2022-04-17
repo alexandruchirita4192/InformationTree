@@ -31,7 +31,8 @@ namespace InformationTree.Render.WinForms.Services
                         ),
                     new Domain.Entities.Features.TreeFeatures(
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.TreeFeatures.EnableManualEncryption)),
-                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.TreeFeatures.EnableAutomaticCompression))
+                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.TreeFeatures.EnableAutomaticCompression)),
+                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.TreeFeatures.EnableEncryptionSigning))
                         )
                     );
             }

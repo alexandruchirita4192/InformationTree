@@ -13,7 +13,7 @@ namespace InformationTree.Forms
         #region Fields
 
         private readonly IPopUpService _popUpService;
-        private readonly IPGPEncryptionProvider _encryptionProvider;
+        private readonly IPGPEncryptionProvider _encryptionAndSigningProvider;
 
         #endregion Fields
 
@@ -41,11 +41,11 @@ namespace InformationTree.Forms
             mtbPgpDecrypt.PasswordChar = '#';
         }
 
-        public PgpDecrypt(IPopUpService popUpService, IPGPEncryptionProvider encryptionProvider, bool fromFile)
+        public PgpDecrypt(IPopUpService popUpService, IPGPEncryptionProvider encryptionAndSigningProvider, bool fromFile)
             : this()
         {
             _popUpService = popUpService;
-            _encryptionProvider = encryptionProvider;
+            _encryptionAndSigningProvider = encryptionAndSigningProvider;
 
             DecryptFromFile = fromFile;
 
@@ -121,14 +121,14 @@ namespace InformationTree.Forms
                 {
                     if (DecryptFromFile)
                     {
-                        if (_encryptionProvider.ExistsPassword(PgpPrivateKeyFile, password.ToCharArray()))
+                        if (_encryptionAndSigningProvider.ExistsPassword(PgpPrivateKeyFile, password.ToCharArray()))
                             Close();
                         else
                             _popUpService.ShowMessage("Password is not valid for the selected PGP file", "Invalid password or PGP file");
                     }
                     else
                     {
-                        if (_encryptionProvider.ExistsPasswordFromString(PgpPrivateKeyText, password.ToCharArray()))
+                        if (_encryptionAndSigningProvider.ExistsPasswordFromString(PgpPrivateKeyText, password.ToCharArray()))
                             Close();
                         else
                             _popUpService.ShowMessage("Password is not valid for the selected PGP key", "Invalid password or PGP file");
