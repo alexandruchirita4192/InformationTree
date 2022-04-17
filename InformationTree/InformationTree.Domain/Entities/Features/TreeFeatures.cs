@@ -10,7 +10,7 @@
             EnableManualEncryption = enableManualEncryption;
         }
         
-        public bool EnableAutomaticCompression { get; set; }
-        public bool EnableManualEncryption { get; set; }
+        public bool EnableAutomaticCompression { get; private set; }
+        public bool EnableManualEncryption { get; private set; }
     }
 }
