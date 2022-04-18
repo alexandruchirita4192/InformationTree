@@ -12,6 +12,7 @@ using InformationTree.Domain.Entities;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
+using InformationTree.Render.WinForms.Extensions;
 using InformationTree.TextProcessing;
 using NLog;
 
@@ -175,7 +176,7 @@ namespace InformationTree.Tree
         {
             foreach (TreeNode tn in nodes)
             {
-                var tagTreeNodeData = tn.Tag as TreeNodeData;
+                var tagTreeNodeData = tn.GetTreeNodeData();
                 if (tagTreeNodeData == null || tagTreeNodeData.AddedNumber == 0)
                     return true;
 
@@ -189,17 +190,11 @@ namespace InformationTree.Tree
         {
             foreach (TreeNode tn in nodes)
             {
-                var tagTreeNodeData = tn.Tag as TreeNodeData;
-                if (tagTreeNodeData == null)
-                    tagTreeNodeData = new TreeNodeData(null, TreeNodeCounter, DateTime.Now, DateTime.Now, 0, null);
-                else
-                {
-                    if (tagTreeNodeData.AddedDate == null)
-                        tagTreeNodeData.AddedDate = DateTime.Now;
-                    tagTreeNodeData.AddedNumber = TreeNodeCounter;
-                }
+                var tagTreeNodeData = tn.GetTreeNodeData();
+                if (tagTreeNodeData.AddedDate == null)
+                    tagTreeNodeData.AddedDate = DateTime.Now;
+                tagTreeNodeData.AddedNumber = TreeNodeCounter;
                 TreeNodeCounter++;
-                tn.Tag = tagTreeNodeData;
 
                 FixTreeNodes(tn.Nodes);
             }
@@ -324,11 +319,11 @@ namespace InformationTree.Tree
             var node = new TreeNode();
             CopyNode(node, from, addedNumberHigherThan, addedNumberLowerThan, type);
 
-            if ((addedNumberLowerThan == null && addedNumberHigherThan == null) || (addedNumberLowerThan != null && addedNumberHigherThan != null && node.Tag != null))
+            if ((addedNumberLowerThan == null && addedNumberHigherThan == null) || (addedNumberLowerThan != null && addedNumberHigherThan != null))
                 to.Add(node);
         }
 
-        public static void CopyNode(TreeNode to, TreeNode from, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
+        public static void CopyNode(TreeNode to, TreeNode from, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1) // TODO: Change type to an enum explaining clearly what it means
         {
             if (from == null)
                 throw new Exception("from is null");
@@ -339,18 +334,14 @@ namespace InformationTree.Tree
             if (to.Nodes == null)
                 throw new Exception("to.Nodes is null");
 
-            var tagData = from.Tag as TreeNodeData;
-            if (tagData != null)
-            {
-                if ((type == 0) && (tagData.AddedNumber >= addedNumberLowerThan) || (tagData.AddedNumber < addedNumberHigherThan))
-                    return;
-                else if ((type == 1) && (tagData.Urgency >= addedNumberLowerThan) || (tagData.Urgency < addedNumberHigherThan))
-                    return;
-
-                to.Tag = new TreeNodeData(tagData.Data, tagData.AddedNumber, tagData.AddedDate, tagData.LastChangeDate, tagData.Urgency, tagData.Link);
-            }
-            else if (addedNumberLowerThan != null) // allow copying only what I should copy
+            var tagData = from.GetTreeNodeData();
+            if ((type == 0) && (tagData.AddedNumber >= addedNumberLowerThan) || (tagData.AddedNumber < addedNumberHigherThan))
                 return;
+            else if ((type == 1) && (tagData.Urgency >= addedNumberLowerThan) || (tagData.Urgency < addedNumberHigherThan))
+                return;
+
+            var toTag = to.GetTreeNodeData();
+            toTag.Copy(tagData);
 
             to.Text = from.Text;
             to.Name = from.Name;
@@ -516,7 +507,7 @@ namespace InformationTree.Tree
 
             foreach (TreeNode node in from)
             {
-                var nodeData = node.Tag as TreeNodeData;
+                var nodeData = node.GetTreeNodeData();
                 if (nodeData != null && !string.IsNullOrEmpty(nodeData.Category) && ((includeOnlyWithStartupAlert && nodeData.IsStartupAlert) || (!includeOnlyWithStartupAlert)))
                 {
                     if (!categories.ContainsKey(nodeData.Category))
@@ -622,7 +613,7 @@ namespace InformationTree.Tree
                     attrStrikeout = node.NodeFont.Strikeout;
                 }
 
-                var tag = node.Tag as TreeNodeData;
+                var tag = node.GetTreeNodeData();
                 var attrForegroundColor = node.ForeColor != null && node.ForeColor.Name != null ? node.ForeColor.Name : string.Empty;
                 var attrBackgroundColor = node.BackColor != null && node.BackColor.Name != null ? node.BackColor.Name : string.Empty;
                 var attrFontFamily = node.NodeFont != null && node.NodeFont.FontFamily != null && node.NodeFont.FontFamily.Name != null && node.NodeFont.FontFamily.Name != FontFamily.GenericSansSerif.Name ? node.NodeFont.FontFamily.Name : string.Empty;
@@ -915,7 +906,7 @@ namespace InformationTree.Tree
             {
                 foreach (TreeNode node in nodes)
                 {
-                    var nodeTagData = node.Tag as TreeNodeData;
+                    var nodeTagData = node.GetTreeNodeData();
                     var nodeData = nodeTagData != null && !string.IsNullOrEmpty(nodeTagData.Data) ? nodeTagData.Data : null;
                     var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text)) || (nodeData != null && nodeData.ToLower().Contains(text));
 
@@ -953,7 +944,7 @@ namespace InformationTree.Tree
             {
                 foreach (TreeNode node in nodes)
                 {
-                    var nodeTagData = node.Tag as TreeNodeData;
+                    var nodeTagData = node.GetTreeNodeData();
                     var nodeData = nodeTagData != null && !string.IsNullOrEmpty(nodeTagData.Data) ? nodeTagData.Data : null;
                     var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text)) || (nodeData != null && nodeData.ToLower().Contains(text));
 
@@ -1041,7 +1032,7 @@ namespace InformationTree.Tree
             if (node == null)
                 return 0;
 
-            var tagData = node.Tag as TreeNodeData;
+            var tagData = node.GetTreeNodeData();
             if (tagData == null)
                 return 0;
 
@@ -1080,7 +1071,7 @@ namespace InformationTree.Tree
             if (!removedNode)
                 tv.Nodes.Remove(oldSelection);
 
-            var currentSelectionTagData = currentSelection.Tag as TreeNodeData;
+            var currentSelectionTagData = currentSelection.GetTreeNodeData();
             if (string.IsNullOrEmpty(currentSelection.Text) &&
                 currentSelectionTagData != null && string.IsNullOrEmpty(currentSelectionTagData.Data) &&
                 currentSelection.Parent == null &&

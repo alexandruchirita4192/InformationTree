@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Services;
 using InformationTree.PgpEncryption;
+using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
 
@@ -91,7 +92,7 @@ namespace InformationTree.Forms
                 var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind);
                 if (node != null)
                 {
-                    var nodeData = node.Tag as TreeNodeData;
+                    var nodeData = node.GetTreeNodeData();
                     if (nodeData != null)
                     {
                         PgpPrivateKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);

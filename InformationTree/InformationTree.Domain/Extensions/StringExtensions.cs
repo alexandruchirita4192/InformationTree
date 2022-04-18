@@ -13,5 +13,15 @@ namespace InformationTree.Domain.Extensions
             stream.Position = 0;
             return stream;
         }
+
+        public static bool IsEmpty(this string s)
+        {
+            return string.IsNullOrWhiteSpace(s);
+        }
+        
+        public static bool IsNotEmpty(this string s)
+        {
+            return !string.IsNullOrWhiteSpace(s);
+        }
     }
 }

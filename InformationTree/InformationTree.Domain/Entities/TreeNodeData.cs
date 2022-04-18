@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace InformationTree.Domain.Entities
 {
@@ -71,6 +72,34 @@ namespace InformationTree.Domain.Entities
                     string.IsNullOrEmpty(Category) &&
                     !IsStartupAlert &&
                     PercentCompleted == 0m;
+            }
+        }
+        
+        public void Copy(TreeNodeData from)
+        {
+            if (from == null)
+                return;
+            
+            Data = from.Data;
+            AddedNumber = from.AddedNumber;
+            AddedDate = from.AddedDate;
+            LastChangeDate = from.LastChangeDate;
+            Urgency = from.Urgency;
+            Link = from.Link;
+            Category = from.Category;
+            IsStartupAlert = from.IsStartupAlert;
+            PercentCompleted = from.PercentCompleted;
+
+            Children.Clear();
+
+            if (from.Children != null)
+            {
+                foreach (var child in from.Children)
+                {
+                    var newChild = new TreeNodeData();
+                    newChild.Copy(child);
+                    Children.Add(newChild);
+                }
             }
         }
 

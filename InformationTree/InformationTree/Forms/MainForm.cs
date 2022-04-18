@@ -3,6 +3,7 @@ using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
+using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
@@ -337,7 +338,7 @@ namespace InformationTree.Forms
                 tbTaskName.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref percentCompleted, true);
                 nudCompleteProgress.Value = percentCompleted;
 
-                var tagData = node.Tag as TreeNodeData;
+                var tagData = node.GetTreeNodeData();
 
                 TreeNodeHelper.UpdateCurrentSelection(node.Text == null && tagData != null && tagData.IsEmptyData ? null : node);
 
@@ -455,7 +456,7 @@ namespace InformationTree.Forms
                 var category = tbCategory.Text;
                 var isStartupAlert = cbIsStartupAlert.Checked;
 
-                var data = selectedNode.Tag as TreeNodeData;
+                var data = selectedNode.GetTreeNodeData();
                 if (data == null)
                     data = new TreeNodeData(null, 0, DateTime.Now, DateTime.Now, urgency, link, category, isStartupAlert, taskPercentCompleted);
                 else
@@ -491,16 +492,8 @@ namespace InformationTree.Forms
                 if (selectedNode.Text != taskName)
                 {
                     selectedNode.Text = taskName;
-                    var tagData = selectedNode.Tag as TreeNodeData;
-
-                    if (tagData != null)
-                        tagData.LastChangeDate = DateTime.Now;
-                    else
-                    {
-                        var nodeData = new TreeNodeData();
-                        nodeData.LastChangeDate = DateTime.Now;
-                        selectedNode.Tag = nodeData;
-                    }
+                    var tagData = selectedNode.GetTreeNodeData();
+                    tagData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
 
@@ -513,16 +506,8 @@ namespace InformationTree.Forms
                 {
                     selectedNodeLastChildren.Text = taskName;
 
-                    var tagData = selectedNodeLastChildren.Tag as TreeNodeData;
-
-                    if (tagData != null)
-                        tagData.LastChangeDate = DateTime.Now;
-                    else
-                    {
-                        var nodeData = new TreeNodeData();
-                        nodeData.LastChangeDate = DateTime.Now;
-                        selectedNodeLastChildren.Tag = nodeData;
-                    }
+                    var tagData = selectedNodeLastChildren.GetTreeNodeData();
+                    tagData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
 
@@ -724,9 +709,8 @@ namespace InformationTree.Forms
                     var foreColor = tvTaskList.SelectedNode.ForeColor;
                     tvTaskList.SelectedNode.ForeColor = foreColor != null && !foreColor.IsEmpty ? foreColor : TreeNodeHelper.DefaultForeGroundColor;
 
-                    var nodeData = tvTaskList.SelectedNode.Tag as TreeNodeData ?? new TreeNodeData();
+                    var nodeData = tvTaskList.SelectedNode.GetTreeNodeData();
                     nodeData.LastChangeDate = DateTime.Now;
-                    tvTaskList.SelectedNode.Tag = nodeData; // set for newly created TreeNodeData instances
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(tvTaskList.SelectedNode));
 
@@ -916,20 +900,12 @@ namespace InformationTree.Forms
             TreeNode theNode = this.tvTaskList.GetNodeAt(e.X, e.Y);
 
             // Set a ToolTip only if the mouse pointer is actually paused on a node.
-            if ((theNode != null))
+            if (theNode != null)
             {
-                // Verify that the tag property is not "null".
-                if (theNode.Tag != null)
+                // Change the ToolTip only if the pointer moved to a new node.
+                if (theNode.ToolTipText != this.toolTip1.GetToolTip(this.tvTaskList))
                 {
-                    // Change the ToolTip only if the pointer moved to a new node.
-                    if (theNode.ToolTipText != this.toolTip1.GetToolTip(this.tvTaskList))
-                    {
-                        this.toolTip1.SetToolTip(this.tvTaskList, theNode.ToolTipText);
-                    }
-                }
-                else
-                {
-                    this.toolTip1.SetToolTip(this.tvTaskList, "");
+                    this.toolTip1.SetToolTip(this.tvTaskList, theNode.ToolTipText);
                 }
             }
             else     // Pointer is not over a node so clear the ToolTip.
@@ -946,12 +922,9 @@ namespace InformationTree.Forms
             var selectedNode = tvTaskList.SelectedNode;
             if (selectedNode != null)
             {
-                var tagData = selectedNode.Tag as TreeNodeData;
-                var data = string.Empty;
-
-                if (tagData != null)
-                    data = tagData.Data;
-
+                var tagData = selectedNode.GetTreeNodeData();
+                var data = tagData.Data ?? string.Empty;
+                
                 var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _configurationReader, selectedNode.Text, data);
 
                 WinFormsApplication.CenterForm(form, this);
@@ -962,15 +935,9 @@ namespace InformationTree.Forms
 
                     if (selectedNode != null)
                     {
-                        var td = selectedNode.Tag as TreeNodeData;
-
-                        if (td == null)
-                            td = new TreeNodeData(d, 0, DateTime.Now, DateTime.Now, 0, null, null, false);
-                        else
-                            td.Data = d;
-
-                        selectedNode.Tag = td;
-
+                        var td = selectedNode.GetTreeNodeData();
+                        td.Data = d;
+                        
                         var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(d);
                         selectedNode.ToolTipText = TextProcessingHelper.GetToolTipText(selectedNode.Text +
                             (!string.IsNullOrEmpty(selectedNode.Name) && selectedNode.Name != "0" ? Environment.NewLine + " TimeSpent: " + selectedNode.Name : "") +
@@ -992,7 +959,7 @@ namespace InformationTree.Forms
             var node = tvTaskList.SelectedNode;
             if (node != null)
             {
-                var tagData = node.Tag as TreeNodeData;
+                var tagData = node.GetTreeNodeData();
                 if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
                 {
                     TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
@@ -1030,7 +997,7 @@ namespace InformationTree.Forms
                 if (node.Nodes.Count == 0 && !useSelectedNode)
                     return;
 
-                var tagData = node.Tag as TreeNodeData;
+                var tagData = node.GetTreeNodeData();
                 if (tagData != null && string.IsNullOrEmpty(tagData.Link))
                     tagData.Link = tbLink.Text;
                 else
@@ -1225,11 +1192,8 @@ namespace InformationTree.Forms
 
             if (cbLogChecked && node != null)
             {
-                var nodeData = node.Tag as TreeNodeData;
-                if (nodeData != null)
-                    nodeData.Data += commandData + Environment.NewLine;
-                else
-                    node.Tag = new TreeNodeData(commandData + Environment.NewLine);
+                var nodeData = node.GetTreeNodeData();
+                nodeData.Data += commandData + Environment.NewLine;
 
                 TreeNodeHelper.TreeUnchanged = false;
             }

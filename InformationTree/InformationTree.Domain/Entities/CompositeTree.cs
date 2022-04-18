@@ -9,11 +9,11 @@ namespace InformationTree.Domain.Entities
         {
         }
 
-        public CompositeTree(List<CompositeTree<T>> children)
+        public CompositeTree(List<T> children)
         {
-            Children = children ?? new List<CompositeTree<T>>();
+            Children = children ?? new List<T>();
         }
 
-        public List<CompositeTree<T>> Children { get; private set; }
+        public List<T> Children { get; private set; }
     }
 }
