@@ -7,6 +7,8 @@ namespace InformationTree.Domain.Entities
     {
         #region Properties
 
+        public string Text { get; set; }
+
         [Obsolete("This might be modeled as another object (RTF object capable of generating RTF, adding tables, images or other)")]
         public string Data { get; set; }
         public int AddedNumber { get; set; }
@@ -40,8 +42,9 @@ namespace InformationTree.Domain.Entities
 
         #region Constructors
 
-        public TreeNodeData(string data = null, int addedNumber = 0, DateTime? addedDate = null, DateTime? lastChangeDate = null, int urgency = 0, string link = null, string category = null, bool isStartupAlert = false, decimal percentCompleted = 0m)
+        public TreeNodeData(string text, string data = null, int addedNumber = 0, DateTime? addedDate = null, DateTime? lastChangeDate = null, int urgency = 0, string link = null, string category = null, bool isStartupAlert = false, decimal percentCompleted = 0m)
         {
+            Text = text;
             Data = data;
             AddedNumber = addedNumber;
             AddedDate = addedDate;
@@ -52,7 +55,7 @@ namespace InformationTree.Domain.Entities
             PercentCompleted = percentCompleted;
         }
 
-        public TreeNodeData(TreeNodeData copy) : this(copy.Data, copy.AddedNumber, copy.AddedDate, copy.LastChangeDate, copy.Urgency, copy.Link, copy.Category, copy.IsStartupAlert, copy.PercentCompleted)
+        public TreeNodeData(TreeNodeData copy) : this(copy.Text, copy.Data, copy.AddedNumber, copy.AddedDate, copy.LastChangeDate, copy.Urgency, copy.Link, copy.Category, copy.IsStartupAlert, copy.PercentCompleted)
         {
         }
 
@@ -79,7 +82,8 @@ namespace InformationTree.Domain.Entities
         {
             if (from == null)
                 return;
-            
+
+            Text = from.Text;
             Data = from.Data;
             AddedNumber = from.AddedNumber;
             AddedDate = from.AddedDate;
@@ -96,7 +100,7 @@ namespace InformationTree.Domain.Entities
             {
                 foreach (var child in from.Children)
                 {
-                    var newChild = new TreeNodeData();
+                    var newChild = new TreeNodeData(child.Text);
                     newChild.Copy(child);
                     Children.Add(newChild);
                 }

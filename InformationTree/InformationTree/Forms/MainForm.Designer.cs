@@ -166,6 +166,7 @@ namespace InformationTree.Forms
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnExportToRtf = new System.Windows.Forms.Button();
             this.gbTaskList.SuspendLayout();
             this.gbTask.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCompleteProgress)).BeginInit();
@@ -258,10 +259,10 @@ namespace InformationTree.Forms
             // btnAddTask
             // 
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddTask.Location = new System.Drawing.Point(12, 22);
+            this.btnAddTask.Location = new System.Drawing.Point(9, 22);
             this.btnAddTask.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(117, 27);
+            this.btnAddTask.Size = new System.Drawing.Size(66, 27);
             this.btnAddTask.TabIndex = 5;
             this.btnAddTask.Text = "&Add";
             this.btnAddTask.UseVisualStyleBackColor = true;
@@ -293,12 +294,12 @@ namespace InformationTree.Forms
             // btnUpdateText
             // 
             this.btnUpdateText.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpdateText.Location = new System.Drawing.Point(12, 53);
+            this.btnUpdateText.Location = new System.Drawing.Point(83, 22);
             this.btnUpdateText.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnUpdateText.Name = "btnUpdateText";
-            this.btnUpdateText.Size = new System.Drawing.Size(215, 27);
+            this.btnUpdateText.Size = new System.Drawing.Size(66, 27);
             this.btnUpdateText.TabIndex = 11;
-            this.btnUpdateText.Text = "&Update Text";
+            this.btnUpdateText.Text = "&Update";
             this.btnUpdateText.UseVisualStyleBackColor = true;
             this.btnUpdateText.Click += new System.EventHandler(this.btnUpdateText_Click);
             // 
@@ -314,10 +315,10 @@ namespace InformationTree.Forms
             // btnDelete
             // 
             this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelete.Location = new System.Drawing.Point(131, 22);
+            this.btnDelete.Location = new System.Drawing.Point(157, 22);
             this.btnDelete.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(96, 27);
+            this.btnDelete.Size = new System.Drawing.Size(66, 27);
             this.btnDelete.TabIndex = 7;
             this.btnDelete.Text = "&Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
@@ -640,6 +641,7 @@ namespace InformationTree.Forms
             // gbTaskOperations
             // 
             this.gbTaskOperations.BackColor = System.Drawing.SystemColors.Control;
+            this.gbTaskOperations.Controls.Add(this.btnExportToRtf);
             this.gbTaskOperations.Controls.Add(this.btnAddTask);
             this.gbTaskOperations.Controls.Add(this.btnUpdateText);
             this.gbTaskOperations.Controls.Add(this.btnDelete);
@@ -1613,6 +1615,18 @@ namespace InformationTree.Forms
             this.decryptToolStripMenuItem.Text = "Decrypt";
             this.decryptToolStripMenuItem.Click += new System.EventHandler(this.decryptToolStripMenuItem_Click);
             // 
+            // btnExportToRtf
+            // 
+            this.btnExportToRtf.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExportToRtf.Location = new System.Drawing.Point(8, 54);
+            this.btnExportToRtf.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnExportToRtf.Name = "btnExportToRtf";
+            this.btnExportToRtf.Size = new System.Drawing.Size(215, 27);
+            this.btnExportToRtf.TabIndex = 12;
+            this.btnExportToRtf.Text = "&Export to RTF";
+            this.btnExportToRtf.UseVisualStyleBackColor = true;
+            this.btnExportToRtf.Click += new System.EventHandler(this.btnExportToRtf_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1795,6 +1809,7 @@ namespace InformationTree.Forms
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem encryptToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decryptToolStripMenuItem;
+        private Button btnExportToRtf;
     }
 }
 

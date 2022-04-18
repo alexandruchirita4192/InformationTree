@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 
 namespace InformationTree.Render.WinForms.Extensions
@@ -15,7 +16,11 @@ namespace InformationTree.Render.WinForms.Extensions
             // Keeping the tree separated as a TreeNodeData tree and rendering it to TreeView when required is a better idea
             if (treeNode.Tag is not TreeNodeData treeNodeData)
             {
-                treeNodeData = new TreeNodeData();
+                treeNodeData = new TreeNodeData(treeNode.Text)
+                {
+                    AddedDate = DateTime.Now,
+                    LastChangeDate = DateTime.Now
+                };
                 treeNode.Tag = treeNodeData;
             }
 

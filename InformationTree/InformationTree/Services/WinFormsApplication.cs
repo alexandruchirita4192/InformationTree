@@ -23,6 +23,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly ICompressionProvider _compressionProvider;
+        private readonly IExportNodeToRtfService _exportNodeToRtfService;
 
         public WinFormsApplication(
             ICommandLineParser commandLineParser,
@@ -32,7 +33,8 @@ namespace InformationTree.Render.WinForms.Services
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            ICompressionProvider compressionProvider)
+            ICompressionProvider compressionProvider,
+            IExportNodeToRtfService exportNodeToRtfService)
         {
             _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
@@ -42,6 +44,7 @@ namespace InformationTree.Render.WinForms.Services
             _canvasFormFactory = canvasFormFactory;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _compressionProvider = compressionProvider;
+            _exportNodeToRtfService = exportNodeToRtfService;
         }
 
         #region extern
@@ -180,7 +183,7 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _compressionProvider, _configurationReader));
+            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _compressionProvider, _configurationReader, _exportNodeToRtfService));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

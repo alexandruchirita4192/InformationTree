@@ -31,6 +31,7 @@ namespace InformationTree.Forms
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly ICompressionProvider _compressionProvider;
         private readonly IConfigurationReader _configurationReader;
+        private readonly IExportNodeToRtfService _exportNodeToRtfService;
 
         #endregion Fields
 
@@ -43,7 +44,8 @@ namespace InformationTree.Forms
             IPopUpService popUpService,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             ICompressionProvider compressionProvider,
-            IConfigurationReader configurationReader)
+            IConfigurationReader configurationReader,
+            IExportNodeToRtfService exportNodeToRtfService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -52,7 +54,7 @@ namespace InformationTree.Forms
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _compressionProvider = compressionProvider;
             _configurationReader = configurationReader;
-            
+            _exportNodeToRtfService = exportNodeToRtfService;
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -430,7 +432,7 @@ namespace InformationTree.Forms
                     new TreeNode(null)
                     {
                         ToolTipText = null,
-                        Tag = new TreeNodeData()
+                        Tag = new TreeNodeData(null)
                     })
             );
             //gbTimeSpent.Enabled = false;
@@ -457,17 +459,12 @@ namespace InformationTree.Forms
                 var isStartupAlert = cbIsStartupAlert.Checked;
 
                 var data = selectedNode.GetTreeNodeData();
-                if (data == null)
-                    data = new TreeNodeData(null, 0, DateTime.Now, DateTime.Now, urgency, link, category, isStartupAlert, taskPercentCompleted);
-                else
-                {
-                    data.Urgency = urgency;
-                    data.Link = link;
-                    data.Category = category;
-                    data.IsStartupAlert = isStartupAlert;
-                    data.PercentCompleted = taskPercentCompleted;
-                    data.LastChangeDate = DateTime.Now;
-                }
+                data.Urgency = urgency;
+                data.Link = link;
+                data.Category = category;
+                data.IsStartupAlert = isStartupAlert;
+                data.PercentCompleted = taskPercentCompleted;
+                data.LastChangeDate = DateTime.Now;
 
                 selectedNode.Text = taskName;
 
@@ -519,12 +516,18 @@ namespace InformationTree.Forms
                 var node = new TreeNode(taskName)
                 {
                     Name = 0.ToString(),
-                    Tag = new TreeNodeData(null, tvTaskList.GetNodeCount(true) + 1, DateTime.Now, DateTime.Now, urgency, link, null, false, taskPercentCompleted),
                     ForeColor = TreeNodeHelper.DefaultForeGroundColor,
                     BackColor = TreeNodeHelper.DefaultBackGroundColor,
                     NodeFont = DefaultFont.Clone() as Font,
                     ToolTipText = TextProcessingHelper.GetToolTipText(taskName)
                 };
+                var treeNodeData = node.GetTreeNodeData();
+                treeNodeData.AddedNumber = tvTaskList.GetNodeCount(true) + 1;
+                treeNodeData.Urgency = urgency;
+                treeNodeData.Link = link;
+                treeNodeData.IsStartupAlert = false;
+                treeNodeData.PercentCompleted = taskPercentCompleted;
+                
                 node.Text = taskName;
 
                 if (tvTaskList.SelectedNode == null)
@@ -998,10 +1001,7 @@ namespace InformationTree.Forms
                     return;
 
                 var tagData = node.GetTreeNodeData();
-                if (tagData != null && string.IsNullOrEmpty(tagData.Link))
-                    tagData.Link = tbLink.Text;
-                else
-                    tagData = new TreeNodeData(null, 0, DateTime.Now, DateTime.Now, 0, tbLink.Text);
+                tagData.Link = tbLink.Text;
 
                 var percentCompleted = 0M;
                 if (string.IsNullOrEmpty(tagData.Link) || !tagData.Link.EndsWith(".xml") || tagData.Link.Contains(" "))
@@ -1356,6 +1356,33 @@ namespace InformationTree.Forms
         private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // TODO: Create a feature for this and deactivate it at first not showing something without any working code
+        }
+
+        private void btnExportToRtf_Click(object sender, EventArgs e)
+        {
+            var selectedNode = tvTaskList.SelectedNode;
+            if (selectedNode == null)
+                return;
+
+            // Create the minimum data that is required for the RTF export (currently not exporting many levels)
+            var treeNodeData = new TreeNodeData(selectedNode.Text);
+
+            foreach (TreeNode child in selectedNode.Nodes)
+            {
+                var childData = new TreeNodeData(child.Text);
+
+                if (child.Nodes != null && child.Nodes.Count > 0)
+                {
+                    foreach (TreeNode grandChild in child.Nodes)
+                        childData.Children.Add(new TreeNodeData(grandChild.Text));
+                }
+
+                treeNodeData.Children.Add(childData);
+            }
+
+            var exportedRtf = _exportNodeToRtfService.GetRtfExport(treeNodeData);
+            
+            Clipboard.SetText(exportedRtf, TextDataFormat.Rtf);
         }
 
         private void tbTask_DoubleClick(object sender, EventArgs e)

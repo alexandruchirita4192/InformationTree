@@ -30,6 +30,7 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<IPGPEncryptionProvider>().ImplementedBy<PGPEncryptionProvider>().LifeStyle.Singleton);
             container.Register(Component.For<IPGPEncryptionAndSigningProvider>().ImplementedBy<PGPEncryptionAndSigningProvider>().LifeStyle.Singleton);
             container.Register(Component.For<ICompressionProvider>().ImplementedBy<CompressionProvider>().LifeStyle.Singleton);
+            container.Register(Component.For<IExportNodeToRtfService>().ImplementedBy<ExportNodeToRtfService>().LifeStyle.Singleton);
         }
     }
 }

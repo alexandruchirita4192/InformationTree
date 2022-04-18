@@ -358,6 +358,7 @@ namespace InformationTree.Tree
 
         #endregion CopyNode, CopyNodes
 
+        // TODO: This could be a TreeNode builder (with a TreeNodeData builder too)
         public static TreeNode GetNewNodeFromTextNameAttr(XmlAttributeCollection attributes, ICompressionProvider compressionProvider)
         {
             var attrText = String.Empty;
@@ -433,7 +434,9 @@ namespace InformationTree.Tree
             if (attrText != null)
                 attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
 
-            var treeNodeData = String.IsNullOrEmpty(attrData) && attrAddedDate == null && attrLastChangeDate == null && attrAddedNumber == 0 && string.IsNullOrEmpty(attrLink) && attrUrgency == 0 && string.IsNullOrEmpty(attrCategory) ? null as TreeNodeData : new TreeNodeData(attrData, attrAddedNumber, attrAddedDate, attrLastChangeDate, attrUrgency, attrLink, attrCategory, attrIsStartupAlert);
+            var treeNodeData = !string.IsNullOrEmpty(attrData) || attrAddedDate != null || attrLastChangeDate != null || attrAddedNumber != 0 || !string.IsNullOrEmpty(attrLink) || attrUrgency != 0 || !string.IsNullOrEmpty(attrCategory)
+                ? new TreeNodeData(attrText, attrData, attrAddedNumber, attrAddedDate, attrLastChangeDate, attrUrgency, attrLink, attrCategory, attrIsStartupAlert)
+                : null;
             var attrDataStripped = treeNodeData != null ? RicherTextBox.Controls.RicherTextBox.StripRTF(treeNodeData.Data) : null;
 
             var node = new TreeNode(attrText)
