@@ -26,8 +26,7 @@ namespace InformationTree.Render.WinForms.Services
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableRtfLoading)),
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableRtfSaving)),
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableTable)),
-                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableCalculation)),
-                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableExtraNotImplementedMenus))
+                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableCalculation))
                         ),
                     new Domain.Entities.Features.TreeFeatures(
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.TreeFeatures.EnableManualEncryption)),
