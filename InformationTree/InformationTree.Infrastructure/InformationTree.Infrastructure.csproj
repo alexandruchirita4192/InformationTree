@@ -17,7 +17,7 @@
     <ProjectReference Include="..\InformationTree.Domain\InformationTree.Domain.csproj" />
     <ProjectReference Include="..\InformationTree.Extra.Graphics\InformationTree.Extra.Graphics.csproj" />
     <ProjectReference Include="..\InformationTree.Extra.Sound\InformationTree.Extra.Sound.csproj" />
-    <ProjectReference Include="..\InformationTree\InformationTree.Render.WinForms.csproj" />
+    <ProjectReference Include="..\InformationTree.Render.WinForms\InformationTree.Render.WinForms.csproj" />
     <ProjectReference Include="..\RicherTextBox\RicherTextBox.csproj" />
   </ItemGroup>
 
