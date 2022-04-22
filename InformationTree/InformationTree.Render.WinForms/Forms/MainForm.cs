@@ -1364,25 +1364,29 @@ namespace InformationTree.Forms
             if (selectedNode == null)
                 return;
 
-            // Create the minimum data that is required for the RTF export (currently not exporting many levels)
-            var treeNodeData = new TreeNodeData(selectedNode.Text);
-
-            foreach (TreeNode child in selectedNode.Nodes)
-            {
-                var childData = new TreeNodeData(child.Text);
-
-                if (child.Nodes != null && child.Nodes.Count > 0)
-                {
-                    foreach (TreeNode grandChild in child.Nodes)
-                        childData.Children.Add(new TreeNodeData(grandChild.Text));
-                }
-
-                treeNodeData.Children.Add(childData);
-            }
-
+            var treeNodeData = ParseTreeRecursively(selectedNode);
             var exportedRtf = _exportNodeToRtfService.GetRtfExport(treeNodeData);
             
             Clipboard.SetText(exportedRtf, TextDataFormat.Rtf);
+        }
+
+        private TreeNodeData ParseTreeRecursively(TreeNode currentNode)
+        {
+            if (currentNode == null)
+                return new TreeNodeData(string.Empty);
+
+            var treeNodeData = new TreeNodeData(currentNode.Text);
+
+            if (currentNode.Nodes != null && currentNode.Nodes.Count > 0)
+            {
+                foreach (TreeNode child in currentNode.Nodes)
+                {
+                    var childTreeNodeDAta = ParseTreeRecursively(child);
+                    treeNodeData.Children.Add(childTreeNodeDAta);
+                }
+            }
+
+            return treeNodeData;
         }
 
         private void tbTask_DoubleClick(object sender, EventArgs e)
