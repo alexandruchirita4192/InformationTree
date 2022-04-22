@@ -1224,6 +1224,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: hide or show this button based on graphics feature?
         private void btnGenerateFiguresAndExec_Click(object sender, EventArgs e)
         {
             btnGenerate_Click(sender, e);
