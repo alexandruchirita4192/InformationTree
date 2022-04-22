@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationTree.Render.WinForms", "InformationTree\InformationTree.Render.WinForms.csproj", "{22BD5023-864E-4286-A704-343F87416BE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationTree.Render.WinForms", "InformationTree.Render.WinForms\InformationTree.Render.WinForms.csproj", "{22BD5023-864E-4286-A704-343F87416BE4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8F3074D8-E771-4C5E-A11E-0C0FBAE34AE3} = {8F3074D8-E771-4C5E-A11E-0C0FBAE34AE3}
 	EndProjectSection
