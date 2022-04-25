@@ -1,20 +1,15 @@
-﻿using InformationTree.Domain.Extensions;
+﻿using System;
+using System.IO;
+using System.Text;
 using InformationTree.Domain.Services;
-using NLog;
 using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities.IO;
-using System;
-using System.IO;
-using System.Text;
 
 namespace InformationTree.PgpEncryption
 {
     public class PGPEncryptionAndSigningProvider : PGPEncryptionProvider, IPGPEncryptionAndSigningProvider
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
         public PGPEncryptionAndSigningProvider(IPopUpService popUpService)
             : base(popUpService)
         {
@@ -22,7 +17,6 @@ namespace InformationTree.PgpEncryption
 
         #region Encrypt and Sign
 
-        // TODO: Use private key only to sign data (public key can be generated based on private key, in C# it's a property of the private key)
         public void EncryptAndSignFile(string inputFile, string outputFile, string publicKeyFile, string privateKeyFile, string passPhrase, bool armor)
         {
             if (!File.Exists(inputFile))
@@ -52,20 +46,19 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        // TODO: Use private key only to sign data (public key can be generated based on private key, in C# it's a property of the private key)
         public string EncryptAndSignString(string inputText, string publicKey, string privateKey, string passPhrase, bool armor)
         {
             if (string.IsNullOrEmpty(inputText))
-                throw new ArgumentNullException("Invalid input text.");
+                throw new ArgumentNullException(nameof(inputText));
 
             if (string.IsNullOrEmpty(publicKey))
-                throw new ArgumentNullException("Invalid public key.");
-            
+                throw new ArgumentNullException(nameof(publicKey));
+
             if (string.IsNullOrEmpty(privateKey))
-                throw new ArgumentNullException("Invalid private key.");
+                throw new ArgumentNullException(nameof(privateKey));
 
             if (string.IsNullOrEmpty(passPhrase))
-                throw new ArgumentNullException("Invalid passphrase.");
+                throw new ArgumentNullException(nameof(passPhrase));
 
             var encryptionKeys = new PGPEncryptionKeys(publicKey, privateKey, passPhrase, false);
             if (encryptionKeys == null)
@@ -91,22 +84,15 @@ namespace InformationTree.PgpEncryption
 
         private void OutputEncrypted(byte[] inputBytes, string inputName, DateTime inputModificationDate, Stream outputStream, PGPEncryptionKeys encryptionKeys)
         {
-            using (var encryptedOut = ChainEncryptedOut(outputStream, encryptionKeys))
-            {
-                using (var compressedOut = ChainCompressedOut(encryptedOut))
-                {
-                    var signatureGenerator = InitSignatureGenerator(compressedOut, encryptionKeys);
-                    using (var literalOut = ChainLiteralOut(compressedOut, inputBytes, inputName, inputModificationDate))
-                    {
-                        // Old code (if this code fails because of some stream issues): var inputFileStream = unencryptedFileInfo.OpenRead()
-                        using (var inputMemoryStream = new MemoryStream(inputBytes))
-                        {
-                            WriteOutputAndSign(compressedOut, literalOut, inputMemoryStream, signatureGenerator);
-                            inputMemoryStream.Close();
-                        }
-                    }
-                }
-            }
+            using var encryptedOut = ChainEncryptedOut(outputStream, encryptionKeys);
+            using var compressedOut = ChainCompressedOut(encryptedOut);
+            var signatureGenerator = InitSignatureGenerator(compressedOut, encryptionKeys);
+            using var literalOut = ChainLiteralOut(compressedOut, inputBytes, inputName, inputModificationDate);
+            using var inputMemoryStream = new MemoryStream(inputBytes);
+            
+            WriteOutputAndSign(compressedOut, literalOut, inputMemoryStream, signatureGenerator);
+            
+            inputMemoryStream.Close();
         }
 
         private void WriteOutputAndSign(Stream compressedOut, Stream literalOut, Stream inputStream, PgpSignatureGenerator signatureGenerator)
@@ -128,7 +114,7 @@ namespace InformationTree.PgpEncryption
             encryptedDataGenerator.AddMethod(m_encryptionKeys.PublicKey);
             return encryptedDataGenerator.Open(outputStream, new byte[BufferSize]);
         }
-        
+
         private Stream ChainCompressedOut(Stream encryptedOut)
         {
             var compressedDataGenerator = new PgpCompressedDataGenerator(CompressionAlgorithmTag.Zip);
@@ -148,14 +134,16 @@ namespace InformationTree.PgpEncryption
             var tag = m_encryptionKeys.SecretKey.PublicKey.Algorithm;
             var pgpSignatureGenerator = new PgpSignatureGenerator(tag, HashAlgorithmTag.Sha1);
             pgpSignatureGenerator.InitSign(PgpSignature.BinaryDocument, m_encryptionKeys.PrivateKey);
+            
             foreach (string userId in m_encryptionKeys.SecretKey.PublicKey.GetUserIds())
             {
-                PgpSignatureSubpacketGenerator subPacketGenerator = new PgpSignatureSubpacketGenerator();
+                var subPacketGenerator = new PgpSignatureSubpacketGenerator();
                 subPacketGenerator.SetSignerUserId(IsCritical, userId);
                 pgpSignatureGenerator.SetHashedSubpackets(subPacketGenerator.Generate());
                 // Just the first one!
                 break;
             }
+            
             pgpSignatureGenerator.GenerateOnePassVersion(IsNested).Encode(compressedOut);
             return pgpSignatureGenerator;
         }

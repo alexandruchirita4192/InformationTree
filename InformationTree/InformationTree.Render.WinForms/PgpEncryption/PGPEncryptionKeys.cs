@@ -2,12 +2,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
+using System.Text;
 
 namespace InformationTree.PgpEncryption
 {
-    // TODO: Use private key only to sign data (public key can be generated based on private key, in C# it's a property of the private key)
-    // TODO: Integrate this class inside PGPEncryptionAndSigningProvider
     public class PGPEncryptionKeys
     {
         public PgpPublicKey PublicKey { get; private set; }
@@ -21,21 +19,21 @@ namespace InformationTree.PgpEncryption
         /// Two keys are required to encrypt and sign data. Your private key and the recipients public key.
         /// The data is encrypted with the recipients public key and signed with your private key.
         /// </summary>
-        /// <param name="publicKey">The key used to encrypt the data</param>
-        /// <param name="privateKey">The key used to sign the data.</param>
-        /// <param name="passPhrase">The (your) password required to access the private key</param>
+        /// <param name="recipientPublicKey">The recipient key used to encrypt the data</param>
+        /// <param name="signerPrivateKey">The signer (your) key used to sign the data.</param>
+        /// <param name="signerPassPhrase">The signer (your) password required to access the private key</param>
         /// <param name="isPathReceived">
-        /// True if the parameters <paramref name="publicKey"/> and <paramref name="privateKey"/> are files 
+        /// True if the parameters <paramref name="recipientPublicKey"/> and <paramref name="signerPrivateKey"/> are files 
         /// containing the public and private keys, false if the parameters are the public and private key string directly.</param>
         /// <exception cref="ArgumentException">Public key not found. Private key not found. Missing password</exception>
-        public PGPEncryptionKeys(string publicKey, string privateKey, string passPhrase, bool isPathReceived = true)
+        public PGPEncryptionKeys(string recipientPublicKey, string signerPrivateKey, string signerPassPhrase, bool isPathReceived = true)
         {
-            if (string.IsNullOrEmpty(publicKey))
-                throw new ArgumentException("Public key info not found.", nameof(publicKey));
-            if (string.IsNullOrEmpty(privateKey))
-                throw new ArgumentException("Private key info not found.", nameof(privateKey));
-            if (string.IsNullOrEmpty(passPhrase))
-                throw new ArgumentException("passPhrase is null or empty.", nameof(passPhrase));
+            if (string.IsNullOrEmpty(recipientPublicKey))
+                throw new ArgumentException("Public key info not found.", nameof(recipientPublicKey));
+            if (string.IsNullOrEmpty(signerPrivateKey))
+                throw new ArgumentException("Private key info not found.", nameof(signerPrivateKey));
+            if (string.IsNullOrEmpty(signerPassPhrase))
+                throw new ArgumentException("passPhrase is null or empty.", nameof(signerPassPhrase));
 
             // Note: There couldn't be another constructor because of the parameters with same types for public key path and private key path
             // vs public key input text and private key input text so another parameter isPathReceived was introduced
@@ -43,35 +41,35 @@ namespace InformationTree.PgpEncryption
 
             if (isPathReceived)
             {
-                if (!File.Exists(publicKey))
-                    throw new ArgumentException("Public key file not found", nameof(publicKey));
-                if (!File.Exists(privateKey))
-                    throw new ArgumentException("Private key file not found", nameof(privateKey));
-                PublicKey = ReadPublicKeyFromFile(publicKey);
-                SecretKey = ReadSecretKeyFromFile(privateKey);
-                PrivateKey = ReadPrivateKey(passPhrase);
+                if (!File.Exists(recipientPublicKey))
+                    throw new ArgumentException("Public key file not found", nameof(recipientPublicKey));
+                if (!File.Exists(signerPrivateKey))
+                    throw new ArgumentException("Private key file not found", nameof(signerPrivateKey));
+                PublicKey = ReadPublicKeyFromFile(recipientPublicKey);
+                SecretKey = ReadSecretKeyFromFile(signerPrivateKey);
+                PrivateKey = ReadPrivateKey(signerPassPhrase);
             }
             else
             {
-                PublicKey = ReadPublicKeyFromString(publicKey);
-                SecretKey = ReadSecretKeyFromString(privateKey);
-                PrivateKey = ReadPrivateKey(passPhrase);
+                PublicKey = ReadPublicKeyFromString(recipientPublicKey);
+                SecretKey = ReadSecretKeyFromString(signerPrivateKey);
+                PrivateKey = ReadPrivateKey(signerPassPhrase);
             }
         }
 
         #region Secret Key
 
-        private PgpSecretKey ReadSecretKeyFromFile(string privateKeyPath)
+        private PgpSecretKey ReadSecretKeyFromFile(string signerPrivateKeyPath)
         {
-            using (Stream keyIn = File.OpenRead(privateKeyPath))
+            using (var keyIn = File.OpenRead(signerPrivateKeyPath))
             {
                 return ReadSecretKey(keyIn);
             }
         }
 
-        private PgpSecretKey ReadSecretKeyFromString(string privateKey)
+        private PgpSecretKey ReadSecretKeyFromString(string signerPrivateKeyText)
         {
-            using (var keyIn = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(privateKey)))
+            using (var keyIn = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(signerPrivateKeyText)))
             {
                 return ReadSecretKey(keyIn);
             }
@@ -81,8 +79,8 @@ namespace InformationTree.PgpEncryption
         {
             using (var inputStream = PgpUtilities.GetDecoderStream(keyIn))
             {
-                PgpSecretKeyRingBundle secretKeyRingBundle = new PgpSecretKeyRingBundle(inputStream);
-                PgpSecretKey foundKey = GetFirstSecretKey(secretKeyRingBundle);
+                var secretKeyRingBundle = new PgpSecretKeyRingBundle(inputStream);
+                var foundKey = GetFirstSecretKey(secretKeyRingBundle);
                 if (foundKey != null)
                     return foundKey;
             }
@@ -97,7 +95,7 @@ namespace InformationTree.PgpEncryption
         {
             foreach (PgpSecretKeyRing kRing in secretKeyRingBundle.GetKeyRings())
             {
-                PgpSecretKey key = kRing.GetSecretKeys()
+                var key = kRing.GetSecretKeys()
                     .Cast<PgpSecretKey>()
                     .Where(k => k.IsSigningKey)
                     .FirstOrDefault();
@@ -111,17 +109,17 @@ namespace InformationTree.PgpEncryption
 
         #region Public Key
 
-        private PgpPublicKey ReadPublicKeyFromFile(string publicKeyPath)
+        private PgpPublicKey ReadPublicKeyFromFile(string recipientPublicKeyPath)
         {
-            using (Stream keyIn = File.OpenRead(publicKeyPath))
+            using (var keyIn = File.OpenRead(recipientPublicKeyPath))
             {
                 return ReadPublicKey(keyIn);
             }
         }
 
-        private PgpPublicKey ReadPublicKeyFromString(string publicKeyText)
+        private PgpPublicKey ReadPublicKeyFromString(string recipientPublicKeyText)
         {
-            using (Stream keyIn = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(publicKeyText)))
+            using (var keyIn = new MemoryStream(Encoding.UTF8.GetBytes(recipientPublicKeyText)))
             {
                 return ReadPublicKey(keyIn);
             }
@@ -129,10 +127,10 @@ namespace InformationTree.PgpEncryption
 
         private PgpPublicKey ReadPublicKey(Stream publicKeyStream)
         {
-            using (Stream inputStream = PgpUtilities.GetDecoderStream(publicKeyStream))
+            using (var inputStream = PgpUtilities.GetDecoderStream(publicKeyStream))
             {
-                PgpPublicKeyRingBundle publicKeyRingBundle = new PgpPublicKeyRingBundle(inputStream);
-                PgpPublicKey foundKey = GetFirstPublicKey(publicKeyRingBundle);
+                var publicKeyRingBundle = new PgpPublicKeyRingBundle(inputStream);
+                var foundKey = GetFirstPublicKey(publicKeyRingBundle);
                 if (foundKey != null)
                     return foundKey;
             }
@@ -143,7 +141,7 @@ namespace InformationTree.PgpEncryption
         {
             foreach (PgpPublicKeyRing kRing in publicKeyRingBundle.GetKeyRings())
             {
-                PgpPublicKey key = kRing.GetPublicKeys()
+                var key = kRing.GetPublicKeys()
                     .Cast<PgpPublicKey>()
                     .Where(k => k.IsEncryptionKey)
                     .FirstOrDefault();
@@ -157,9 +155,9 @@ namespace InformationTree.PgpEncryption
 
         #region Private Key
 
-        private PgpPrivateKey ReadPrivateKey(string passPhrase)
+        private PgpPrivateKey ReadPrivateKey(string signerPassPhrase)
         {
-            PgpPrivateKey privateKey = SecretKey.ExtractPrivateKey(passPhrase.ToCharArray());
+            var privateKey = SecretKey.ExtractPrivateKey(signerPassPhrase.ToCharArray());
             if (privateKey != null)
                 return privateKey;
             throw new ArgumentException("No private key found in secret key.");
