@@ -57,11 +57,13 @@ namespace InformationTree.Forms
             }
         }
 
-        public bool FromFile;
+        public bool FromFile { get { return cbFromFile.Checked; } }
 
-        public string PgpPassword;
-        public string PgpKeyFile;
-        public string PgpKeyText;
+        private string _pgpPassword;
+        private string _pgpPublicKeyFile;
+        private string _pgpPrivateKeyFile;
+        private string _pgpPublicKeyText;
+        private string _pgpPrivateKeyText;
 
         #endregion Properties
 
@@ -106,17 +108,19 @@ namespace InformationTree.Forms
             SetVisibleAndEnabled(btnPgpEncryptData, _configuration.TreeFeatures.EnableManualEncryption);
             SetVisibleAndEnabled(btnPgpDecryptData, _configuration.TreeFeatures.EnableManualEncryption);
             SetVisibleAndEnabled(btnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
+            SetVisibleAndEnabled(cbKeepCrypt, _configuration.TreeFeatures.EnableManualEncryption);
+            SetVisibleAndEnabled(cbFromFile, _configuration.TreeFeatures.EnableManualEncryption);
         }
         
-        private void SetVisibleAndEnabled(Button button, bool visibleAndEnabled)
+        private void SetVisibleAndEnabled(Control control, bool visibleAndEnabled)
         {
-            if (button == null)
+            if (control == null)
                 return;
             
-            button.Visible = visibleAndEnabled;
-            button.Enabled = visibleAndEnabled;
+            control.Visible = visibleAndEnabled;
+            control.Enabled = visibleAndEnabled;
         }
-        
+
         public PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
@@ -366,15 +370,21 @@ namespace InformationTree.Forms
             if (DataIsPgpEncrypted ||
                 _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?") == PopUpResult.Yes)
             {
-                var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, cbFromFile.Checked);
-                if (!form.IsDisposed)
-                {
-                    WinFormsApplication.CenterForm(form, this);
-
-                    form.FormClosed += PgpDecryptForm_FormClosed;
-                    form.ShowDialog();
-                }
+                GetPrivateKeyWithPassword();
             }
+        }
+
+        private void GetPrivateKeyWithPassword(string titleOverride = null)
+        {
+            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, FromFile);
+
+            if (titleOverride.IsNotEmpty())
+                form.Text = titleOverride;
+            
+            WinFormsApplication.CenterForm(form, this);
+
+            form.FormClosed += PgpDecryptForm_FormClosed;
+            form.ShowDialog();
         }
 
         private void PgpDecryptForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -382,21 +392,19 @@ namespace InformationTree.Forms
             var form = sender as PgpDecrypt;
             if (form != null)
             {
-                PgpPassword = form.PgpPassword;
+                _pgpPassword = form.PgpPassword;
+                _pgpPrivateKeyFile = form.PgpPrivateKeyFile;
+                _pgpPrivateKeyText = form.PgpPrivateKeyText;
 
-                //FromFile = form.DecryptFromFile;
-                PgpKeyFile = form.PgpPrivateKeyFile;
-                PgpKeyText = form.PgpPrivateKeyText;
-
-                var result = string.Empty;
+                string result;
                 if (FromFile)
                 {
-                    result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(tbData.Text, PgpKeyFile, PgpPassword);
-                    lblEncryption.Text = "Decrypted with key: " + PgpKeyFile;
+                    result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(tbData.Text, _pgpPrivateKeyFile, _pgpPassword);
+                    lblEncryption.Text = $"Decrypted with key: {_pgpPrivateKeyFile}";
                 }
                 else
                 {
-                    result = _encryptionAndSigningProvider.GetDecryptedStringFromString(tbData.Text, PgpKeyText, PgpPassword);
+                    result = _encryptionAndSigningProvider.GetDecryptedStringFromString(tbData.Text, _pgpPrivateKeyText, _pgpPassword);
                     lblEncryption.Text = "Decrypted with node key";
                 }
 
@@ -406,8 +414,6 @@ namespace InformationTree.Forms
 
         private void btnPgpEncryptData_Click(object sender, EventArgs e)
         {
-            FromFile = cbFromFile.Checked;
-
             var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
             var decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
             
@@ -419,22 +425,22 @@ namespace InformationTree.Forms
             
             if (FromFile)
             {
-                PgpKeyFile = _popUpService.GetPublicKeyFile();
+                _pgpPublicKeyFile = _popUpService.GetPublicKeyFile();
 
                 if (_configuration.TreeFeatures.EnableEncryptionSigning)
                 {
-                    PgpKeyText = File.ReadAllText(PgpKeyFile);
+                    _pgpPublicKeyText = File.ReadAllText(_pgpPublicKeyFile);
 
-                    // TODO: Get the private key and password also, for encryption with signing, and do not get both because is redundant
+                    GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
 
-                    var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, PgpKeyText, string.Empty, string.Empty, true);
+                    var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
                     resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
 
                     if (tbData.Text != resultedText)
                     {
                         data = null;
                         tbData.Text = resultedText;
-                        lblEncryption.Text = "Encrypted with key: " + PgpKeyFile;
+                        lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
                     }
                 }
                 else
@@ -443,7 +449,7 @@ namespace InformationTree.Forms
                     {
                         using (var outputStream = new MemoryStream())
                         {
-                            _encryptionAndSigningProvider.EncryptFromFile(decryptedStream, outputStream, PgpKeyFile, true, true);
+                            _encryptionAndSigningProvider.EncryptFromFile(decryptedStream, outputStream, _pgpPublicKeyFile, true, true);
 
                             using (var reader = new StreamReader(outputStream))
                             {
@@ -452,7 +458,7 @@ namespace InformationTree.Forms
                                 {
                                     data = null;
                                     tbData.Text = resultedText;
-                                    lblEncryption.Text = "Encrypted with key: " + PgpKeyFile;
+                                    lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
                                 }
                             }
                         }
@@ -463,16 +469,16 @@ namespace InformationTree.Forms
             {
                 FindNodeWithPublicKey();
 
-                var  resultedText = string.Empty;
+                string resultedText;
                 if (_configuration.TreeFeatures.EnableEncryptionSigning)
                 {
-                    // TODO: Get the private key and password also, for encryption with signing, and do not get both because is redundant
+                    GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
 
-                    resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, PgpKeyText, string.Empty, string.Empty, true);
+                    resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
                 }
                 else
                 {
-                    resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(tbData.Rtf, PgpKeyText, true, true);
+                    resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(tbData.Rtf, _pgpPublicKeyText, true, true);
                 }
                 resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
 
@@ -511,13 +517,13 @@ namespace InformationTree.Forms
                     var nodeData = node.GetTreeNodeData();
                     if (nodeData != null)
                     {
-                        PgpKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
+                        _pgpPublicKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
 
                         _popUpService.ShowMessage($"Public key taken from data of node {node.Text}", $"Node {node.Text} used");
                     }
                 }
 
-                if (string.IsNullOrEmpty(PgpKeyText) && _popUpService.ShowQuestion("You did not select a valid public key node. Try to select again?") == PopUpResult.Yes)
+                if (string.IsNullOrEmpty(_pgpPublicKeyText) && _popUpService.ShowQuestion("You did not select a valid public key node. Try to select again?") == PopUpResult.Yes)
                     FindNodeWithPublicKey();
             }
         }

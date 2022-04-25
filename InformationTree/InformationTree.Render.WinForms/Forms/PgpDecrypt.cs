@@ -1,8 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
-using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.Tree;
@@ -28,10 +29,9 @@ namespace InformationTree.Forms
             }
         }
 
-        public bool DecryptFromFile;
-
-        public string PgpPrivateKeyFile;
-        public string PgpPrivateKeyText;
+        public bool DecryptFromFile { get; set; }
+        public string PgpPrivateKeyFile { get; private set; }
+        public string PgpPrivateKeyText { get; private set; }
 
         #endregion Properties
 
@@ -53,13 +53,17 @@ namespace InformationTree.Forms
             if (DecryptFromFile)
             {
                 PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
-                while (string.IsNullOrEmpty(PgpPrivateKeyFile) &&
+                while (PgpPrivateKeyFile.IsEmpty() &&
                     _popUpService.ShowQuestion("You did not select a private key file. Try to select again?") == PopUpResult.Yes)
                     PgpPrivateKeyFile = _popUpService.GetPrivateKeyFile();
 
-                if (string.IsNullOrEmpty(PgpPrivateKeyFile))
+                if (PgpPrivateKeyFile.IsNotEmpty())
                 {
-                    this.Close();
+                    PgpPrivateKeyText = File.ReadAllText(PgpPrivateKeyFile);
+                }
+                else
+                {
+                    Close();
                     return;
                 }
             }
@@ -101,7 +105,7 @@ namespace InformationTree.Forms
                     }
                 }
 
-                if (string.IsNullOrEmpty(PgpPrivateKeyText) &&
+                if (PgpPrivateKeyText.IsEmpty() &&
                     _popUpService.ShowQuestion("You did not select a valid private key node. Try to select again?") == PopUpResult.Yes)
                     FindNodeWithPrivateKey();
             }
