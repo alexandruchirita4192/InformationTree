@@ -159,7 +159,6 @@ namespace InformationTree.Forms
             this.btnExecCommand = new System.Windows.Forms.Button();
             this.tbCommand = new System.Windows.Forms.TextBox();
             this.btnShowCanvasPopUp = new System.Windows.Forms.Button();
-            this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.lblChangeTreeType = new System.Windows.Forms.Label();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showChildrenAsListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -200,7 +199,6 @@ namespace InformationTree.Forms
             ((System.ComponentModel.ISupportInitialize)(this.nudY)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudNumber)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudX)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -1559,11 +1557,6 @@ namespace InformationTree.Forms
             this.btnShowCanvasPopUp.UseVisualStyleBackColor = false;
             this.btnShowCanvasPopUp.Click += new System.EventHandler(this.btnShowCanvasPopUp_Click);
             // 
-            // fileSystemWatcher1
-            // 
-            this.fileSystemWatcher1.EnableRaisingEvents = true;
-            this.fileSystemWatcher1.SynchronizingObject = this;
-            // 
             // lblChangeTreeType
             // 
             this.lblChangeTreeType.AutoSize = true;
@@ -1684,7 +1677,6 @@ namespace InformationTree.Forms
             ((System.ComponentModel.ISupportInitialize)(this.nudY)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudNumber)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudX)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -1746,7 +1738,6 @@ namespace InformationTree.Forms
         private System.Windows.Forms.NumericUpDown nudShowToUrgencyNumber;
         private System.Windows.Forms.Label lblUrgencyNumber;
         private System.Windows.Forms.GroupBox gbTaskDetails;
-        private System.IO.FileSystemWatcher fileSystemWatcher1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tbLink;
         private System.Windows.Forms.Button btnUpdateLink;

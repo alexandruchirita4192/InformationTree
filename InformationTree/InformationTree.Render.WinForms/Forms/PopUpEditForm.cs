@@ -52,7 +52,8 @@ namespace InformationTree.Forms
         {
             get
             {
-                return tbData.Text.Trim().StartsWith("-----BEGIN PGP");
+                var text = tbData.Text ?? string.Empty;
+                return text.Trim().StartsWith("-----BEGIN PGP");
             }
         }
 
@@ -87,6 +88,7 @@ namespace InformationTree.Forms
 
             InitializeComponent();
             InitializeRicherTextBoxControlAndSaveAndCloseButton();
+            HideComponentsBasedOnFeatures();
 
             FormClosing += tbExitPopUpAndSave_Click;
 
@@ -94,6 +96,27 @@ namespace InformationTree.Forms
                 tbData.TextBox.AllowDrop = true;
         }
 
+        private void HideComponentsBasedOnFeatures()
+        {
+            if (_configuration == null)
+                return;
+            
+            SetVisibleAndEnabled(btnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
+            SetVisibleAndEnabled(btnShowGraphics, _configuration.ApplicationFeatures.EnableExtraGraphics);
+            SetVisibleAndEnabled(btnPgpEncryptData, _configuration.TreeFeatures.EnableManualEncryption);
+            SetVisibleAndEnabled(btnPgpDecryptData, _configuration.TreeFeatures.EnableManualEncryption);
+            SetVisibleAndEnabled(btnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
+        }
+        
+        private void SetVisibleAndEnabled(Button button, bool visibleAndEnabled)
+        {
+            if (button == null)
+                return;
+            
+            button.Visible = visibleAndEnabled;
+            button.Enabled = visibleAndEnabled;
+        }
+        
         public PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
@@ -218,6 +241,9 @@ namespace InformationTree.Forms
 
             tbData.TableFunction = (target) =>
             {
+                if (!_configuration.RicherTextBoxFeatures.EnableTable)
+                    return target;
+
                 var tableControl = new TableControl(target, tbData);
 
                 ////rtbDocument.Rtf = rtbDocument.Rtf.Replace() // TODO: change here to see the table in RTF
@@ -242,7 +268,13 @@ namespace InformationTree.Forms
                 return tbData.Rtf;
             };
 
-            // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service
+            tbData.CalculateFunction = (target) =>
+            {
+                if (btnCalculate != null)
+                    btnCalculate.PerformClick();
+
+                return tbData.Rtf;
+            };
 
             Controls.Add(tbData);
             Controls.Add(tbExitPopUpAndSave);
@@ -288,8 +320,8 @@ namespace InformationTree.Forms
 
         private void tbExitPopUpAndSave_Click(object sender, EventArgs e)
         {
-            if (object.ReferenceEquals(sender, tbExitPopUpAndSave))
-                this.Close();
+            if (ReferenceEquals(sender, tbExitPopUpAndSave))
+                Close();
         }
 
         private void tbData_LinkClicked(object sender, LinkClickedEventArgs e)
@@ -492,25 +524,23 @@ namespace InformationTree.Forms
 
         private void PopUpEditForm_DoubleClick(object sender, EventArgs e)
         {
-            if (this.FormBorderStyle == System.Windows.Forms.FormBorderStyle.Sizable)
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            else
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+            FormBorderStyle = FormBorderStyle == FormBorderStyle.Sizable ? FormBorderStyle.None : FormBorderStyle.Sizable;
         }
 
         private void PopUpEditForm_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
-                this.Close();
+                Close();
         }
 
         private void btnCalculate_Click(object sender, EventArgs e)
         {
+            // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service which should implement basic calculation functions
+
             // TODO: Hide unfinished feature using a flag
             _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
         }
 
-        // TODO: hide or show this button based on graphics feature?
         private void btnShowGraphics_Click(object sender, EventArgs e)
         {
             var text = tbData.TextBox.SelectedText.Length > 0 ? tbData.TextBox.SelectedText : tbData.TextBox.Text;

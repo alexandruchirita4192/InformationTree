@@ -12,7 +12,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
 
@@ -32,6 +31,8 @@ namespace InformationTree.Forms
         private readonly ICompressionProvider _compressionProvider;
         private readonly IConfigurationReader _configurationReader;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
+        
+        private readonly Configuration _configuration;
 
         #endregion Fields
 
@@ -55,8 +56,9 @@ namespace InformationTree.Forms
             _compressionProvider = compressionProvider;
             _configurationReader = configurationReader;
             _exportNodeToRtfService = exportNodeToRtfService;
+            
             InitializeComponent();
-
+            
             // SetStyleTo(this, Color.Black, Color.White);
 
             nudMilliseconds.Maximum = 999;
@@ -115,7 +117,31 @@ namespace InformationTree.Forms
             _isControlPressed = false;
             StartPosition = FormStartPosition.CenterScreen;
 
+            _configuration = _configurationReader.GetConfiguration();
+
             InitializeComponent_AddEvents();
+            HideComponentsBasedOnFeatures();
+        }
+
+        private void HideComponentsBasedOnFeatures()
+        {
+            if (_configuration == null)
+                return;
+            
+            // Let the designer add it by default and remove it based on configuration if it's not enabled (helping with changes in designer)
+            if (!_configuration.ApplicationFeatures.EnableExtraGraphics)
+                tbTreeChange.Controls.Remove(tbGraphics);
+
+            SetVisibleAndEnabled(encryptToolStripMenuItem, _configuration.TreeFeatures.EnableManualEncryption);
+            SetVisibleAndEnabled(decryptToolStripMenuItem, _configuration.TreeFeatures.EnableManualEncryption);
+        }
+
+        private void SetVisibleAndEnabled(ToolStripItem toolStripItem, bool visibleAndEnabled)
+        {
+            if (toolStripItem == null)
+                return;
+            toolStripItem.Visible = visibleAndEnabled;
+            toolStripItem.Enabled = visibleAndEnabled;
         }
 
         private void InitializeComponent_AddEvents()
@@ -956,7 +982,6 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: use the graphics feature inside this button event based on graphics feature?
         private void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
@@ -968,7 +993,7 @@ namespace InformationTree.Forms
                     TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
                 }
             }
-            else
+            else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
             {
                 var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
 
@@ -1129,7 +1154,6 @@ namespace InformationTree.Forms
             ShowStartupAlertForm();
         }
 
-        // TODO: hide or show this button based on graphics feature?
         private void btnExecCommand_Click(object sender, EventArgs e)
         {
             if (tbCommand.Lines.Length <= 0)
@@ -1158,7 +1182,6 @@ namespace InformationTree.Forms
             _canvasForm.Show();
         }
 
-        // TODO: hide or show this button based on graphics feature?
         private void btnDeleteCanvas_Click(object sender, EventArgs e)
         {
             if (_canvasForm != null && !_canvasForm.IsDisposed)
@@ -1169,7 +1192,6 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: hide or show this button based on graphics feature?
         private void btnGenerate_Click(object sender, EventArgs e)
         {
             var x = (double)nudX.Value;
@@ -1224,7 +1246,6 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: hide or show this button based on graphics feature?
         private void btnGenerateFiguresAndExec_Click(object sender, EventArgs e)
         {
             btnGenerate_Click(sender, e);
@@ -1234,6 +1255,7 @@ namespace InformationTree.Forms
 
         private void cbLog_CheckedChanged(object sender, EventArgs e)
         {
+            // TODO: Remove if not needed
         }
 
         private void lblUnchanged_Click(object sender, EventArgs e)
@@ -1351,11 +1373,13 @@ namespace InformationTree.Forms
 
         private void encryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            _popUpService.ShowWarning("Not implemented.");
             // TODO: Create a feature for this and deactivate it at first not showing something without any working code
         }
 
         private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            _popUpService.ShowWarning("Not implemented.");
             // TODO: Create a feature for this and deactivate it at first not showing something without any working code
         }
 
