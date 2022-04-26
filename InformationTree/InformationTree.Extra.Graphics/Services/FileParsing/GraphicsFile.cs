@@ -387,7 +387,10 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
         {
             if (string.IsNullOrEmpty(figureLine))
                 return;
-            Frame.GetActiveFrameOrThis().Figures.AddFigure(FigureFactory.GetFigure(figureLine));
+            var figure = FigureFactory.GetFigure(figureLine);
+            if (figure == null)
+                return;
+            Frame.GetActiveFrameOrThis().Figures.AddFigure(figure);
         }
 
         public void AddText(string textLine)

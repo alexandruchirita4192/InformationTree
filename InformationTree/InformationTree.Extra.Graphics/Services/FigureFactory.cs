@@ -4,9 +4,9 @@ namespace InformationTree.Extra.Graphics.Services
 {
     public static class FigureFactory
     {
-        public static BaseFigure GetFigure(string _line)
+        public static BaseFigure? GetFigure(string _line)
         {
-            BaseFigure ret = null;
+            BaseFigure? ret = null;
 
             var words = _line.Split(' ');
 
@@ -14,7 +14,7 @@ namespace InformationTree.Extra.Graphics.Services
             || !Enum.IsDefined(typeof(FigureType), words[0]))
                 return ret;
 
-            FigureType figureType = (FigureType)Enum.Parse(typeof(FigureType), words[0]);
+            var figureType = (FigureType)Enum.Parse(typeof(FigureType), words[0]);
 
             switch (figureType)
             {
