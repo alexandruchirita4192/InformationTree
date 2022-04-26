@@ -9,12 +9,12 @@ namespace InformationTree.Infrastructure
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        public static void Main(string[] args)
+        public static void Main()
         {
             var container = new WindsorContainer();
             container.Install(new WindsorInstaller());
             var application = container.Resolve<IApplication>();
-            application.Run(args);
+            application.Run();
         }
     }
 }
