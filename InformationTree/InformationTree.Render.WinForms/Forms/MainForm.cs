@@ -1258,11 +1258,6 @@ namespace InformationTree.Forms
             btnExecCommand_Click(sender, e);
         }
 
-        private void cbLog_CheckedChanged(object sender, EventArgs e)
-        {
-            // TODO: Remove if not needed
-        }
-
         private void lblUnchanged_Click(object sender, EventArgs e)
         {
             TreeNodeHelper.TreeUnchanged = !TreeNodeHelper.TreeUnchanged;

@@ -1272,7 +1272,6 @@ namespace InformationTree.Forms
             this.cbLog.TabIndex = 24;
             this.cbLog.Text = "Log";
             this.cbLog.UseVisualStyleBackColor = true;
-            this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
             // 
             // btnGenerateFiguresAndExec
             // 

@@ -542,8 +542,7 @@ namespace InformationTree.Forms
         private void btnCalculate_Click(object sender, EventArgs e)
         {
             // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service which should implement basic calculation functions
-
-            // TODO: Hide unfinished feature using a flag
+            
             _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
         }
 
