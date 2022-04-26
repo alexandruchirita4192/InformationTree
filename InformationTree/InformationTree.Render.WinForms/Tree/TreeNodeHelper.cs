@@ -9,6 +9,7 @@ using System.Web;
 using System.Windows.Forms;
 using System.Xml;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
@@ -407,20 +408,20 @@ namespace InformationTree.Tree
                     attrPercentCompleted = decimal.Parse(HttpUtility.HtmlDecode(attr.Value));
                 else if (attr.Name == XmlAttrData)
                     attrData = HttpUtility.HtmlDecode(compressionProvider.Decompress(attr.Value));
-                else if (attr.Name == XmlAttrAddedNumber)
-                    attrAddedNumber = Int32.Parse(HttpUtility.HtmlDecode(attr.Value));
+                else if (attr.Name == XmlAttrAddedNumber && int.TryParse(HttpUtility.HtmlDecode(attr.Value), out var addedNumber))
+                    attrAddedNumber = addedNumber;
                 else if (attr.Name == XmlAttrAddedDate)
                     attrAddedDate = StringToDateTime(HttpUtility.HtmlDecode(attr.Value));
                 else if (attr.Name == XmlAttrLastChangeDate)
                     attrLastChangeDate = StringToDateTime(HttpUtility.HtmlDecode(attr.Value));
-                else if (XmlAttrUrgencyAcceptedList.Contains(attr.Name))
-                    attrUrgency = Int32.Parse(HttpUtility.HtmlDecode(attr.Value));
+                else if (XmlAttrUrgencyAcceptedList.Contains(attr.Name) && int.TryParse(HttpUtility.HtmlDecode(attr.Value), out var urgency))
+                    attrUrgency = urgency;
                 else if (XmlAttrLinkAcceptedList.Contains(attr.Name))
                     attrLink = HttpUtility.HtmlDecode(attr.Value);
                 else if (attr.Name == XmlAttrCategory)
                     attrCategory = HttpUtility.HtmlDecode(attr.Value);
-                else if (attr.Name == XmlAttrIsStartupAlert)
-                    attrIsStartupAlert = Boolean.Parse(HttpUtility.HtmlDecode(attr.Value));
+                else if (attr.Name == XmlAttrIsStartupAlert && bool.TryParse(HttpUtility.HtmlDecode(attr.Value), out var isStartupAlert))
+                    attrIsStartupAlert = isStartupAlert;
             }
 
             var newStyle = (attrBold ? FontStyle.Bold : FontStyle.Regular) |
@@ -447,8 +448,8 @@ namespace InformationTree.Tree
                 ForeColor = foreground,
                 Tag = treeNodeData,
                 ToolTipText = TextProcessingHelper.GetToolTipText(attrText +
-                    (!string.IsNullOrEmpty(attrName) && attrName != "0" ? Environment.NewLine + " TimeSpent: " + attrName : "") +
-                    (!string.IsNullOrEmpty(attrDataStripped) ? Environment.NewLine + " Data: " + attrDataStripped : ""))
+                    (attrName.IsNotEmpty() && attrName != "0" ? $"{Environment.NewLine} TimeSpent: {attrName}" : "") +
+                    (attrDataStripped.IsNotEmpty() ? $"{Environment.NewLine} Data: {attrDataStripped}" : ""))
             };
             return node;
         }
@@ -530,7 +531,7 @@ namespace InformationTree.Tree
 
             foreach (var key in categories.Keys.OrderBy(c => c))
             {
-                if (to.OfType<TreeNode>().Count(e => e.Text == key) == 0)
+                if (!to.OfType<TreeNode>().Any(e => e.Text == key))
                     to.Add(categories[key]);
 
                 //foreach(TreeNode child in categories[key].Nodes)

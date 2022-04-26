@@ -15,7 +15,6 @@ namespace InformationTree.Render.WinForms.Services
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ICommandLineParser _commandLineParser;
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpService _popUpService;
         private readonly ISoundProvider _soundProvider;
@@ -26,7 +25,6 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
 
         public WinFormsApplication(
-            ICommandLineParser commandLineParser,
             IConfigurationReader configurationReader,
             IPopUpService popUpService,
             ISoundProvider soundProvider,
@@ -36,7 +34,6 @@ namespace InformationTree.Render.WinForms.Services
             ICompressionProvider compressionProvider,
             IExportNodeToRtfService exportNodeToRtfService)
         {
-            _commandLineParser = commandLineParser;
             _configurationReader = configurationReader;
             _popUpService = popUpService;
             _soundProvider = soundProvider;
@@ -123,12 +120,9 @@ namespace InformationTree.Render.WinForms.Services
             GlobalExceptionHandling(e.Exception ?? new Exception("Unknown exception"));
         }
 
-        public void Run(string[] args)
+        public void Run()
         {
             var configuration = _configurationReader.GetConfiguration();
-            _commandLineParser.Parse(args, configuration);
-
-            // TODO: Use configuration updated object
 
             Application.EnableVisualStyles();
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
