@@ -43,21 +43,21 @@ namespace InformationTree.Extra.Graphics.Domain
             SetColor();
         }
 
-        public Figure(int _points, double _x, double _y, double _r) : this()
+        public Figure(int points, double x, double y, double r) : this()
         {
-            Points = _points;
-            X = _x;
-            Y = _y;
-            Radius = _r;
+            Points = points;
+            X = x;
+            Y = y;
+            Radius = r;
         }
 
-        public Figure(int _points, double _x, double _y, double _r, double _rotation) : this()
+        public Figure(int points, double x, double y, double r, double rotation) : this()
         {
-            Points = _points;
-            X = _x;
-            Y = _y;
-            Radius = _r;
-            Rotation = _rotation;
+            Points = points;
+            X = x;
+            Y = y;
+            Radius = r;
+            Rotation = rotation;
         }
 
         #endregion Constructors
@@ -71,22 +71,22 @@ namespace InformationTree.Extra.Graphics.Domain
 
             if (Points == 0) // circle
             {
-                var color = D.Color.FromArgb((int)(Red * 255.0), (int)(Green * 255.0), (int)(Blue * 255.0));
-                var pen = new D.Pen(color);
+                var color = Color.FromArgb((int)(Red * 255.0), (int)(Green * 255.0), (int)(Blue * 255.0));
+                var pen = new Pen(color);
                 graphics.DrawCircle(pen, (float)X, (float)Y, (float)Radius);
             }
             else if (Points == 1) // point
             {
-                var color = D.Color.FromArgb((int)(Red * 255.0), (int)(Green * 255.0), (int)(Blue * 255.0));
-                var pen = new D.Pen(color);
-                var point = new D.Point((int)X, (int)Y);
+                var color = Color.FromArgb((int)(Red * 255.0), (int)(Green * 255.0), (int)(Blue * 255.0));
+                var pen = new Pen(color);
+                var point = new Point((int)X, (int)Y);
                 graphics.DrawLine(pen, point, point);
             }
             else // other
             {
-                var color = D.Color.FromArgb((int)(Red * 255.0), (int)(Green * 255.0), (int)(Blue * 255.0));
-                var pen = new D.Pen(color);
-                var pointList = new List<D.PointF>();
+                var color = Color.FromArgb((int)(Red * 255.0), (int)(Green * 255.0), (int)(Blue * 255.0));
+                var pen = new Pen(color);
+                var pointList = new List<PointF>();
 
                 for (int i = 0; i < Points; i++)
                 {
@@ -102,13 +102,13 @@ namespace InformationTree.Extra.Graphics.Domain
             }
         }
 
-        public void Move(double _x, double _y, double _r)
+        public void Move(double x, double y, double r)
         {
             if (Points == 0 || Points > 1)
             {
-                X = _x;
-                Y = _y;
-                Radius = _r;
+                X = x;
+                Y = y;
+                Radius = r;
             }
             else
                 throw new Exception("Not enough data to move a figure with " + Points.ToString() + " points!");
@@ -118,15 +118,15 @@ namespace InformationTree.Extra.Graphics.Domain
         {
             var stringBuilder = new StringBuilder();
             if (X != 0)
-                stringBuilder.Append("x=" + X.ToString() + ";");
+                stringBuilder.Append($"x={X};");
             if (Y != 0)
-                stringBuilder.Append("y=" + Y.ToString() + ";");
+                stringBuilder.Append($"y={Y};");
             if (Radius != 0)
-                stringBuilder.Append("r=" + Radius.ToString() + ";");
+                stringBuilder.Append($"r={Radius};");
             if (Rotation != 0)
-                stringBuilder.Append("rotation=" + Rotation.ToString() + ";");
+                stringBuilder.Append($"rotation={Rotation};");
             if (AddRotation != 0)
-                stringBuilder.Append("addRotation=" + AddRotation.ToString() + ";");
+                stringBuilder.Append($"addRotation={AddRotation};");
 
             Rotation? c = Rot;
             if (c != null)
@@ -134,7 +134,7 @@ namespace InformationTree.Extra.Graphics.Domain
 
             while (c != null)
             {
-                stringBuilder.AppendLine("Rotation(" + c.GetDebugText() + ");");
+                stringBuilder.AppendLine($"Rotation({c.GetDebugText()});");
                 c = c.NextRotation;
             }
 

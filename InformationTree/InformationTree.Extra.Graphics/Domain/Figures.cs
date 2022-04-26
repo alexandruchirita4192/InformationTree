@@ -1,4 +1,5 @@
-﻿using InformationTree.Extra.Graphics.Services;
+﻿using InformationTree.Domain.Extensions;
+using InformationTree.Extra.Graphics.Services;
 using D = System.Drawing;
 
 namespace InformationTree.Extra.Graphics.Domain
@@ -8,8 +9,8 @@ namespace InformationTree.Extra.Graphics.Domain
         #region Properties
 
         public List<BaseFigure> FigureList { get; private set; }
-        public D.Point CenterPoint { get; private set; }
-        public D.Point RealCenterPoint { get; private set; }
+        public Point CenterPoint { get; private set; }
+        public Point RealCenterPoint { get; private set; }
 
         #endregion Properties
 
@@ -37,12 +38,17 @@ namespace InformationTree.Extra.Graphics.Domain
 
         public void AddFigure(string figureLine)
         {
-            AddFigure(FigureFactory.GetFigure(figureLine));
+            if (figureLine.IsEmpty())
+                return;
+            var figure = FigureFactory.GetFigure(figureLine);
+            if (figure == null)
+                return;
+            AddFigure(figure);
         }
 
         public void AddText(string textLine)
         {
-            AddFigure(FigureFactory.GetFigure(textLine));
+            AddFigure(textLine);
         }
 
         public void AddFigureOnce(BaseFigure figure)
@@ -53,44 +59,49 @@ namespace InformationTree.Extra.Graphics.Domain
 
         public void AddFigureOnce(string figureLine)
         {
-            AddFigureOnce(FigureFactory.GetFigure(figureLine));
+            if (figureLine.IsEmpty())
+                return;
+            var figure = FigureFactory.GetFigure(figureLine);
+            if (figure == null)
+                return;
+            AddFigureOnce(figure);
         }
 
         // GoToNr(int nr) { iterates figures and gets figures with position "nr" }
 
         #region Individual methods
 
-        public BaseFigure? GetFigureAt(int _position)
+        public BaseFigure? GetFigureAt(int position)
         {
-            return FigureList != null && FigureList.Count > _position && _position >= 0 ? FigureList.ElementAt(_position) : null;
+            return FigureList != null && FigureList.Count > position && position >= 0 ? FigureList.ElementAt(position) : null;
         }
 
-        public void InitRotate(int _position, double _rotation)
+        public void InitRotate(int position, double rotation)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).InitRotate(_rotation);
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).InitRotate(rotation);
         }
 
         public void InitRotate(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            if (parameters.IsEmpty())
                 return;
             
             var words = parameters.Split(' ');
             switch (words.Length)
             {
                 case 2:
-                    var _position = int.Parse(words[0]);
-                    var _rotation = double.Parse(words[1]);
-                    InitRotate(_position, _rotation);
+                    if (int.TryParse(words[0], out var position)
+                    && double.TryParse(words[1], out var rotation))
+                        InitRotate(position, rotation);
                     break;
             }
         }
 
-        public void Rotate(int _position)
+        public void Rotate(int position)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).Rotate();
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).Rotate();
         }
 
         public void Rotate(string positionStr)
@@ -98,102 +109,102 @@ namespace InformationTree.Extra.Graphics.Domain
             Rotate(int.Parse(positionStr));
         }
 
-        public void RotateAround(int _position)
+        public void RotateAround(int position)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).RotateAround();
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).RotateAround();
         }
 
         public void RotateAround(string s)
         {
-            RotateAround(int.Parse(s));
+            if (int.TryParse(s, out int result))
+                RotateAround(result);
         }
 
-        public void AddRotateAround(int _position, double _r, double _addRotation)
+        public void AddRotateAround(int position, double r, double addRotation)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).AddRotateAround(_r, _addRotation);
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).AddRotateAround(r, addRotation);
         }
 
-        public void AddRotateAround(int _position, double _r, double _addRotation, double _angle)
+        public void AddRotateAround(int position, double r, double addRotation, double angle)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).AddRotateAround(_r, _addRotation, _angle);
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).AddRotateAround(r, addRotation, angle);
         }
 
         public void AddRotateAround(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            if (parameters.IsEmpty())
                 return;
-            
-            int _position;
-            double _r, _addRotation;
+
+            int position;
+            double r, addRotation;
 
             var words = parameters.Split(' ');
             switch (words.Length)
             {
                 case 3:
-                    _position = int.Parse(words[0]);
-                    _r = double.Parse(words[1]);
-                    _addRotation = double.Parse(words[2]);
-                    AddRotateAround(_position, _r, _addRotation);
+                    if (int.TryParse(words[0], out position)
+                    && double.TryParse(words[1], out r)
+                    && double.TryParse(words[2], out addRotation))
+                        AddRotateAround(position, r, addRotation);
                     break;
 
                 case 4:
-                    _position = int.Parse(words[0]);
-                    _r = double.Parse(words[1]);
-                    _addRotation = double.Parse(words[2]);
-                    var _angle = double.Parse(words[3]);
-                    AddRotateAround(_position, _r, _addRotation, _angle);
+                    if (int.TryParse(words[0], out position)
+                    && double.TryParse(words[1], out r)
+                    && double.TryParse(words[2], out addRotation)
+                    && double.TryParse(words[3], out var angle))
+                        AddRotateAround(position, r, addRotation, angle);
                     break;
             }
         }
 
-        public void Move(int _position, double _x, double _y)
+        public void Move(int position, double x, double y)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).Move(_x, _y);
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).Move(x, y);
         }
 
-        public void Move(int _position, double _x, double _y, double _r)
+        public void Move(int position, double x, double y, double r)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
+            if (FigureList != null && FigureList.Count > position && position >= 0)
             {
-                var f = FigureList.ElementAt(_position);
-                var ff = f as Figure;
-                if (ff != null)
-                    ff.Move(_x, _y, _r);
+                var f = FigureList.ElementAt(position);
+                if (f is Figure ff)
+                    ff.Move(x, y, r);
             }
         }
 
         public void Move(string s)
         {
-            int _position;
-            double _x, _y;
+            int position;
+            double x, y;
             var words = s.Split(' ');
             switch (words.Length)
             {
                 case 3:
-                    _position = int.Parse(words[0]);
-                    _x = double.Parse(words[1]);
-                    _y = double.Parse(words[2]);
-                    Move(_position, _x, _y);
+                    if (int.TryParse(words[0], out position)
+                    && double.TryParse(words[1], out x)
+                    && double.TryParse(words[2], out y))
+                        Move(position, x, y);
                     break;
 
                 case 4:
-                    _position = int.Parse(words[0]);
-                    _x = double.Parse(words[1]);
-                    _y = double.Parse(words[2]);
-                    var _r = double.Parse(words[3]);
-                    Move(_position, _x, _y, _r);
+                    if (int.TryParse(words[0], out position)
+                    && double.TryParse(words[1], out x)
+                    && double.TryParse(words[2], out y)
+                    && double.TryParse(words[3], out var r))
+                        Move(position, x, y, r);
                     break;
             }
         }
 
-        public void SetPoints(int _position, int _points)
+        public void SetPoints(int position, int points)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).Points = _points;
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).Points = points;
         }
 
         public void SetPoints(string parameters)
@@ -202,17 +213,17 @@ namespace InformationTree.Extra.Graphics.Domain
             switch (words.Length)
             {
                 case 2:
-                    var _position = int.Parse(words[0]);
-                    var _points = int.Parse(words[1]);
-                    SetPoints(_position, _points);
+                    var position = int.Parse(words[0]);
+                    var points = int.Parse(words[1]);
+                    SetPoints(position, points);
                     break;
             }
         }
 
-        public void SetColor(int _position, double _r, double _g, double _b)
+        public void SetColor(int position, double r, double g, double b)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).SetColor(_r, _g, _b);
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).SetColor(r, g, b);
         }
 
         public void SetColor(string parameters)
@@ -221,29 +232,29 @@ namespace InformationTree.Extra.Graphics.Domain
             switch (words.Length)
             {
                 case 4:
-                    var _position = int.Parse(words[0]);
-                    var _r = double.Parse(words[1]);
-                    var _g = double.Parse(words[2]);
-                    var _b = double.Parse(words[3]);
-                    SetColor(_position, _r, _g, _b);
+                    if (int.TryParse(words[0], out var position)
+                    && double.TryParse(words[1], out var r)
+                    && double.TryParse(words[2], out var g)
+                    && double.TryParse(words[3], out var b))
+                        SetColor(position, r, g, b);
                     break;
             }
         }
 
-        public void Show(int _position, D.Graphics graphics)
+        public void Show(int position, D.Graphics graphics)
         {
-            if (FigureList != null && FigureList.Count > _position && _position >= 0)
-                FigureList.ElementAt(_position).Show(graphics);
+            if (FigureList != null && FigureList.Count > position && position >= 0)
+                FigureList.ElementAt(position).Show(graphics);
         }
 
         #endregion Individual methods
 
         #region Group methods
 
-        public void InitRotateAll(double _rotation)
+        public void InitRotateAll(double rotation)
         {
             if (FigureList != null)
-                FigureList.ForEach(f => f.InitRotate(_rotation));
+                FigureList.ForEach(f => f.InitRotate(rotation));
         }
 
         public void RotateAll()
@@ -258,33 +269,32 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ForEach(f => f.RotateAround());
         }
 
-        public void MoveAll(double _x, double _y)
+        public void MoveAll(double x, double y)
         {
             if (FigureList != null)
-                FigureList.ForEach(f => f.Move(_x, _y));
+                FigureList.ForEach(f => f.Move(x, y));
         }
 
-        public void MoveAll(double _x, double _y, double _r)
+        public void MoveAll(double x, double y, double r)
         {
             if (FigureList != null)
                 FigureList.ForEach(f =>
                 {
-                    // only Figure has a Radius (_r)
-                    var ff = f as Figure;
-                    if (ff != null)
-                        ff.Move(_x, _y, _r);
+                    // only Figure has a Radius (r)
+                    if (f is Figure ff)
+                        ff.Move(x, y, r);
                 });
         }
 
-        public void SetPointsAll(int _points)
+        public void SetPointsAll(int points)
         {
-            FigureList.ForEach(f => f.Points = _points);
+            FigureList.ForEach(f => f.Points = points);
         }
 
-        public void SetColorAll(double _r, double _g, double _b)
+        public void SetColorAll(double r, double g, double b)
         {
             if (FigureList != null)
-                FigureList.ForEach(f => f.SetColor(_r, _g, _b));
+                FigureList.ForEach(f => f.SetColor(r, g, b));
         }
 
         public void ShowAll(D.Graphics graphics)
@@ -298,11 +308,8 @@ namespace InformationTree.Extra.Graphics.Domain
                 });
         }
 
-        public void TranslateCenterAll(D.Point oldCenter, D.Point newCenter)
+        public void TranslateCenterAll(Point oldCenter, Point newCenter)
         {
-            if (oldCenter == null || newCenter == null)
-                return;
-
             CenterPoint = oldCenter;
             RealCenterPoint = newCenter;
 

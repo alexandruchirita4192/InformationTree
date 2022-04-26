@@ -53,10 +53,10 @@ namespace InformationTree.Extra.Graphics.Domain
             Rotation += AddRotation;
         }
 
-        public void InitRotate(double _rotation)
+        public void InitRotate(double rotation)
         {
             Rotation = 0.0;
-            AddRotation = _rotation;
+            AddRotation = rotation;
         }
 
         public void RotateAround()
@@ -84,11 +84,11 @@ namespace InformationTree.Extra.Graphics.Domain
             }
         }
 
-        public void AddRotateAround(double _r, double _addRotation, double _angle)
+        public void AddRotateAround(double r, double addRotation, double angle)
         {
             if (Rot == null)
             {
-                Rot = new Rotation(X, Y, _r, _angle, _addRotation, null);
+                Rot = new Rotation(X, Y, r, angle, addRotation, null);
             }
             else
             {
@@ -96,19 +96,19 @@ namespace InformationTree.Extra.Graphics.Domain
                 while (c.NextRotation != null)
                     c = c.NextRotation;
 
-                c.NextRotation = new Rotation(c.X, c.Y, _r, _angle, _addRotation, null);
+                c.NextRotation = new Rotation(c.X, c.Y, r, angle, addRotation, null);
             }
         }
 
-        public void AddRotateAround(double _r, double _addRotation)
+        public void AddRotateAround(double r, double addRotation)
         {
-            AddRotateAround(_r, _addRotation, 0);
+            AddRotateAround(r, addRotation, 0);
         }
 
-        public void Move(double _x, double _y)
+        public void Move(double x, double y)
         {
-            X = _x;
-            Y = _y;
+            X = x;
+            Y = y;
         }
 
         public void SetColor(double r = 1.0, double g = 1.0, double b = 1.0)

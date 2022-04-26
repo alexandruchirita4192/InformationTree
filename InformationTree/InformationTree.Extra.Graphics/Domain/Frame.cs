@@ -7,23 +7,23 @@ namespace InformationTree.Graphics
     {
         #region Properties
 
-        public bool IsActive { get; private set; } //false = inactive; true = active
-        public Frame NextFrame { get; private set; }
+        public bool IsActive { get; private set; }
+        public Frame? NextFrame { get; private set; }
         public Figures Figures { get; private set; }
 
-        public D.Point CenterPoint
+        public Point CenterPoint
         {
             get
             {
-                return Figures != null ? Figures.CenterPoint : new D.Point();
+                return Figures != null ? Figures.CenterPoint : new Point();
             }
         }
 
-        public D.Point RealCenterPoint
+        public Point RealCenterPoint
         {
             get
             {
-                return Figures != null ? Figures.RealCenterPoint : new D.Point();
+                return Figures != null ? Figures.RealCenterPoint : new Point();
             }
         }
 
@@ -39,7 +39,7 @@ namespace InformationTree.Graphics
         {
         }
 
-        public Frame(bool isActive, Frame nextFrame)
+        public Frame(bool isActive, Frame? nextFrame)
         { IsActive = isActive; NextFrame = nextFrame; Figures = new Figures(); }
 
         #endregion Constructor
@@ -48,7 +48,7 @@ namespace InformationTree.Graphics
 
         public void NewFrame()
         {
-            Frame c = this;
+            var c = this;
             while (c.NextFrame != null)
             {
                 c.IsActive = false;
@@ -62,15 +62,12 @@ namespace InformationTree.Graphics
         {
             if (NextFrame == null)
                 return;
-
-            Frame d = this.NextFrame, c = this;
-            c.NextFrame = c.NextFrame.NextFrame;
-            d = null;
+            NextFrame = NextFrame.NextFrame;
         }
 
         public bool ChangeToNextFrame(bool addNewFrameIfNextFrameIsNull = true)
         {
-            Frame c = this;
+            var c = this;
             while (c.NextFrame != null)
             {
                 if (c.IsActive)
@@ -95,15 +92,18 @@ namespace InformationTree.Graphics
 
         public void ChangeToPreviousFrame()
         {
-            if (this.NextFrame == null)
+            if (NextFrame == null)
                 return;
 
-            Frame c = this;
-            while ((c.NextFrame.NextFrame != null) && (!c.NextFrame.IsActive))
+            var c = this;
+            while ((c.NextFrame?.NextFrame != null) && (!c.NextFrame.IsActive))
                 c = c.NextFrame;
 
-            c.NextFrame.IsActive = false;
-            c.IsActive = true;
+            if (c.NextFrame != null && c.NextFrame.IsActive)
+            {
+                c.NextFrame.IsActive = false;
+                c.IsActive = true;
+            }
         }
 
         public void CycleFramesFromThis()
@@ -111,22 +111,22 @@ namespace InformationTree.Graphics
             if (!ChangeToNextFrame(false))
                 InactivateFramesAndReactivateThis();
         }
-
+        
         public void GoToFrame(int position)
         {
             if (position < 0)
                 return;
 
-            Frame c = this;
-            //facem toate frame-urile inactive
+            // Inactivate all frames
+            var c = this;
             while (c.NextFrame != null)
             {
                 c.IsActive = false;
                 c = c.NextFrame;
             }
 
+            // Make the frame at position active (or the last frame active if the position is greater than the number of frames)
             c = this;
-            //activam frame-ul pe care il vrem
             while ((position != 0) && (c.NextFrame != null))
             {
                 position--;
@@ -138,7 +138,7 @@ namespace InformationTree.Graphics
 
         public void Show(D.Graphics graphics)
         {
-            Frame frame = GetActiveFrameOrThis();
+            var frame = GetActiveFrameOrThis();
 
             graphics.Clear(D.Color.Black);
 
@@ -155,8 +155,8 @@ namespace InformationTree.Graphics
         public List<Frame> GetFramesList()
         {
             var framesList = new List<Frame>() { this };
-
-            Frame c = this;
+            
+            var c = this;
             while (c.NextFrame != null)
             {
                 c = c.NextFrame;
@@ -168,13 +168,13 @@ namespace InformationTree.Graphics
 
         public void CleanAllFrames()
         {
-            Frame c = this;
-            c.CleanThisFrame();
-            while (c.NextFrame != null)
+            var c = this;
+            do
             {
-                c = c.NextFrame;
                 c.CleanThisFrame();
+                c = c.NextFrame;
             }
+            while (c != null);
         }
 
         public bool HasActiveFrame()
@@ -182,9 +182,9 @@ namespace InformationTree.Graphics
             return GetFirstActiveFrame() != null;
         }
 
-        public Frame GetFirstActiveFrame()
+        public Frame? GetFirstActiveFrame()
         {
-            Frame c = this;
+            var c = this;
             while (c.NextFrame != null)
             {
                 if (c.IsActive)
@@ -198,14 +198,14 @@ namespace InformationTree.Graphics
         public Frame GetActiveFrameOrThis()
         {
             var frame = GetFirstActiveFrame();
-            this.IsActive = frame == null ? true : this.IsActive; // fix IsActive
+            IsActive = frame == null || IsActive;
             return frame ?? this;
         }
 
         public void InactivateFramesAndReactivateThis()
         {
-            Frame c = this;
-            this.IsActive = true; // activate this
+            var c = this;
+            IsActive = true; // activate this
             while (c.NextFrame != null) // inactivate the rest
             {
                 c = c.NextFrame;
@@ -216,24 +216,18 @@ namespace InformationTree.Graphics
         public void Clean()
         {
             CleanAllFrames();
-            this.NextFrame = null;
+            NextFrame = null;
         }
 
         public void TranslateCenter(D.Point oldCenter, D.Point newCenter)
         {
-            if (oldCenter == null || newCenter == null)
-                return;
-
             if (Figures != null)
                 Figures.TranslateCenterAll(oldCenter, newCenter);
         }
 
         public void TranslateCenterAllFrames(D.Point oldCenter, D.Point newCenter)
         {
-            if (oldCenter == null || newCenter == null)
-                return;
-
-            Frame c = this;
+            var c = this;
             c.TranslateCenter(oldCenter, newCenter);
             while (c.NextFrame != null)
             {

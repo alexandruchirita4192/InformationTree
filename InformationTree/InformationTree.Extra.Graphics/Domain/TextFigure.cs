@@ -8,11 +8,11 @@ namespace InformationTree.Extra.Graphics.Domain
 
         #region Private
 
-        private string fontFamilyName;
-        private int blue;
-        private int green;
-        private int red;
-        private double size;
+        private double _size;
+        private string _fontFamilyName;
+        private int _blue;
+        private int _green;
+        private int _red;
 
         #endregion Private
 
@@ -31,20 +31,21 @@ namespace InformationTree.Extra.Graphics.Domain
 
         #region Constructors
 
-        public TextFigure(string _text, int _x, int _y) : this(_text, _x, _y, 255, 255, 255)
+        public TextFigure(string text, int x, int y) : this(text, x, y, 255, 255, 255)
         {
         }
 
-        public TextFigure(string _text, int _x, int _y, int _r, int _g, int _b) : this(_text, _x, _y, "AngelicWar.ttf", 12, _r, _g, _b)
+        public TextFigure(string text, int x, int y, int r, int g, int b) : this(text, x, y, "AngelicWar.ttf", 12, r, g, b)
         {
         }
 
-        public TextFigure(string _text, int _x, int _y, string _fontFamilyName, double _size, int _r, int _g, int _b)
+        public TextFigure(string text, int x, int y, string fontFamilyName, double size, int r, int g, int b)
         {
-            SetText(_text);
-            Move(_x, _y);
-            SetFont(_fontFamilyName, _size);
-            SetColor(_r, _g, _b);
+            Text = text;
+            Move(x, y);
+            _fontFamilyName = fontFamilyName;
+            _size = size;
+            SetColor(r, g, b);
         }
 
         #endregion Constructors
@@ -53,41 +54,30 @@ namespace InformationTree.Extra.Graphics.Domain
 
         public override void Show(D.Graphics graphics)
         {
-            var point = new D.PointF((float)X, (float)Y);
-            var color = red == 255 && green == 255 && blue == 255 ? D.Color.LightGreen : D.Color.FromArgb(red, green, blue);
-            var brush = new D.SolidBrush(color);
-            var font = new D.Font(fontFamilyName, (float)size);
-            graphics.DrawString(Text.Replace('_', ' '), font, brush, point);
+            var point = new PointF((float)X, (float)Y);
+            var color = _red == 255 && _green == 255 && _blue == 255 ? Color.LightGreen : Color.FromArgb(_red, _green, _blue);
+            var brush = new SolidBrush(color);
+            var font = new Font(_fontFamilyName, (float)_size);
+            var text = Text?.Replace('_', ' ');
+            graphics.DrawString(text, font, brush, point);
         }
 
-        public void SetFont(string _fontFamilyName, double _size)
+        public void SetFont(string fontFamilyName, double size)
         {
-            fontFamilyName = _fontFamilyName;
-            size = _size;
+            _fontFamilyName = fontFamilyName;
+            _size = size;
         }
 
-        public void SetText(string _text)
+        public void SetColor(int r, int g, int b)
         {
-            Text = _text;
-        }
-
-        public void SetText(string t, int x, int y) //text
-        {
-            Text = t;
-            X = x;
-            Y = y;
-        }
-
-        public void SetColor(int _r, int _g, int _b)
-        {
-            red = _r;
-            blue = _g;
-            green = _b;
+            _red = r;
+            _blue = g;
+            _green = b;
         }
 
         public override string GetDebugText()
         {
-            return "Text=" + Text.ToString() + ";";
+            return $"Text={Text};";
         }
 
         #endregion Methods
