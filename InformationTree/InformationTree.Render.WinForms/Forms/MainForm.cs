@@ -1,5 +1,6 @@
 ﻿using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
@@ -256,8 +257,8 @@ namespace InformationTree.Forms
 
         private ICanvasForm _canvasForm;
         
-        private Stopwatch _timer = new Stopwatch();
-        private System.Timers.Timer _randomTimer = new System.Timers.Timer();
+        private Stopwatch _timer = new();
+        private System.Timers.Timer _randomTimer = new();
         private static int _systemSoundNumber = -1;
 
         // TODO: Use TreeNodeData here instead of TaskList
@@ -385,7 +386,7 @@ namespace InformationTree.Forms
 
                     var size = TreeNodeHelper.CalculateDataSizeFromNodeAndChildren(node);
                     var sizeMb = size / 1024 / 1024;
-                    tbDataSize.Text = size.ToString() + "b " + sizeMb + "M";
+                    tbDataSize.Text = $"{size}b {sizeMb}M";
                 }
 
                 gbTimeSpent.Enabled = true;
@@ -687,10 +688,9 @@ namespace InformationTree.Forms
         {
             if (tvTaskList.SelectedNode != null && cbFontFamily.SelectedItem != null)
             {
-                var fontFamily = cbFontFamily.SelectedItem as String;
                 var oldFont = tvTaskList.SelectedNode.NodeFont;
 
-                if (fontFamily != null)
+                if (cbFontFamily.SelectedItem is string fontFamily)
                     tvTaskList.SelectedNode.NodeFont = new Font(fontFamily, (float)nudFontSize.Value, oldFont.Style);
 
                 TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
@@ -934,12 +934,12 @@ namespace InformationTree.Forms
                 // Change the ToolTip only if the pointer moved to a new node.
                 if (theNode.ToolTipText != this.toolTip1.GetToolTip(this.tvTaskList))
                 {
-                    this.toolTip1.SetToolTip(this.tvTaskList, theNode.ToolTipText);
+                    toolTip1.SetToolTip(this.tvTaskList, theNode.ToolTipText);
                 }
             }
-            else     // Pointer is not over a node so clear the ToolTip.
+            else // Pointer is not over a node so clear the ToolTip.
             {
-                this.toolTip1.SetToolTip(this.tvTaskList, "");
+                toolTip1.SetToolTip(this.tvTaskList, "");
             }
 
             _oldX = e.X;
@@ -969,10 +969,16 @@ namespace InformationTree.Forms
                         
                         var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(d);
                         selectedNode.ToolTipText = TextProcessingHelper.GetToolTipText(selectedNode.Text +
-                            (!string.IsNullOrEmpty(selectedNode.Name) && selectedNode.Name != "0" ? Environment.NewLine + " TimeSpent: " + selectedNode.Name : "") +
-                            (!string.IsNullOrEmpty(strippedData) ? Environment.NewLine + " Data: " + strippedData : ""));
+                            (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
+                            (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""));
 
-                        tbTaskName.BackColor = string.IsNullOrEmpty(tagData.Data) ? (string.IsNullOrEmpty(tagData.Link) ? TreeNodeHelper.DefaultBackGroundColor : TreeNodeHelper.LinkBackGroundColor) : TreeNodeHelper.DataBackGroundColor;
+                        tbTaskName.BackColor = tagData.Data.IsNotEmpty()
+                            ? (
+                                tagData.Link.IsNotEmpty()
+                                ? TreeNodeHelper.DefaultBackGroundColor
+                                : TreeNodeHelper.LinkBackGroundColor
+                            )
+                            : TreeNodeHelper.DataBackGroundColor;
 
                         TreeNodeHelper.TreeUnchanged = false;
                     }
@@ -1029,7 +1035,7 @@ namespace InformationTree.Forms
                 tagData.Link = tbLink.Text;
 
                 var percentCompleted = 0M;
-                if (string.IsNullOrEmpty(tagData.Link) || !tagData.Link.EndsWith(".xml") || tagData.Link.Contains(" "))
+                if (tagData.Link.IsEmpty() || !tagData.Link.EndsWith(".xml") || tagData.Link.Contains(" "))
                     tagData.Link = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref percentCompleted, true).Replace(" ", "_") + ".xml";
                 tbLink.Text = tagData.Link;
 
@@ -1079,8 +1085,7 @@ namespace InformationTree.Forms
 
         private void SearchForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            var form = sender as SearchForm;
-            if (form != null)
+            if (sender is SearchForm form)
             {
                 var textToFind = form.TextToFind;
                 tbSearchBox.Text = textToFind;
@@ -1302,10 +1307,10 @@ namespace InformationTree.Forms
 
         private void MainForm_DoubleClick(object sender, EventArgs e)
         {
-            if (this.FormBorderStyle == System.Windows.Forms.FormBorderStyle.Sizable)
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            if (FormBorderStyle == FormBorderStyle.Sizable)
+                FormBorderStyle = FormBorderStyle.None;
             else
-                this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+                FormBorderStyle = FormBorderStyle.Sizable;
         }
 
         private void tbTreeChange_MouseDoubleClick(object sender, MouseEventArgs e)
