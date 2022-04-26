@@ -1,12 +1,7 @@
-﻿using InformationTree.Domain.Extensions;
-using InformationTree.PgpEncryption;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
+using NLog;
 
 namespace InformationTree.TextProcessing
 {
@@ -113,8 +108,7 @@ namespace InformationTree.TextProcessing
             if (text.Length <= charsCount)
                 return text;
 
-            return new String(text.Take(charsCount).ToArray()) + "[...]";
+            return new string(text.Take(charsCount).ToArray()) + "[...]";
         }
-
     }
 }
