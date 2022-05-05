@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
@@ -24,6 +25,7 @@ namespace InformationTree.Forms
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly IConfigurationReader _configurationReader;
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
         private readonly Configuration _configuration;
         
         private ICanvasForm _canvasForm;
@@ -80,12 +82,15 @@ namespace InformationTree.Forms
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            IConfigurationReader configurationReader)
+            IConfigurationReader configurationReader,
+            ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _configurationReader = configurationReader;
+            _treeNodeDataCachingService = treeNodeDataCachingService;
+            
             _configuration = _configurationReader.GetConfiguration();
 
             InitializeComponent();
@@ -126,9 +131,10 @@ namespace InformationTree.Forms
             IPopUpService popUpService,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             IConfigurationReader configurationReader,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
             string title,
             string data)
-            : this(canvasFormFactory, popUpService, encryptionAndSigningProvider, configurationReader)
+            : this(canvasFormFactory, popUpService, encryptionAndSigningProvider, configurationReader, treeNodeDataCachingService)
         {
             Text += $": {title}";
 
@@ -143,23 +149,23 @@ namespace InformationTree.Forms
             }
 
             var richTextBoxForeColor = tbData.ForeColor;
-            if (richTextBoxForeColor == TreeNodeHelper.DefaultBackGroundColor)
-                tbData.ForeColor = TreeNodeHelper.DefaultForeGroundColor;
+            if (richTextBoxForeColor == Constants.Colors.DefaultBackGroundColor)
+                tbData.ForeColor = Constants.Colors.DefaultForeGroundColor;
 
             var richTextBoxBackColor = tbData.BackColor;
-            if (richTextBoxBackColor != TreeNodeHelper.DefaultBackGroundColor)
-                tbData.BackColor = TreeNodeHelper.DefaultBackGroundColor;
+            if (richTextBoxBackColor != Constants.Colors.DefaultBackGroundColor)
+                tbData.BackColor = Constants.Colors.DefaultBackGroundColor;
 
             if (tbData?.TextBox?.Text != null)
             {
                 for (int i = 0; i < tbData.TextBox.Text.Length; i++)
                 {
                     tbData.TextBox.Select(i, 1);
-                    if (tbData.TextBox.SelectionColor == TreeNodeHelper.DefaultBackGroundColor)
-                        tbData.TextBox.SelectionColor = TreeNodeHelper.DefaultForeGroundColor;
+                    if (tbData.TextBox.SelectionColor == Constants.Colors.DefaultBackGroundColor)
+                        tbData.TextBox.SelectionColor = Constants.Colors.DefaultForeGroundColor;
 
-                    if (tbData.TextBox.SelectionBackColor != TreeNodeHelper.DefaultBackGroundColor)
-                        tbData.TextBox.SelectionBackColor = TreeNodeHelper.DefaultBackGroundColor;
+                    if (tbData.TextBox.SelectionBackColor != Constants.Colors.DefaultBackGroundColor)
+                        tbData.TextBox.SelectionBackColor = Constants.Colors.DefaultBackGroundColor;
                 }
             }
         }
@@ -376,7 +382,7 @@ namespace InformationTree.Forms
 
         private void GetPrivateKeyWithPassword(string titleOverride = null)
         {
-            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, FromFile);
+            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, _treeNodeDataCachingService, FromFile);
 
             if (titleOverride.IsNotEmpty())
                 form.Text = titleOverride;
@@ -508,13 +514,13 @@ namespace InformationTree.Forms
             {
                 var textToFind = form.TextToFind;
 
-                if (WinFormsApplication.MainForm == null || WinFormsApplication.MainForm.TaskList == null || WinFormsApplication.MainForm.TaskList.Nodes == null)
+                if (WinFormsApplication.MainForm?.TaskList?.Nodes == null)
                     return;
 
-                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind);
+                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind, _treeNodeDataCachingService);
                 if (node != null)
                 {
-                    var nodeData = node.GetTreeNodeData();
+                    var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
                     if (nodeData != null)
                     {
                         _pgpPublicKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);

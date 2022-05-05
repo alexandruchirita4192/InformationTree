@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Render.WinForms.Extensions;
 
 namespace InformationTree.Forms
 {
@@ -64,8 +65,13 @@ namespace InformationTree.Forms
 
         private void T_Elapsed(object sender, ElapsedEventArgs e)
         {
-            pbFileLoad.PerformStep(); // TODO: TEST: Check if the progress bar changes
-            pbLoadingGraphics.Refresh(); // paint?
+            if (pbFileLoad.Style != ProgressBarStyle.Marquee)
+            {
+                // Marquee style progress bar shouldn't perform steps manually
+                pbFileLoad.InvokeWrapper(fl=>fl.PerformStep());
+            }
+
+            pbLoadingGraphics.InvokeWrapper(lg => lg.Refresh());
         }
 
         public ProgressBar LoadProgressBar
@@ -93,7 +99,6 @@ namespace InformationTree.Forms
             e.Graphics.DrawIcon(extractedIconFromCurrentAssembly, 0, 0);
         }
 
-        // TODO: maybe use this method based on graphics feature enabled/disabled
         private void pbLoadingGraphics_Paint(object sender, PaintEventArgs e)
         {
             GraphicsFile.Show(e.Graphics);

@@ -1,9 +1,11 @@
-﻿using InformationTree.Domain.Entities;
+﻿using InformationTree.Domain;
+using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
+using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
@@ -32,6 +34,10 @@ namespace InformationTree.Forms
         private readonly ICompressionProvider _compressionProvider;
         private readonly IConfigurationReader _configurationReader;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly IImportTreeFromXmlService _importTreeFromXmlService;
+        private readonly IExportTreeToXmlService _exportTreeToXmlService;
+        private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         
         private readonly Configuration _configuration;
 
@@ -47,7 +53,11 @@ namespace InformationTree.Forms
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             ICompressionProvider compressionProvider,
             IConfigurationReader configurationReader,
-            IExportNodeToRtfService exportNodeToRtfService)
+            IExportNodeToRtfService exportNodeToRtfService,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            IImportTreeFromXmlService importTreeFromXmlService,
+            IExportTreeToXmlService exportTreeToXmlService,
+            IImportExportTreeXmlService importExportTreeXmlService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -57,6 +67,10 @@ namespace InformationTree.Forms
             _compressionProvider = compressionProvider;
             _configurationReader = configurationReader;
             _exportNodeToRtfService = exportNodeToRtfService;
+            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _importTreeFromXmlService = importTreeFromXmlService;
+            _exportTreeToXmlService = exportTreeToXmlService;
+            _importExportTreeXmlService = importExportTreeXmlService;
             
             InitializeComponent();
             
@@ -97,15 +111,22 @@ namespace InformationTree.Forms
             TreeNodeHelper.TreeUnchanged = true;
             TreeNodeHelper.IsSafeToSave = true;
 
-            var loadedExisting = TreeNodeHelper.LoadTree(this, tvTaskList, TreeNodeHelper.FileName, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
+            var beforeLoad = new Action(() => this.InvokeWrapper(f => f.Cursor = Cursors.WaitCursor));
+            var afterLoad = new Action(() => this.InvokeWrapper(f => f.Cursor = Cursors.Default));
+            (var root, var fileName) = _importTreeFromXmlService.LoadTree(TreeNodeHelper.FileName, beforeLoad, afterLoad);
+            root.CopyToTreeView(tvTaskList, _treeNodeDataCachingService, true);
+            TreeNodeHelper.FileName = fileName;
+
+            var loadedExisting = !root.IsEmptyData;
             if (loadedExisting)
             {
                 tvTaskList.CollapseAll();
                 tvTaskList.Refresh();
 
-                TreeNodeHelper.FixTreeNodesAndResetCounter(tvTaskList.Nodes);
+                var countNodes = tvTaskList.GetNodeCount(true);
+                TreeNodeHelper.TreeNodeCounter = countNodes;
+                
                 UpdateShowUntilNumber();
-
                 ShowStartupAlertForm();
             }
 
@@ -247,7 +268,6 @@ namespace InformationTree.Forms
 
         #region Constants
 
-        public new static readonly Font DefaultFont = new Font(FontFamily.GenericSansSerif, 8.5F, FontStyle.Regular);
 
         #endregion Constants
 
@@ -283,7 +303,8 @@ namespace InformationTree.Forms
 
         public void SaveTree()
         {
-            TreeNodeHelper.SaveTree(tvTaskList, _compressionProvider);
+            var treeNodeData = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
+            _exportTreeToXmlService.SaveTree(treeNodeData, TreeNodeHelper.FileName);
         }
 
         public void ClearStyleAdded()
@@ -299,15 +320,15 @@ namespace InformationTree.Forms
             if (!TreeNodeHelper.IsSafeToSave || !String.IsNullOrEmpty(message))
             {
                 btnResetException.Enabled = true;
-                btnResetException.BackColor = TreeNodeHelper.DefaultBackGroundColor;
-                btnResetException.ForeColor = TreeNodeHelper.ExceptionColor;
+                btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
+                btnResetException.ForeColor = Constants.Colors.ExceptionColor;
                 btnResetException.Text = "Reset exception: " + message.Substring(0, 10);
             }
             else
             {
                 btnResetException.Enabled = false;
-                btnResetException.ForeColor = TreeNodeHelper.DefaultForeGroundColor;
-                btnResetException.BackColor = TreeNodeHelper.DefaultBackGroundColor;
+                btnResetException.ForeColor = Constants.Colors.DefaultForeGroundColor;
+                btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
                 btnResetException.Text = "Reset exception";
             }
         }
@@ -367,27 +388,25 @@ namespace InformationTree.Forms
                 tbTaskName.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref percentCompleted, true);
                 nudCompleteProgress.Value = percentCompleted;
 
-                var tagData = node.GetTreeNodeData();
+                var treeNodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
 
-                TreeNodeHelper.UpdateCurrentSelection(node.Text == null && tagData != null && tagData.IsEmptyData ? null : node);
+                TreeNodeHelper.UpdateCurrentSelection(node.Text == null && treeNodeData != null && treeNodeData.IsEmptyData ? null : node);
 
-                if (tagData != null)
-                {
-                    tbAddedDate.Text = (tagData.AddedDate.HasValue ? tagData.AddedDate.Value.ToString(TreeNodeHelper.DateTimeFormatSeparatedWithDot) : "-");
-                    tbLastChangeDate.Text = (tagData.LastChangeDate.HasValue ? tagData.LastChangeDate.Value.ToString(TreeNodeHelper.DateTimeFormatSeparatedWithDot) : "-");
-                    tbAddedNumber.Text = tagData.AddedNumber.ToString();
-                    tbTaskName.BackColor = string.IsNullOrEmpty(tagData.Data) ? (string.IsNullOrEmpty(tagData.Link) ? TreeNodeHelper.DefaultBackGroundColor : TreeNodeHelper.LinkBackGroundColor) : TreeNodeHelper.DataBackGroundColor;
+                tbAddedDate.Text = (treeNodeData.AddedDate.HasValue ? treeNodeData.AddedDate.Value.ToFormattedString() : "-");
+                tbLastChangeDate.Text = (treeNodeData.LastChangeDate.HasValue ? treeNodeData.LastChangeDate.Value.ToFormattedString() : "-");
+                tbAddedNumber.Text = treeNodeData.AddedNumber.ToString();
 
-                    nudUrgency.Value = tagData.Urgency;
-                    tbLink.Text = tagData.Link;
-                    cbIsStartupAlert.Checked = tagData.IsStartupAlert;
-                    nudCompleteProgress.Value = tagData.PercentCompleted;
-                    tbCategory.Text = tagData.Category;
+                tbTaskName.BackColor = treeNodeData.GetTaskNameColor();
+                
+                nudUrgency.Value = treeNodeData.Urgency;
+                tbLink.Text = treeNodeData.Link;
+                cbIsStartupAlert.Checked = treeNodeData.IsStartupAlert;
+                nudCompleteProgress.Value = treeNodeData.PercentCompleted;
+                tbCategory.Text = treeNodeData.Category;
 
-                    var size = TreeNodeHelper.CalculateDataSizeFromNodeAndChildren(node);
-                    var sizeMb = size / 1024 / 1024;
-                    tbDataSize.Text = $"{size}b {sizeMb}M";
-                }
+                var sizeBytes = TreeNodeHelper.CalculateDataSizeFromNodeAndChildren(node, _treeNodeDataCachingService);
+                var sizeMb = sizeBytes / 1024 / 1024;
+                tbDataSize.Text = $"{sizeBytes}b {sizeMb}M";
 
                 gbTimeSpent.Enabled = true;
                 var timeSpanTotal = !string.IsNullOrEmpty(node.Name) ? TimeSpan.FromMilliseconds(long.Parse(node.Name)) : new TimeSpan(0);
@@ -485,7 +504,7 @@ namespace InformationTree.Forms
                 var category = tbCategory.Text;
                 var isStartupAlert = cbIsStartupAlert.Checked;
 
-                var data = selectedNode.GetTreeNodeData();
+                var data = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                 data.Urgency = urgency;
                 data.Link = link;
                 data.Category = category;
@@ -516,7 +535,7 @@ namespace InformationTree.Forms
                 if (selectedNode.Text != taskName)
                 {
                     selectedNode.Text = taskName;
-                    var tagData = selectedNode.GetTreeNodeData();
+                    var tagData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                     tagData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
@@ -530,7 +549,7 @@ namespace InformationTree.Forms
                 {
                     selectedNodeLastChildren.Text = taskName;
 
-                    var tagData = selectedNodeLastChildren.GetTreeNodeData();
+                    var tagData = selectedNodeLastChildren.ToTreeNodeData(_treeNodeDataCachingService);
                     tagData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
@@ -543,12 +562,12 @@ namespace InformationTree.Forms
                 var node = new TreeNode(taskName)
                 {
                     Name = 0.ToString(),
-                    ForeColor = TreeNodeHelper.DefaultForeGroundColor,
-                    BackColor = TreeNodeHelper.DefaultBackGroundColor,
-                    NodeFont = DefaultFont.Clone() as Font,
+                    ForeColor = Constants.Colors.DefaultForeGroundColor,
+                    BackColor = Constants.Colors.DefaultBackGroundColor,
+                    NodeFont = WinFormsConstants.FontDefaults.DefaultFont.Clone() as Font,
                     ToolTipText = TextProcessingHelper.GetToolTipText(taskName)
                 };
-                var treeNodeData = node.GetTreeNodeData();
+                var treeNodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 treeNodeData.AddedNumber = tvTaskList.GetNodeCount(true) + 1;
                 treeNodeData.Urgency = urgency;
                 treeNodeData.Link = link;
@@ -729,16 +748,16 @@ namespace InformationTree.Forms
                     AppendTheCheckedFontStyleToCurrentFontStyle(e, clbStyle, ref newFontStyle, FontStyle.Underline);
                     AppendTheCheckedFontStyleToCurrentFontStyle(e, clbStyle, ref newFontStyle, FontStyle.Strikeout);
 
-                    var font = tvTaskList.SelectedNode.NodeFont ?? tvTaskList.SelectedNode.Parent?.NodeFont ?? DefaultFont;
+                    var font = tvTaskList.SelectedNode.NodeFont ?? tvTaskList.SelectedNode.Parent?.NodeFont ?? WinFormsConstants.FontDefaults.DefaultFont;
                     if (font != null)
                         tvTaskList.SelectedNode.NodeFont = new Font(font.FontFamily, font.Size, newFontStyle);
 
                     var backColor = tvTaskList.SelectedNode.BackColor;
-                    tvTaskList.SelectedNode.BackColor = backColor != null && !backColor.IsEmpty ? backColor : TreeNodeHelper.DefaultBackGroundColor;
+                    tvTaskList.SelectedNode.BackColor = backColor != null && !backColor.IsEmpty ? backColor : Constants.Colors.DefaultBackGroundColor;
                     var foreColor = tvTaskList.SelectedNode.ForeColor;
-                    tvTaskList.SelectedNode.ForeColor = foreColor != null && !foreColor.IsEmpty ? foreColor : TreeNodeHelper.DefaultForeGroundColor;
+                    tvTaskList.SelectedNode.ForeColor = foreColor != null && !foreColor.IsEmpty ? foreColor : Constants.Colors.DefaultForeGroundColor;
 
-                    var nodeData = tvTaskList.SelectedNode.GetTreeNodeData();
+                    var nodeData = tvTaskList.SelectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                     nodeData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(tvTaskList.SelectedNode));
@@ -882,7 +901,7 @@ namespace InformationTree.Forms
             var addedNumberLowerThan = nudShowUntilNumber.Value;
             var addedNumberHigherThan = nudShowFromNumber.Value;
 
-            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(tvTaskList, addedNumberLowerThan, addedNumberHigherThan, 0);
+            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(tvTaskList, addedNumberLowerThan, addedNumberHigherThan, 0, _treeNodeDataCachingService);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -895,7 +914,7 @@ namespace InformationTree.Forms
             var addedNumberLowerThan = nudShowToUrgencyNumber.Value;
             var addedNumberHigherThan = nudShowFromUrgencyNumber.Value;
 
-            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(tvTaskList, addedNumberLowerThan, addedNumberHigherThan, 1);
+            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(tvTaskList, addedNumberLowerThan, addedNumberHigherThan, 1, _treeNodeDataCachingService);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -951,10 +970,17 @@ namespace InformationTree.Forms
             var selectedNode = tvTaskList.SelectedNode;
             if (selectedNode != null)
             {
-                var tagData = selectedNode.GetTreeNodeData();
+                var tagData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                 var data = tagData.Data ?? string.Empty;
                 
-                var form = new PopUpEditForm(_canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _configurationReader, selectedNode.Text, data);
+                var form = new PopUpEditForm(
+                    _canvasFormFactory,
+                    _popUpService,
+                    _encryptionAndSigningProvider,
+                    _configurationReader,
+                    _treeNodeDataCachingService,
+                    selectedNode.Text,
+                    data);
 
                 WinFormsApplication.CenterForm(form, this);
 
@@ -964,7 +990,7 @@ namespace InformationTree.Forms
 
                     if (selectedNode != null)
                     {
-                        var td = selectedNode.GetTreeNodeData();
+                        var td = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                         td.Data = d;
                         
                         var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(d);
@@ -972,13 +998,7 @@ namespace InformationTree.Forms
                             (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
                             (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""));
 
-                        tbTaskName.BackColor = tagData.Data.IsNotEmpty()
-                            ? (
-                                tagData.Link.IsNotEmpty()
-                                ? TreeNodeHelper.DefaultBackGroundColor
-                                : TreeNodeHelper.LinkBackGroundColor
-                            )
-                            : TreeNodeHelper.DataBackGroundColor;
+                        tbTaskName.BackColor = tagData.GetTaskNameColor();
 
                         TreeNodeHelper.TreeUnchanged = false;
                     }
@@ -993,10 +1013,21 @@ namespace InformationTree.Forms
             var node = tvTaskList.SelectedNode;
             if (node != null)
             {
-                var tagData = node.GetTreeNodeData();
+                var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
                 {
-                    TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, tagData.Link, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
+                    var afterSaveDoWithFileName = new Action<string>((fileName) => TreeNodeHelper.FileName = fileName);
+                    var beforeLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.WaitCursor));
+                    var afterLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.Default));
+                    var afterLoad = new Action(() =>
+                    {
+                        tvTaskList.InvokeWrapper(tv => { tv.CollapseAll(); tv.Refresh(); });
+                        TreeNodeHelper.IsSafeToSave = true;
+                        UpdateShowUntilNumber();
+                    });
+                    var currentRoot = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
+
+                    (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, tagData.Link, beforeLoadInside, afterLoadInside, afterLoad);
                 }
             }
             else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
@@ -1031,7 +1062,7 @@ namespace InformationTree.Forms
                 if (node.Nodes.Count == 0 && !useSelectedNode)
                     return;
 
-                var tagData = node.GetTreeNodeData();
+                var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 tagData.Link = tbLink.Text;
 
                 var percentCompleted = 0M;
@@ -1043,18 +1074,19 @@ namespace InformationTree.Forms
                 if (useSelectedNode)
                 {
                     var parentNode = new TreeNode();
-                    TreeNodeHelper.CopyNode(parentNode, node);
+                    TreeNodeHelper.CopyNode(parentNode, node, _treeNodeDataCachingService);
                     treeView.Nodes.Add(parentNode);
                     tagData.Data = null;
                 }
                 else
                 {
-                    TreeNodeHelper.CopyNodes(treeView.Nodes, node.Nodes);
+                    TreeNodeHelper.CopyNodes(treeView.Nodes, node.Nodes, _treeNodeDataCachingService);
                 }
 
                 var auxFileName = TreeNodeHelper.FileName;
                 TreeNodeHelper.FileName = tagData.Link;
-                TreeNodeHelper.SaveTree(treeView, _compressionProvider);
+                var root = treeView.ToTreeNodeData(_treeNodeDataCachingService);
+                _exportTreeToXmlService.SaveTree(root, TreeNodeHelper.FileName);
                 TreeNodeHelper.FileName = auxFileName;
                 node.Nodes.Clear();
             }
@@ -1064,13 +1096,22 @@ namespace InformationTree.Forms
 
         private void btnMoveNode_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.MoveNode(tvTaskList);
+            TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService);
             TreeNodeHelper.TreeUnchanged = false;
         }
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.SaveCurrentTreeAndLoadAnother(this, tvTaskList, null, UpdateShowUntilNumber, _graphicsFileRecursiveGenerator, _soundProvider, _popUpService, _compressionProvider);
+            var afterSaveDoWithFileName = new Action<string>((fileName) => TreeNodeHelper.FileName = fileName);
+            var beforeLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.WaitCursor));
+            var afterLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.Default));
+            var afterLoad = new Action(() => {
+                tvTaskList.InvokeWrapper(tv => { tv.CollapseAll(); tv.Refresh(); });
+                TreeNodeHelper.IsSafeToSave = true;
+                UpdateShowUntilNumber();
+            });
+            var currentRoot = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
+            (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, null, beforeLoadInside, afterLoadInside, afterLoad);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)
@@ -1108,7 +1149,7 @@ namespace InformationTree.Forms
 
                 if (!string.IsNullOrEmpty(searchText))
                 {
-                    TreeNodeHelper.SetStyleForSearch(tvTaskList.Nodes, searchText);
+                    TreeNodeHelper.SetStyleForSearch(tvTaskList.Nodes, searchText, _treeNodeDataCachingService);
                 }
             }
         }
@@ -1142,12 +1183,13 @@ namespace InformationTree.Forms
 
         private void ShowStartupAlertForm()
         {
-            var alertNodes = new TreeNode().Nodes;
-            var haveAlerts = TreeNodeHelper.LoadTreeNodesByCategory(tvTaskList.Nodes, alertNodes, true);
+            var alertNodesRoot = new TreeNodeData();
+            var root = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
+            var haveAlerts = _importTreeFromXmlService.LoadTreeNodesByCategory(root, alertNodesRoot, true);
 
             if (haveAlerts)
             {
-                var form = new StartupAlertForm(alertNodes);
+                var form = new StartupAlertForm(_treeNodeDataCachingService, alertNodesRoot);
                 form.FormClosing += StartupAlertForm_FormClosing;
                 form.ShowDialog();
                 tvTaskList.Refresh();
@@ -1219,7 +1261,7 @@ namespace InformationTree.Forms
 
             if (cbLogChecked && node != null)
             {
-                var nodeData = node.GetTreeNodeData();
+                var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 nodeData.Data += commandData + Environment.NewLine;
 
                 TreeNodeHelper.TreeUnchanged = false;
@@ -1398,9 +1440,9 @@ namespace InformationTree.Forms
         private TreeNodeData ParseTreeRecursively(TreeNode currentNode)
         {
             if (currentNode == null)
-                return new TreeNodeData(string.Empty);
+                return new TreeNodeData();
 
-            var treeNodeData = new TreeNodeData(currentNode.Text);
+            var treeNodeData = new TreeNodeData { Text = currentNode.Text };
 
             if (currentNode.Nodes != null && currentNode.Nodes.Count > 0)
             {

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using InformationTree.Domain.Extensions;
 
 namespace InformationTree.Domain.Entities
 {
@@ -38,51 +38,58 @@ namespace InformationTree.Domain.Entities
 
         #endregion LastChangeDate
 
+        public TreeNodeFont NodeFont { get; set; }
+        public string Name { get; set; }
+        public string BackColorName { get; set; }
+        public string ForeColorName { get; set; }
+        public string ToolTipText { get; set; }
+
+        public bool IsEmptyData
+        {
+            get
+            {
+                return Name.IsEmpty() &&
+                    Data.IsEmpty() &&
+                    ToolTipText.IsEmpty() &&
+                    AddedNumber == 0 &&
+                    AddedDate == null &&
+                    Urgency == 0 &&
+                    Link.IsEmpty() &&
+                    Category.IsEmpty() &&
+                    IsStartupAlert == false &&
+                    PercentCompleted == 0m &&
+                    (NodeFont?.IsEmpty ?? true) &&
+                    BackColorName.IsEmpty() &&
+                    ForeColorName.IsEmpty();
+            }
+        }
+
         #endregion Properties
 
         #region Constructors
 
-        public TreeNodeData(string text, string data = null, int addedNumber = 0, DateTime? addedDate = null, DateTime? lastChangeDate = null, int urgency = 0, string link = null, string category = null, bool isStartupAlert = false, decimal percentCompleted = 0m)
+        public TreeNodeData()
         {
-            Text = text;
-            Data = data;
-            AddedNumber = addedNumber;
-            AddedDate = addedDate;
-            Urgency = urgency;
-            Link = link;
-            Category = category;
-            IsStartupAlert = isStartupAlert;
-            PercentCompleted = percentCompleted;
+            Text = string.Empty;
+            Name = string.Empty;
+            ToolTipText = string.Empty;
         }
 
-        public TreeNodeData(TreeNodeData copy) : this(copy.Text, copy.Data, copy.AddedNumber, copy.AddedDate, copy.LastChangeDate, copy.Urgency, copy.Link, copy.Category, copy.IsStartupAlert, copy.PercentCompleted)
+        public TreeNodeData(TreeNodeData copy) : this()
         {
+            Copy(copy);
         }
 
         #endregion Constructors
 
         #region Methods
 
-        public bool IsEmptyData
-        {
-            get
-            {
-                return string.IsNullOrEmpty(Data) &&
-                    AddedNumber == 0 &&
-                    AddedDate == null &&
-                    Urgency == 0 &&
-                    string.IsNullOrEmpty(Link) &&
-                    string.IsNullOrEmpty(Category) &&
-                    !IsStartupAlert &&
-                    PercentCompleted == 0m;
-            }
-        }
-        
         public void Copy(TreeNodeData from)
         {
             if (from == null)
                 return;
 
+            Name = from.Name;
             Text = from.Text;
             Data = from.Data;
             AddedNumber = from.AddedNumber;
@@ -93,6 +100,9 @@ namespace InformationTree.Domain.Entities
             Category = from.Category;
             IsStartupAlert = from.IsStartupAlert;
             PercentCompleted = from.PercentCompleted;
+            NodeFont = from.NodeFont?.Clone();
+            BackColorName = from.BackColorName;
+            ForeColorName = from.ForeColorName;
 
             Children.Clear();
 
@@ -100,11 +110,18 @@ namespace InformationTree.Domain.Entities
             {
                 foreach (var child in from.Children)
                 {
-                    var newChild = new TreeNodeData(child.Text);
+                    var newChild = new TreeNodeData();
                     newChild.Copy(child);
                     Children.Add(newChild);
                 }
             }
+        }
+
+        public TreeNodeData Clone()
+        {
+            var clone = new TreeNodeData();
+            clone.Copy(this);
+            return clone;
         }
 
         #endregion Methods

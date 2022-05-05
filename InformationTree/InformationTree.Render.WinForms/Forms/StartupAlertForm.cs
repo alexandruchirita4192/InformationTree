@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using InformationTree.Domain.Entities;
+using InformationTree.Domain.Services;
+using InformationTree.Render.WinForms.Extensions;
 
 namespace InformationTree.Forms
 {
@@ -13,15 +16,15 @@ namespace InformationTree.Forms
             }
         }
 
-        public StartupAlertForm(TreeNodeCollection treeNodes = null)
+        public StartupAlertForm(ITreeNodeDataCachingService treeNodeDataCachingService, TreeNodeData treeNodeData = null)
         {
             InitializeComponent();
 
-            if (treeNodes != null && tvAlertCategoryAndTasks != null && tvAlertCategoryAndTasks.Nodes != null)
+            if (treeNodeData != null && tvAlertCategoryAndTasks?.Nodes != null)
             {
                 tvAlertCategoryAndTasks.Nodes.Add(new TreeNode("None"));
-                foreach (TreeNode node in treeNodes)
-                    tvAlertCategoryAndTasks.Nodes.Add(node);
+                foreach (TreeNodeData child in treeNodeData.Children)
+                    tvAlertCategoryAndTasks.Nodes.Add(child.ToTreeNode(treeNodeDataCachingService, false));
             }
 
             StartPosition = FormStartPosition.CenterScreen;
@@ -29,11 +32,7 @@ namespace InformationTree.Forms
 
         private void btnSelectTaskOrCategory_Click(object sender, EventArgs e)
         {
-            this.Close();
-        }
-
-        private void StartupAlertForm_KeyUp(object sender, KeyEventArgs e)
-        {
+            Close();
         }
     }
 }

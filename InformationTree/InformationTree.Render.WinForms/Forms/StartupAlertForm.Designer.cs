@@ -65,7 +65,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "StartupAlertForm";
             this.Text = "Startup alert window";
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.StartupAlertForm_KeyUp);
             this.ResumeLayout(false);
 
         }

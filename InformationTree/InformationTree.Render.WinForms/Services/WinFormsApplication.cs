@@ -23,6 +23,10 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly ICompressionProvider _compressionProvider;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly IImportTreeFromXmlService _importTreeFromXmlService;
+        private readonly IExportTreeToXmlService _exportTreeToXmlService;
+        private readonly IImportExportTreeXmlService _importExportTreeXmlService;
 
         public WinFormsApplication(
             IConfigurationReader configurationReader,
@@ -32,7 +36,11 @@ namespace InformationTree.Render.WinForms.Services
             ICanvasFormFactory canvasFormFactory,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             ICompressionProvider compressionProvider,
-            IExportNodeToRtfService exportNodeToRtfService)
+            IExportNodeToRtfService exportNodeToRtfService,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            IImportTreeFromXmlService importTreeFromXmlService,
+            IExportTreeToXmlService exportTreeToXmlService,
+            IImportExportTreeXmlService importExportTreeXmlService)
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
@@ -42,6 +50,10 @@ namespace InformationTree.Render.WinForms.Services
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _compressionProvider = compressionProvider;
             _exportNodeToRtfService = exportNodeToRtfService;
+            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _importTreeFromXmlService = importTreeFromXmlService;
+            _exportTreeToXmlService = exportTreeToXmlService;
+            _importExportTreeXmlService = importExportTreeXmlService;
         }
 
         #region extern
@@ -177,7 +189,20 @@ namespace InformationTree.Render.WinForms.Services
                 AutoSaveTimer.Tick -= AutoSaveTimer_Tick;
             };
 
-            Application.Run(MainForm = new MainForm(_soundProvider, _graphicsFileRecursiveGenerator, _canvasFormFactory, _popUpService, _encryptionAndSigningProvider, _compressionProvider, _configurationReader, _exportNodeToRtfService));
+            Application.Run(MainForm = new MainForm(
+                _soundProvider,
+                _graphicsFileRecursiveGenerator,
+                _canvasFormFactory,
+                _popUpService,
+                _encryptionAndSigningProvider,
+                _compressionProvider,
+                _configurationReader,
+                _exportNodeToRtfService,
+                _treeNodeDataCachingService,
+                _importTreeFromXmlService,
+                _exportTreeToXmlService,
+                _importExportTreeXmlService
+                ));
         }
 
         private static void AutoSaveTimer_Tick(object sender, EventArgs e)

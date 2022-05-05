@@ -16,6 +16,7 @@ namespace InformationTree.Forms
 
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionProvider _encryptionAndSigningProvider;
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
 
         #endregion Fields
 
@@ -42,12 +43,17 @@ namespace InformationTree.Forms
             mtbPgpDecrypt.PasswordChar = '#';
         }
 
-        public PgpDecrypt(IPopUpService popUpService, IPGPEncryptionProvider encryptionAndSigningProvider, bool fromFile)
+        public PgpDecrypt(
+            IPopUpService popUpService,
+            IPGPEncryptionProvider encryptionAndSigningProvider,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            bool fromFile)
             : this()
         {
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
-
+            _treeNodeDataCachingService = treeNodeDataCachingService;
+            
             DecryptFromFile = fromFile;
 
             if (DecryptFromFile)
@@ -90,13 +96,13 @@ namespace InformationTree.Forms
             {
                 var textToFind = form.TextToFind;
 
-                if (WinFormsApplication.MainForm == null || WinFormsApplication.MainForm.TaskList == null || WinFormsApplication.MainForm.TaskList.Nodes == null)
+                if (WinFormsApplication.MainForm?.TaskList?.Nodes == null)
                     return;
 
-                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind);
+                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind, _treeNodeDataCachingService);
                 if (node != null)
                 {
-                    var nodeData = node.GetTreeNodeData();
+                    var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
                     if (nodeData != null)
                     {
                         PgpPrivateKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);

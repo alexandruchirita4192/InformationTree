@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Web;
 using System.Windows.Forms;
-using System.Xml;
-using InformationTree.Domain.Entities;
-using InformationTree.Domain.Extensions;
+using InformationTree.Domain;
 using InformationTree.Domain.Services;
-using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
+using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.TextProcessing;
 using NLog;
@@ -24,92 +19,6 @@ namespace InformationTree.Tree
     public static class TreeNodeHelper
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        #region Constants
-
-        #region Colors
-
-        public static Color DefaultBackGroundColor = Color.White;
-        public static Color DefaultForeGroundColor = Color.Black;
-
-        public static Color BackGroundColorSearch = Color.SlateGray;
-        public static Color ForeGroundColorSearch = Color.LightBlue;
-
-        public static Color ExceptionColor = Color.Red;
-
-        public static Color LinkBackGroundColor = Color.DarkCyan;
-
-        public static Color DataBackGroundColor = Color.FromArgb(200, 200, 200);
-
-        #endregion Colors
-
-        #region XML Attributes
-
-        private const string XmlAttrText = "text";
-        private const string XmlAttrName = "name";
-        private const string XmlAttrBold = "bold";
-        private const string XmlAttrItalic = "italic";
-        private const string XmlAttrUnderline = "underline";
-        private const string XmlAttrStrikeout = "strikeout";
-        private const string XmlAttrForegroundColor = "foreground";
-        private const string XmlAttrBackgroundColor = "background";
-        private const string XmlAttrFontFamily = "fontFamily";
-        private const string XmlAttrFontSize = "fontSize";
-        private const string XmlAttrAddedNumber = "addedNumber";
-        private const string XmlAttrAddedDate = "addedDate";
-        private const string XmlAttrLastChangeDate = "lastChangeDate";
-        private const string XmlAttrUrgency = "urgency";
-        private const string XmlAttrLink = "link";
-        private const string XmlAttrCategory = "category";
-        private const string XmlAttrIsStartupAlert = "isStartupAlert";
-
-        private const string XmlAttrData = "data";
-
-        private const string XmlAttrPercentCompleted = "percentCompleted";
-
-        #region Old XML Attribute Names
-
-        private static List<string> XmlAttrForegroundColorAcceptedList
-        {
-            get
-            {
-                return new List<string> { XmlAttrForegroundColor, "foreColor", "color" };
-            }
-        }
-
-        private static List<string> XmlAttrBackgroundColorAcceptedList
-        {
-            get
-            {
-                return new List<string> { XmlAttrBackgroundColor, "backColor" };
-            }
-        }
-
-        private static List<string> XmlAttrUrgencyAcceptedList
-        {
-            get
-            {
-                return new List<string> { XmlAttrUrgency, "attrUrgency" };
-            }
-        }
-
-        private static List<string> XmlAttrLinkAcceptedList
-        {
-            get
-            {
-                return new List<string> { XmlAttrLink, "attrLink" };
-            }
-        }
-
-        #endregion Old XML Attribute Names
-
-        #endregion XML Attributes
-
-        // TODO: Create some datetime parsing service that tries both parsing formats and use it everywhere those 2 constants are used
-        public const string DateTimeFormatSeparatedWithDot = "dd.MM.yyyy HH:mm:ss";
-        public const string DateTimeFormatSeparatedWithSlash = "dd/MM/yyyy HH:mm:ss";
-
-        #endregion Constants
 
         #region Properties
 
@@ -123,7 +32,7 @@ namespace InformationTree.Tree
             {
                 if (!string.IsNullOrEmpty(fileName))
                     return fileName;
-                return "Data.xml";
+                return "Data.xml"; // TODO: Move to constants
             }
             set
             {
@@ -133,6 +42,7 @@ namespace InformationTree.Tree
 
         #endregion FileName
 
+        // TODO: Create a new class for keeping state of the tree
         public static bool IsSafeToSave;
         public static bool ReadOnlyState;
 
@@ -148,7 +58,7 @@ namespace InformationTree.Tree
             {
                 if (_treeUnchanged != value)
                 {
-                    File.AppendAllText("TreeUnchangedIssue", $"Tree unchanged set as {value} was called by {new StackTrace()} at {DateTime.Now}");
+                    File.AppendAllText("TreeUnchangedIssue.txt", $"Tree unchanged set as {value} was called by {new StackTrace()} at {DateTime.Now}");
                     _treeUnchanged = value;
 
                     if (TreeUnchangedChangeDelegate != null)
@@ -157,550 +67,18 @@ namespace InformationTree.Tree
             }
         }
 
-        public static bool TreeSaved { get; private set; }
-        public static DateTime TreeSavedAt { get; private set; }
+        public static bool TreeSaved { get; set; }
+        public static DateTime TreeSavedAt { get; set; }
 
         public static Action<bool> TreeUnchangedChangeDelegate;
 
         public static int TreeNodeCounter = 0;
-        private static StreamWriter streamWriter;
         private static TreeNodeCollection nodes;
 
         private static TreeNode currentSelection;
         private static TreeNode oldSelection;
 
         #endregion Properties
-
-        #region Fix Tree
-
-        public static bool TreeNodesNeedFix(TreeNodeCollection nodes)
-        {
-            foreach (TreeNode tn in nodes)
-            {
-                var tagTreeNodeData = tn.GetTreeNodeData();
-                if (tagTreeNodeData == null || tagTreeNodeData.AddedNumber == 0)
-                    return true;
-
-                if (TreeNodesNeedFix(tn.Nodes))
-                    return true;
-            }
-            return false;
-        }
-
-        public static void FixTreeNodes(TreeNodeCollection nodes)
-        {
-            foreach (TreeNode tn in nodes)
-            {
-                var tagTreeNodeData = tn.GetTreeNodeData();
-                if (tagTreeNodeData.AddedDate == null)
-                    tagTreeNodeData.AddedDate = DateTime.Now;
-                tagTreeNodeData.AddedNumber = TreeNodeCounter;
-                TreeNodeCounter++;
-
-                FixTreeNodes(tn.Nodes);
-            }
-        }
-
-        public static void FixTreeNodesAndResetCounter(TreeNodeCollection nodes)
-        {
-            if (TreeNodesNeedFix(nodes))
-            {
-                TreeNodeCounter = 1;
-                FixTreeNodes(nodes);
-            }
-        }
-
-        #endregion Fix Tree
-
-        #region Load
-
-        public static DateTime? StringToDateTime(string s)
-        {
-            var convertedDateTime = (DateTime?)null;
-            if (!string.IsNullOrEmpty(s))
-            {
-                try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithDot, CultureInfo.InvariantCulture); } catch (Exception ex) { _logger.Error(ex); }
-                if (convertedDateTime == null)
-                    try { convertedDateTime = DateTime.ParseExact(s, DateTimeFormatSeparatedWithSlash, CultureInfo.InvariantCulture); } catch (Exception ex) { _logger.Error(ex); }
-                if (convertedDateTime == null)
-                    try { convertedDateTime = DateTime.Parse(s); } catch (Exception ex) { _logger.Error(ex); }
-            }
-            return convertedDateTime;
-        }
-
-        public static Color? StringToColor(string s)
-        {
-            var convertedColor = (Color?)null;
-            if (!string.IsNullOrEmpty(s))
-                convertedColor = Color.FromName(s);
-            return convertedColor;
-        }
-
-        public static bool LoadTree(Form t, TreeView tv, string fileName, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService, ICompressionProvider compressionProvider)
-        {
-            var fileNameExists = File.Exists(fileName);
-            if (fileNameExists)
-            {
-                var result = popUpService.ShowCancelableQuestion($"Use default XML file {fileName}?", "Choose data file");
-                if (result == PopUpResult.Yes)
-                {
-                    FileName = fileName;
-                    LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider, compressionProvider);
-                    return true;
-                }
-                else if (result == PopUpResult.Cancel)
-                {
-                    if (fileNameExists)
-                        FileName = GetNewFileName(fileName, popUpService);
-                    return false;
-                }
-            }
-
-            var selectedFile = popUpService.GetXmlDataFile(fileName, fileNameExists);
-            if (!string.IsNullOrWhiteSpace(selectedFile))
-            {
-                FileName = selectedFile;
-                LoadXML(t, tv, graphicsFileRecursiveGenerator, soundProvider, compressionProvider);
-                return true;
-            }
-
-            if (fileNameExists)
-                FileName = GetNewFileName(fileName, popUpService);
-
-            return true;
-        }
-
-        private static string GetNewFileName(string fileName, IPopUpService popUpService)
-        {
-            var fileNameExists = File.Exists(fileName);
-            if (!fileNameExists)
-                return fileName;
-            var extension = Path.GetExtension(fileName);
-            if (extension == ".xml")
-                return GetNewFileName($"{fileName}.1", popUpService);
-            else
-            {
-                try
-                {
-                    extension = extension.Replace(".", "");
-                    var newIteration = int.Parse(extension) + 1;
-                    return GetNewFileName(fileName.Replace(extension, newIteration.ToString()), popUpService);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex);
-                    popUpService.ShowError($"Error while trying to get new file name from file name '{fileName}'. Error occured: {ex.Message}");
-                }
-            }
-            return null;
-        }
-
-        #region CopyNode, CopyNodes
-
-        public static void CopyNodes(TreeNodeCollection to, TreeNodeCollection from, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
-        {
-            if (from == null)
-                throw new Exception("from is null");
-
-            if (to == null)
-                throw new Exception("to is null");
-
-            foreach (TreeNode node in from)
-                CopyNode(to, node, addedNumberHigherThan, addedNumberLowerThan, type);
-        }
-
-        public static void CopyNode(TreeNodeCollection to, TreeNode from, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
-        {
-            if (from == null)
-                throw new Exception("from is null");
-
-            if (to == null)
-                throw new Exception("to is null");
-
-            var node = new TreeNode();
-            CopyNode(node, from, addedNumberHigherThan, addedNumberLowerThan, type);
-
-            if ((addedNumberLowerThan == null && addedNumberHigherThan == null) || (addedNumberLowerThan != null && addedNumberHigherThan != null))
-                to.Add(node);
-        }
-
-        public static void CopyNode(TreeNode to, TreeNode from, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1) // TODO: Change type to an enum explaining clearly what it means
-        {
-            if (from == null)
-                throw new Exception("from is null");
-
-            if (to == null)
-                throw new Exception("to is null");
-
-            if (to.Nodes == null)
-                throw new Exception("to.Nodes is null");
-
-            var tagData = from.GetTreeNodeData();
-            if ((type == 0) && (tagData.AddedNumber >= addedNumberLowerThan) || (tagData.AddedNumber < addedNumberHigherThan))
-                return;
-            else if ((type == 1) && (tagData.Urgency >= addedNumberLowerThan) || (tagData.Urgency < addedNumberHigherThan))
-                return;
-
-            var toTag = to.GetTreeNodeData();
-            toTag.Copy(tagData);
-
-            to.Text = from.Text;
-            to.Name = from.Name;
-
-            var font = from.NodeFont;
-            to.NodeFont = font != null ? new Font(font.FontFamily, font.SizeInPoints, font.Style) : MainForm.DefaultFont;
-
-            to.ForeColor = from.ForeColor.IsEmpty ? DefaultForeGroundColor : from.ForeColor;
-            to.BackColor = from.BackColor.IsEmpty ? DefaultBackGroundColor : from.BackColor;
-
-            foreach (TreeNode node in from.Nodes)
-                CopyNode(to.Nodes, node, addedNumberHigherThan, addedNumberLowerThan, type);
-        }
-
-        #endregion CopyNode, CopyNodes
-
-        // TODO: This could be a TreeNode builder (with a TreeNodeData builder too)
-        public static TreeNode GetNewNodeFromTextNameAttr(XmlAttributeCollection attributes, ICompressionProvider compressionProvider)
-        {
-            var attrText = String.Empty;
-            var attrName = String.Empty;
-            var attrBold = false;
-            var attrItalic = false;
-            var attrUnderline = false;
-            var attrStrikeout = false;
-            var attrForegroundColor = DefaultForeGroundColor.Name;
-            var attrBackgroundColor = DefaultBackGroundColor.Name;
-            var attrFontFamily = FontFamily.GenericSansSerif; // Microsoft Sans Serif
-            var attrFontSize = 8.5F;
-            var attrPercentCompleted = 0.0M;
-            var attrData = string.Empty;
-            var attrAddedNumber = 0;
-            var attrAddedDate = (DateTime?)null;
-            var attrLastChangeDate = (DateTime?)null;
-            var attrUrgency = 0;
-            var attrLink = string.Empty;
-            var attrCategory = string.Empty;
-            var attrIsStartupAlert = false;
-
-            foreach (XmlAttribute attr in attributes)
-            {
-                if (attr.Name == XmlAttrText)
-                    attrText = HttpUtility.HtmlDecode(attr.Value);
-                else if (attr.Name == XmlAttrName)
-                    attrName = HttpUtility.HtmlDecode(attr.Value);
-                else if (attr.Name == XmlAttrBold)
-                    attrBold = true;
-                else if (attr.Name == XmlAttrItalic)
-                    attrItalic = true;
-                else if (attr.Name == XmlAttrUnderline)
-                    attrUnderline = true;
-                else if (attr.Name == XmlAttrStrikeout)
-                    attrStrikeout = true;
-                else if (XmlAttrForegroundColorAcceptedList.Contains(attr.Name))
-                    attrForegroundColor = HttpUtility.HtmlDecode(attr.Value);
-                else if (XmlAttrBackgroundColorAcceptedList.Contains(attr.Name))
-                    attrBackgroundColor = HttpUtility.HtmlDecode(attr.Value);
-                else if (attr.Name == XmlAttrFontFamily)
-                    attrFontFamily = FontFamily.Families.FirstOrDefault(f => f.Name == HttpUtility.HtmlDecode(attr.Value)) ?? FontFamily.GenericSansSerif;
-                else if (attr.Name == XmlAttrFontSize)
-                    attrFontSize = float.Parse(HttpUtility.HtmlDecode(attr.Value));
-                else if (attr.Name == XmlAttrPercentCompleted)
-                    attrPercentCompleted = decimal.Parse(HttpUtility.HtmlDecode(attr.Value));
-                else if (attr.Name == XmlAttrData)
-                    attrData = HttpUtility.HtmlDecode(compressionProvider.Decompress(attr.Value));
-                else if (attr.Name == XmlAttrAddedNumber && int.TryParse(HttpUtility.HtmlDecode(attr.Value), out var addedNumber))
-                    attrAddedNumber = addedNumber;
-                else if (attr.Name == XmlAttrAddedDate)
-                    attrAddedDate = StringToDateTime(HttpUtility.HtmlDecode(attr.Value));
-                else if (attr.Name == XmlAttrLastChangeDate)
-                    attrLastChangeDate = StringToDateTime(HttpUtility.HtmlDecode(attr.Value));
-                else if (XmlAttrUrgencyAcceptedList.Contains(attr.Name) && int.TryParse(HttpUtility.HtmlDecode(attr.Value), out var urgency))
-                    attrUrgency = urgency;
-                else if (XmlAttrLinkAcceptedList.Contains(attr.Name))
-                    attrLink = HttpUtility.HtmlDecode(attr.Value);
-                else if (attr.Name == XmlAttrCategory)
-                    attrCategory = HttpUtility.HtmlDecode(attr.Value);
-                else if (attr.Name == XmlAttrIsStartupAlert && bool.TryParse(HttpUtility.HtmlDecode(attr.Value), out var isStartupAlert))
-                    attrIsStartupAlert = isStartupAlert;
-            }
-
-            var newStyle = (attrBold ? FontStyle.Bold : FontStyle.Regular) |
-                (attrItalic ? FontStyle.Italic : FontStyle.Regular) |
-                (attrUnderline ? FontStyle.Underline : FontStyle.Regular) |
-                (attrStrikeout ? FontStyle.Strikeout : FontStyle.Regular);
-
-            var background = StringToColor(attrBackgroundColor) ?? DefaultBackGroundColor;
-            var foreground = StringToColor(attrForegroundColor) ?? DefaultForeGroundColor;
-
-            if (attrText != null)
-                attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
-
-            var treeNodeData = !string.IsNullOrEmpty(attrData) || attrAddedDate != null || attrLastChangeDate != null || attrAddedNumber != 0 || !string.IsNullOrEmpty(attrLink) || attrUrgency != 0 || !string.IsNullOrEmpty(attrCategory)
-                ? new TreeNodeData(attrText, attrData, attrAddedNumber, attrAddedDate, attrLastChangeDate, attrUrgency, attrLink, attrCategory, attrIsStartupAlert)
-                : null;
-            var attrDataStripped = treeNodeData != null ? RicherTextBox.Controls.RicherTextBox.StripRTF(treeNodeData.Data) : null;
-
-            var node = new TreeNode(attrText)
-            {
-                Name = attrName,
-                NodeFont = new Font(attrFontFamily, attrFontSize, newStyle),
-                BackColor = background,
-                ForeColor = foreground,
-                Tag = treeNodeData,
-                ToolTipText = TextProcessingHelper.GetToolTipText(attrText +
-                    (attrName.IsNotEmpty() && attrName != "0" ? $"{Environment.NewLine} TimeSpent: {attrName}" : "") +
-                    (attrDataStripped.IsNotEmpty() ? $"{Environment.NewLine} Data: {attrDataStripped}" : ""))
-            };
-            return node;
-        }
-
-        // TODO: Extract loading and saving XML to separate class
-        public static void LoadXML(Form t, TreeView tv, IGraphicsFileFactory graphicsFileRecursiveGenerator , ISoundProvider soundProvider, ICompressionProvider compressionProvider)
-        {
-            try
-            {
-                t.Cursor = Cursors.WaitCursor;
-                SplashForm.ShowDefaultSplashScreen(graphicsFileRecursiveGenerator);
-                XmlDocument xDoc = new XmlDocument();
-                xDoc.Load(FileName);
-
-                tv.Nodes.Clear();
-                if (xDoc.HasChildNodes)
-                {
-                    foreach (XmlElement child in xDoc.DocumentElement.ChildNodes)
-                    {
-                        var newNode = TreeNodeHelper.GetNewNodeFromTextNameAttr(child.Attributes, compressionProvider);
-                        tv.Nodes.Add(newNode);
-
-                        if (child.HasChildNodes)
-                            LoadTreeNodes(child, newNode, compressionProvider);
-                    }
-                }
-                tv.ExpandAll();
-            }
-            finally
-            {
-                SplashForm.CloseForm();
-                t.Cursor = Cursors.Default;
-                soundProvider.PlaySystemSound(4);
-            }
-        }
-
-        public static void LoadTreeNodes(XmlNode xmlNode, TreeNode treeNode, ICompressionProvider compressionProvider)
-        {
-            if (xmlNode.HasChildNodes)
-                foreach (XmlElement child in xmlNode.ChildNodes)
-                {
-                    var newNode = TreeNodeHelper.GetNewNodeFromTextNameAttr(child.Attributes, compressionProvider);
-                    treeNode.Nodes.Add(newNode);
-                    if (child.HasChildNodes)
-                        LoadTreeNodes(child, newNode, compressionProvider);
-                }
-        }
-
-        public static bool LoadTreeNodesByCategory(TreeNodeCollection from, TreeNodeCollection to, bool includeOnlyWithStartupAlert, Dictionary<string, TreeNode> categories = null)
-        {
-            if (from == null || to == null || from.Count == 0)
-                return false;
-
-            if (categories == null || categories.Count == 0)
-                to.Clear();
-
-            if (categories == null)
-                categories = new Dictionary<string, TreeNode>();
-
-            foreach (TreeNode node in from)
-            {
-                var nodeData = node.GetTreeNodeData();
-                if (nodeData != null && !string.IsNullOrEmpty(nodeData.Category) && ((includeOnlyWithStartupAlert && nodeData.IsStartupAlert) || (!includeOnlyWithStartupAlert)))
-                {
-                    if (!categories.ContainsKey(nodeData.Category))
-                        categories.Add(nodeData.Category, new TreeNode(nodeData.Category));
-                    categories[nodeData.Category].Nodes.Add(node.Clone() as TreeNode);
-                }
-                else if (nodeData != null && string.IsNullOrEmpty(nodeData.Category) && (includeOnlyWithStartupAlert && nodeData.IsStartupAlert))
-                {
-                    if (!categories.ContainsKey(string.Empty))
-                        categories.Add(string.Empty, new TreeNode(nodeData.Category));
-                    categories[string.Empty].Nodes.Add(node.Clone() as TreeNode);
-                }
-
-                if (node.Nodes.Count > 0)
-                    LoadTreeNodesByCategory(node.Nodes, to, includeOnlyWithStartupAlert, categories);
-            }
-
-            foreach (var key in categories.Keys.OrderBy(c => c))
-            {
-                if (!to.OfType<TreeNode>().Any(e => e.Text == key))
-                    to.Add(categories[key]);
-
-                //foreach(TreeNode child in categories[key].Nodes)
-                //{
-                //    var n = to.OfType<TreeNode>().First(e => e.Text == key);
-
-                //    var exists = n.Nodes.OfType<TreeNode>().First(e => e.Text == child.Text);
-                //    if(exists == null)
-                //        n.Nodes.Add(child);
-                //}
-            }
-
-            return categories.Count > 0;
-        }
-
-        #endregion Load
-
-        #region Save
-
-        public static string DateTimeToString(DateTime? dt)
-        {
-            var convertedString = (String)null;
-            if (dt.HasValue)
-                convertedString = dt.Value.ToString(DateTimeFormatSeparatedWithDot);
-            return convertedString;
-        }
-
-        public static void SaveTree(TreeView tv, ICompressionProvider compressionProvider)
-        {
-            if (ReadOnlyState)
-            {
-                tv.Nodes.Clear();
-                CopyNodes(nodes, tv.Nodes, null, null);
-            }
-
-            if (IsSafeToSave && !TreeUnchanged)
-            {
-                streamWriter = new StreamWriter(FileName, false, System.Text.Encoding.UTF8);
-                //Write the header
-                streamWriter.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
-                //Write our root node
-                streamWriter.WriteLine("<root>");
-                SaveNode(tv.Nodes, compressionProvider, 1);
-                streamWriter.WriteLine("</root>");
-                streamWriter.Close();
-
-                TreeUnchanged = true;
-                TreeSaved = true;
-                TreeSavedAt = DateTime.Now;
-            }
-        }
-
-        public static string GetTabsByIndent(int indent)
-        {
-            string tabs = String.Empty;
-            for (int i = 0; i < indent; i++)
-                tabs += "\t";
-            return tabs;
-        }
-
-        private static string GetXmlAttributeText(string attribute, string value, bool spaceAfterAttribute = false, string emptyValue = null)
-        {
-            return
-                (string.IsNullOrEmpty(value) || value == emptyValue) ?
-                string.Empty :
-                (attribute + "=\"" + HttpUtility.HtmlEncode(value) + "\"" + (spaceAfterAttribute ? " " : string.Empty));
-        }
-
-        public static void SaveNode(TreeNodeCollection tnc, ICompressionProvider compressionProvider, int indentTabs = 1)
-        {
-            foreach (TreeNode node in tnc)
-            {
-                var attrBold = false;
-                var attrItalic = false;
-                var attrUnderline = false;
-                var attrStrikeout = false;
-
-                if (node.NodeFont != null)
-                {
-                    attrBold = node.NodeFont.Bold;
-                    attrItalic = node.NodeFont.Italic;
-                    attrUnderline = node.NodeFont.Underline;
-                    attrStrikeout = node.NodeFont.Strikeout;
-                }
-
-                var tag = node.GetTreeNodeData();
-                var attrForegroundColor = node.ForeColor != null && node.ForeColor.Name != null ? node.ForeColor.Name : string.Empty;
-                var attrBackgroundColor = node.BackColor != null && node.BackColor.Name != null ? node.BackColor.Name : string.Empty;
-                var attrFontFamily = node.NodeFont != null && node.NodeFont.FontFamily != null && node.NodeFont.FontFamily.Name != null && node.NodeFont.FontFamily.Name != FontFamily.GenericSansSerif.Name ? node.NodeFont.FontFamily.Name : string.Empty;
-                var attrFontSize = node.NodeFont != null ? node.NodeFont.Size.ToString() : string.Empty;
-                var attrText = node.Text;
-                var attrPercentCompleted = tag == null ? 0.0M : tag.PercentCompleted;
-                var attrData = tag == null ? string.Empty : compressionProvider.Compress(tag.Data);
-                var attrAddedNumber = tag == null ? 0 : tag.AddedNumber;
-                var attrAddedDate = (DateTime?)(tag == null ? (DateTime?)null : (DateTime?)tag.AddedDate);
-                var attrLastChangeDate = (DateTime?)(tag == null ? (DateTime?)null : (DateTime?)tag.LastChangeDate);
-                var attrUrgency = (int?)(tag == null ? (int?)null : (int?)tag.Urgency);
-                var attrLink = (string)(tag == null || string.IsNullOrEmpty(tag.Link) ? (string)null : tag.Link);
-                var attrCategory = (string)(tag == null ? (string)null : (string)tag.Category);
-                var attrIsStartupAlert = (bool?)(tag == null ? (bool?)null : (bool?)tag.IsStartupAlert);
-
-                if (attrText != null)
-                    attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
-
-                var tagNodeLine = GetTabsByIndent(indentTabs) +
-                    @"<node " +
-                        GetXmlAttributeText(XmlAttrText, attrText, true) +
-                        GetXmlAttributeText(XmlAttrName, node.Name, true, "0") +
-                        GetXmlAttributeText(XmlAttrBold, attrBold.ToString(), true, false.ToString()) +
-                        GetXmlAttributeText(XmlAttrItalic, attrItalic.ToString(), true, false.ToString()) +
-                        GetXmlAttributeText(XmlAttrUnderline, attrUnderline.ToString(), true, false.ToString()) +
-                        GetXmlAttributeText(XmlAttrStrikeout, attrStrikeout.ToString(), true, false.ToString()) +
-                        GetXmlAttributeText(XmlAttrForegroundColor, attrForegroundColor, true, DefaultForeGroundColor.Name) +
-                        GetXmlAttributeText(XmlAttrBackgroundColor, attrBackgroundColor, true, DefaultBackGroundColor.Name) +
-                        GetXmlAttributeText(XmlAttrFontFamily, attrFontFamily, true) +
-                        GetXmlAttributeText(XmlAttrFontSize, attrFontSize, true, 8.5F.ToString()) +
-                        GetXmlAttributeText(XmlAttrData, attrData, true) +
-                        GetXmlAttributeText(XmlAttrAddedDate, attrAddedDate.HasValue ? ((DateTime)attrAddedDate).ToString(DateTimeFormatSeparatedWithDot) : null, true) +
-                        GetXmlAttributeText(XmlAttrLastChangeDate, ((attrAddedDate.HasValue && attrLastChangeDate.HasValue && attrAddedDate.Value != attrLastChangeDate.Value) || (!attrLastChangeDate.HasValue)) ? ((DateTime)attrLastChangeDate).ToString(DateTimeFormatSeparatedWithDot) : null, true) +
-                        GetXmlAttributeText(XmlAttrAddedNumber, attrAddedNumber.ToString(), true) +
-                        GetXmlAttributeText(XmlAttrUrgency, attrUrgency.HasValue ? attrUrgency.ToString() : null, true, "0") +
-                        GetXmlAttributeText(XmlAttrLink, attrLink, true) +
-                        GetXmlAttributeText(XmlAttrPercentCompleted, attrPercentCompleted.ToString(), true, "0.0") +
-                        GetXmlAttributeText(XmlAttrCategory, attrCategory, true) +
-                        GetXmlAttributeText(XmlAttrIsStartupAlert, attrIsStartupAlert.HasValue ? attrIsStartupAlert.ToString() : null, true, false.ToString());
-
-                if (streamWriter == null)
-                    throw new Exception("StreamWriter \"streamWriter\" is null");
-
-                if (node.Nodes.Count > 0)
-                {
-                    tagNodeLine = tagNodeLine.Substring(0, tagNodeLine.Length - 1) + ">"; // remove a space before ">"
-                    streamWriter.WriteLine(tagNodeLine);
-                    SaveNode(node.Nodes, compressionProvider, indentTabs + 1);
-                    streamWriter.WriteLine(GetTabsByIndent(indentTabs) + "</node>");
-                }
-                else
-                {
-                    tagNodeLine += @"/>";
-                    streamWriter.WriteLine(tagNodeLine);
-                }
-            }
-        }
-
-        #endregion Save
-
-        #region Load & save
-
-        public static void SaveCurrentTreeAndLoadAnother(Form t, TreeView tv, string fileName, Action updateShowUntilNumber, IGraphicsFileFactory graphicsFileRecursiveGenerator, ISoundProvider soundProvider, IPopUpService popUpService, ICompressionProvider compressionProvider)
-        {
-            SaveTree(tv, compressionProvider);
-            FileName = fileName;
-            LoadTree(t, tv, FileName, graphicsFileRecursiveGenerator, soundProvider, popUpService, compressionProvider);
-            tv.CollapseAll();
-            tv.Refresh();
-
-            IsSafeToSave = true;
-
-            if (TreeNodesNeedFix(tv.Nodes))
-            {
-                TreeNodeCounter = 1;
-                FixTreeNodes(tv.Nodes);
-            }
-
-            if (updateShowUntilNumber != null)
-                updateShowUntilNumber();
-        }
-
-        #endregion Load & save
 
         #region Node update
 
@@ -729,6 +107,70 @@ namespace InformationTree.Tree
         }
 
         #endregion Node update
+
+        #region CopyNode, CopyNodes
+
+        public static void CopyNodes(TreeNodeCollection to, TreeNodeCollection from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
+        {
+            if (from == null)
+                throw new Exception("from is null");
+
+            if (to == null)
+                throw new Exception("to is null");
+
+            foreach (TreeNode node in from)
+                CopyNode(to, node, treeNodeDataCachingService, addedNumberHigherThan, addedNumberLowerThan, type);
+        }
+
+        public static void CopyNode(TreeNodeCollection to, TreeNode from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
+        {
+            if (from == null)
+                throw new Exception("from is null");
+
+            if (to == null)
+                throw new Exception("to is null");
+
+            var node = new TreeNode();
+            CopyNode(node, from, treeNodeDataCachingService, addedNumberHigherThan, addedNumberLowerThan, type);
+
+            if ((addedNumberLowerThan == null && addedNumberHigherThan == null) || (addedNumberLowerThan != null && addedNumberHigherThan != null))
+                to.Add(node);
+        }
+
+        public static void CopyNode(TreeNode to, TreeNode from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1) // TODO: Change type to an enum explaining clearly what it means
+        {
+            if (from == null)
+                throw new Exception("from is null");
+
+            if (to == null)
+                throw new Exception("to is null");
+
+            if (to.Nodes == null)
+                throw new Exception("to.Nodes is null");
+
+            var tagData = from.ToTreeNodeData(treeNodeDataCachingService);
+            if ((type == 0) && (tagData.AddedNumber >= addedNumberLowerThan) || (tagData.AddedNumber < addedNumberHigherThan))
+                return;
+            else if ((type == 1) && (tagData.Urgency >= addedNumberLowerThan) || (tagData.Urgency < addedNumberHigherThan))
+                return;
+
+            var toTag = to.ToTreeNodeData(treeNodeDataCachingService);
+            toTag.Copy(tagData);
+
+            to.Text = from.Text;
+            to.Name = from.Name;
+
+            var font = from.NodeFont;
+            to.NodeFont = font != null ? new Font(font.FontFamily, font.SizeInPoints, font.Style) : WinFormsConstants.FontDefaults.DefaultFont;
+
+            to.ForeColor = from.ForeColor.IsEmpty ? Constants.Colors.DefaultForeGroundColor : from.ForeColor;
+            to.BackColor = from.BackColor.IsEmpty ? Constants.Colors.DefaultBackGroundColor : from.BackColor;
+
+            foreach (TreeNode node in from.Nodes)
+                CopyNode(to.Nodes, node, treeNodeDataCachingService, addedNumberHigherThan, addedNumberLowerThan, type);
+        }
+
+        #endregion CopyNode, CopyNodes
 
         #region Node percentage
 
@@ -824,7 +266,7 @@ namespace InformationTree.Tree
 
                     if (completed == 100)
                     {
-                        if (node.ForeColor.Name == DefaultBackGroundColor.ToString())
+                        if (node.ForeColor.Name == Constants.Colors.DefaultBackGroundColor.ToString())
                             return true;
                         else
                             return false;
@@ -844,7 +286,7 @@ namespace InformationTree.Tree
 
         public static void ToggleCompletedTasks(TreeView tv, bool toggleCompletedTasksAreHidden, TreeNodeCollection nodes)
         {
-            var foreColor = toggleCompletedTasksAreHidden ? DefaultForeGroundColor : DefaultBackGroundColor;
+            var foreColor = toggleCompletedTasksAreHidden ? Constants.Colors.DefaultForeGroundColor : Constants.Colors.DefaultBackGroundColor;
 
             if (tv.Nodes.Count > 0)
             {
@@ -902,7 +344,7 @@ namespace InformationTree.Tree
 
         #region Node search
 
-        public static TreeNode GetFirstNode(TreeNodeCollection nodes, string text)
+        public static TreeNode GetFirstNode(TreeNodeCollection nodes, string text, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             TreeNode ret = null;
             text = text.ToLower();
@@ -910,7 +352,7 @@ namespace InformationTree.Tree
             {
                 foreach (TreeNode node in nodes)
                 {
-                    var nodeTagData = node.GetTreeNodeData();
+                    var nodeTagData = node.ToTreeNodeData(treeNodeDataCachingService);
                     var nodeData = nodeTagData != null && !string.IsNullOrEmpty(nodeTagData.Data) ? nodeTagData.Data : null;
                     var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text)) || (nodeData != null && nodeData.ToLower().Contains(text));
 
@@ -918,7 +360,7 @@ namespace InformationTree.Tree
                         return node;
 
                     if (node.Nodes != null && node.Nodes.Count > 0)
-                        ret = GetFirstNode(node.Nodes, text);
+                        ret = GetFirstNode(node.Nodes, text, treeNodeDataCachingService);
 
                     if (ret != null)
                         return ret;
@@ -941,28 +383,31 @@ namespace InformationTree.Tree
             }
         }
 
-        public static void SetStyleForSearch(TreeNodeCollection nodes, string text)
+        public static void SetStyleForSearch(TreeNodeCollection nodes, string text, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             text = text.ToLower();
             if (nodes.Count > 0)
             {
                 foreach (TreeNode node in nodes)
                 {
-                    var nodeTagData = node.GetTreeNodeData();
+                    var nodeTagData = node.ToTreeNodeData(treeNodeDataCachingService);
                     var nodeData = nodeTagData != null && !string.IsNullOrEmpty(nodeTagData.Data) ? nodeTagData.Data : null;
-                    var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text)) || (nodeData != null && nodeData.ToLower().Contains(text));
+                    var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text))
+                        || (nodeData != null && nodeData.ToLower().Contains(text));
 
-                    if (foundCondition && (node.BackColor != BackGroundColorSearch || node.ForeColor != ForeGroundColorSearch))
+                    if (foundCondition
+                        && (node.BackColor != Constants.Colors.BackGroundColorSearch
+                        || node.ForeColor != Constants.Colors.ForeGroundColorSearch))
                     {
-                        node.BackColor = BackGroundColorSearch;
-                        node.ForeColor = ForeGroundColorSearch;
+                        node.BackColor = Constants.Colors.BackGroundColorSearch;
+                        node.ForeColor = Constants.Colors.ForeGroundColorSearch;
                         node.Expand();
 
                         ExpandParents(node);
                     }
 
                     if (node.Nodes != null && node.Nodes.Count > 0)
-                        SetStyleForSearch(node.Nodes, text);
+                        SetStyleForSearch(node.Nodes, text, treeNodeDataCachingService);
                 }
             }
         }
@@ -983,11 +428,11 @@ namespace InformationTree.Tree
             {
                 foreach (TreeNode node in col)
                 {
-                    if (node.BackColor != DefaultBackGroundColor)
-                        node.BackColor = DefaultBackGroundColor;
+                    if (node.BackColor != Constants.Colors.DefaultBackGroundColor)
+                        node.BackColor = Constants.Colors.DefaultBackGroundColor;
 
-                    if (node.ForeColor != DefaultForeGroundColor)
-                        node.ForeColor = DefaultForeGroundColor;
+                    if (node.ForeColor != Constants.Colors.DefaultForeGroundColor)
+                        node.ForeColor = Constants.Colors.DefaultForeGroundColor;
 
                     if (node.Nodes.Count > 0)
                         ClearStyleAdded(node.Nodes);
@@ -999,7 +444,7 @@ namespace InformationTree.Tree
 
         #region Node show by urgency or added number
 
-        public static void ShowNodesFromTaskToNumberOfTask(TreeView tv, decimal addedNumberLowerThan, decimal addedNumberHigherThan, int type)
+        public static void ShowNodesFromTaskToNumberOfTask(TreeView tv, decimal addedNumberLowerThan, decimal addedNumberHigherThan, int type, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             if (nodes == null)
                 nodes = new TreeNode().Nodes;
@@ -1013,7 +458,7 @@ namespace InformationTree.Tree
 
             // let tvTaskList with only addedNumber < addedNumberLowerThan
             tv.Nodes.Clear();
-            CopyNodes(tv.Nodes, nodes, (int)addedNumberHigherThan, (int)addedNumberLowerThan, type);
+            CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, (int)addedNumberHigherThan, (int)addedNumberLowerThan, type);
             ReadOnlyState = true;
         }
 
@@ -1031,18 +476,18 @@ namespace InformationTree.Tree
 
         #region Node data size calculation
 
-        public static int CalculateDataSizeFromNodeAndChildren(TreeNode node)
+        public static int CalculateDataSizeFromNodeAndChildren(TreeNode node, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             if (node == null)
                 return 0;
 
-            var tagData = node.GetTreeNodeData();
+            var tagData = node.ToTreeNodeData(treeNodeDataCachingService);
             if (tagData == null)
                 return 0;
 
             var size = tagData.Data == null ? 0 : tagData.Data.Length;
             foreach (TreeNode n in node.Nodes)
-                size += CalculateDataSizeFromNodeAndChildren(n);
+                size += CalculateDataSizeFromNodeAndChildren(n, treeNodeDataCachingService);
             return size;
         }
 
@@ -1056,7 +501,7 @@ namespace InformationTree.Tree
             currentSelection = node;
         }
 
-        public static void MoveNode(TreeView tv)
+        public static void MoveNode(TreeView tv, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             if (oldSelection == null)
                 return;
@@ -1075,7 +520,7 @@ namespace InformationTree.Tree
             if (!removedNode)
                 tv.Nodes.Remove(oldSelection);
 
-            var currentSelectionTagData = currentSelection.GetTreeNodeData();
+            var currentSelectionTagData = currentSelection.ToTreeNodeData(treeNodeDataCachingService);
             if (string.IsNullOrEmpty(currentSelection.Text) &&
                 currentSelectionTagData != null && string.IsNullOrEmpty(currentSelectionTagData.Data) &&
                 currentSelection.Parent == null &&
