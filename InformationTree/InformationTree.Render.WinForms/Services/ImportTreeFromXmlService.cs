@@ -165,56 +165,70 @@ namespace InformationTree.Render.WinForms.Services
                     ? HttpUtility.HtmlDecode(attr.Value)
                     : string.Empty;
 
-                if (attr.Name == Constants.XmlAttributes.XmlAttrText)
-                    attrText = decodedAttrValue;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrName)
-                    attrName = decodedAttrValue;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrBold)
-                    attrBold = true;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrItalic)
-                    attrItalic = true;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrUnderline)
-                    attrUnderline = true;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrStrikeout)
-                    attrStrikeout = true;
-                else if (Constants.XmlAttributes.XmlAttrForegroundColorAcceptedList.Contains(attr.Name))
-                    attrForegroundColor = decodedAttrValue;
-                else if (Constants.XmlAttributes.XmlAttrBackgroundColorAcceptedList.Contains(attr.Name))
-                    attrBackgroundColor = decodedAttrValue;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrFontFamily)
-                    attrFontFamily = FontFamily.Families.FirstOrDefault(f => f.Name == decodedAttrValue)
-                        ?? WinFormsConstants.FontDefaults.DefaultFontFamily;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrFontSize
-                    && float.TryParse(decodedAttrValue, out var fontSize))
-                    attrFontSize = fontSize;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrPercentCompleted
-                    && decimal.TryParse(decodedAttrValue, out var percentCompleted))
-                    attrPercentCompleted = percentCompleted;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrData)
-                    attrData = _compressionProvider.Decompress(decodedAttrValue);
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrAddedNumber
-                    && int.TryParse(decodedAttrValue, out var addedNumber))
-                    attrAddedNumber = addedNumber;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrAddedDate)
-                    attrAddedDate = decodedAttrValue.ToDateTime(_logger);
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrLastChangeDate)
-                    attrLastChangeDate = decodedAttrValue.ToDateTime(_logger);
-                else if (Constants.XmlAttributes.XmlAttrUrgencyAcceptedList.Contains(attr.Name)
-                    && int.TryParse(decodedAttrValue, out var urgency))
-                    attrUrgency = urgency;
-                else if (Constants.XmlAttributes.XmlAttrLinkAcceptedList.Contains(attr.Name))
-                    attrLink = decodedAttrValue;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrCategory)
-                    attrCategory = decodedAttrValue;
-                else if (attr.Name == Constants.XmlAttributes.XmlAttrIsStartupAlert
-                    && bool.TryParse(decodedAttrValue, out var isStartupAlert))
-                    attrIsStartupAlert = isStartupAlert;
+                switch (attr.Name)
+                {
+                    case Constants.XmlAttributes.XmlAttrText:
+                        attrText = decodedAttrValue;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrName:
+                        attrName = decodedAttrValue;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrBold:
+                        attrBold = true;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrItalic:
+                        attrItalic = true;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrUnderline:
+                        attrUnderline = true;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrStrikeout:
+                        attrStrikeout = true;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrFontFamily:
+                        attrFontFamily = FontFamily.Families.FirstOrDefault(f => f.Name == decodedAttrValue)
+                            ?? WinFormsConstants.FontDefaults.DefaultFontFamily;
+                        break;
+                    case Constants.XmlAttributes.XmlAttrData:
+                        attrData = _compressionProvider.Decompress(decodedAttrValue);
+                        break;
+                    case Constants.XmlAttributes.XmlAttrAddedDate:
+                        attrAddedDate = decodedAttrValue.ToDateTime(_logger);
+                        break;
+                    case Constants.XmlAttributes.XmlAttrLastChangeDate:
+                        attrLastChangeDate = decodedAttrValue.ToDateTime(_logger);
+                        break;
+                    case Constants.XmlAttributes.XmlAttrCategory:
+                        attrCategory = decodedAttrValue;
+                        break;
+
+                    default:
+                        if (Constants.XmlAttributes.XmlAttrForegroundColorAcceptedList.Contains(attr.Name))
+                            attrForegroundColor = decodedAttrValue;
+                        else if (Constants.XmlAttributes.XmlAttrBackgroundColorAcceptedList.Contains(attr.Name))
+                            attrBackgroundColor = decodedAttrValue;
+                        else if (Constants.XmlAttributes.XmlAttrUrgencyAcceptedList.Contains(attr.Name)
+                            && int.TryParse(decodedAttrValue, out var urgency))
+                            attrUrgency = urgency;
+                        else if (Constants.XmlAttributes.XmlAttrLinkAcceptedList.Contains(attr.Name))
+                            attrLink = decodedAttrValue;
+                        else if (attr.Name == Constants.XmlAttributes.XmlAttrFontSize
+                            && float.TryParse(decodedAttrValue, out var fontSize))
+                            attrFontSize = fontSize;
+                        else if (attr.Name == Constants.XmlAttributes.XmlAttrPercentCompleted
+                            && decimal.TryParse(decodedAttrValue, out var percentCompleted))
+                            attrPercentCompleted = percentCompleted;
+                        else if (attr.Name == Constants.XmlAttributes.XmlAttrAddedNumber
+                            && int.TryParse(decodedAttrValue, out var addedNumber))
+                            attrAddedNumber = addedNumber;
+                        else if (attr.Name == Constants.XmlAttributes.XmlAttrIsStartupAlert
+                            && bool.TryParse(decodedAttrValue, out var isStartupAlert))
+                            attrIsStartupAlert = isStartupAlert;
+                        break;
+                }
             }
 
-            var newStyle = (attrBold ? FontStyle.Bold : FontStyle.Regular) |
-                (attrItalic ? FontStyle.Italic : FontStyle.Regular) |
-                (attrUnderline ? FontStyle.Underline : FontStyle.Regular) |
-                (attrStrikeout ? FontStyle.Strikeout : FontStyle.Regular);
+            var newStyle = GetStyleFrom(attrBold, attrItalic, attrUnderline, attrStrikeout);
 
             if (attrText != null)
                 attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
@@ -253,6 +267,14 @@ namespace InformationTree.Render.WinForms.Services
             return treeNodeData;
         }
 
+        private static FontStyle GetStyleFrom(bool bold, bool italic, bool underline, bool strikeout)
+        {
+            return (bold ? FontStyle.Bold : FontStyle.Regular) |
+                (italic ? FontStyle.Italic : FontStyle.Regular) |
+                (underline ? FontStyle.Underline : FontStyle.Regular) |
+                (strikeout ? FontStyle.Strikeout : FontStyle.Regular);
+        }
+
         private void LoadTreeNodes(XmlNode xmlNode, TreeNodeData treeNodeData)
         {
             if (xmlNode.HasChildNodes)
@@ -265,18 +287,28 @@ namespace InformationTree.Render.WinForms.Services
                 }
         }
 
-        public bool LoadTreeNodesByCategory(TreeNodeData from, TreeNodeData to, bool includeOnlyWithStartupAlert, Dictionary<string, TreeNodeData> categories = null)
+        public bool LoadTreeNodesByCategory(TreeNodeData source, TreeNodeData destination, bool includeOnlyWithStartupAlert, Dictionary<string, TreeNodeData> categories = null)
         {
-            if (from == null || to == null || from.Children.Count == 0) // TODO: Check why it returns early without even clearing the children of "to" parameter
+            if (source == null || destination == null)
                 return false;
 
-            if (categories == null || categories.Count == 0) // TODO: Check why this is needed
-                to.Children.Clear();
+            if (source.Children.Count == 0)
+            {
+                // Not much to do here
+                destination.Children.Clear();
+                return false;
+            }
+
+            // Clear the children of destination tree only once, because this function is called recursively
+            // (and immediately categories will be not null)
+            var isFirstCall = categories == null;
+            if (isFirstCall)
+                destination.Children.Clear();
 
             if (categories == null)
                 categories = new Dictionary<string, TreeNodeData>();
 
-            foreach (TreeNodeData nodeData in from.Children)
+            foreach (TreeNodeData nodeData in source.Children)
             {
                 if (nodeData != null
                     && nodeData.Category.IsNotEmpty()
@@ -285,6 +317,7 @@ namespace InformationTree.Render.WinForms.Services
                         || (!includeOnlyWithStartupAlert)
                     ))
                 {
+                    // Create a node with category data and add a clone of the real node as a child
                     if (!categories.ContainsKey(nodeData.Category))
                         categories.Add(nodeData.Category, new TreeNodeData { Text = nodeData.Category });
                     categories[nodeData.Category].Children.Add(nodeData.Clone());
@@ -295,18 +328,19 @@ namespace InformationTree.Render.WinForms.Services
                     && nodeData.IsStartupAlert)
                 {
                     if (!categories.ContainsKey(string.Empty))
-                        categories.Add(string.Empty, new TreeNodeData { Text = nodeData.Category });
+                        categories.Add(string.Empty, new TreeNodeData { Text = "Category without text" });
                     categories[string.Empty].Children.Add(nodeData.Clone());
                 }
 
                 if (nodeData.Children.Count > 0)
-                    LoadTreeNodesByCategory(nodeData, to, includeOnlyWithStartupAlert, categories);
+                    LoadTreeNodesByCategory(nodeData, destination, includeOnlyWithStartupAlert, categories);
             }
 
+            // Add missing categories to the destination tree
             foreach (var key in categories.Keys.OrderBy(c => c))
             {
-                if (!to.Children.Any(e => e.Text == key))
-                    to.Children.Add(categories[key]);
+                if (!destination.Children.Any(e => string.Compare(e.Text, key, StringComparison.InvariantCultureIgnoreCase) == 0))
+                    destination.Children.Add(categories[key]);
             }
 
             return categories.Count > 0;

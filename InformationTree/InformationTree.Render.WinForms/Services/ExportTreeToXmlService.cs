@@ -56,10 +56,11 @@ namespace InformationTree.Render.WinForms.Services
             return sb.ToString();
         }
 
-        private string GetXmlAttributeText<T>(string attribute, T value, T defaultValue = default(T))
+        private string GetXmlAttributeText<T>(string attribute, T value, T defaultValue = default)
         {
             return
                 (value.Equals(defaultValue)
+                || value == null
                 || value.ToString().IsEmpty())
                 ? string.Empty
                 : ($"{attribute}=\"{HttpUtility.HtmlEncode(value)}\" ");
