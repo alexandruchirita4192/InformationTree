@@ -80,34 +80,6 @@ namespace InformationTree.Tree
 
         #endregion Properties
 
-        #region Node update
-
-        public static bool ParseNodeAndUpdate(TreeNode node, string taskName, string nodeValue)
-        {
-            if (node.Text.Equals(taskName /* StartsWith + " [" */))
-            {
-                node.Text = nodeValue;
-                return true;
-            }
-            else
-            {
-                if (node.Nodes != null)
-                {
-                    bool exists = false;
-                    foreach (TreeNode n in node.Nodes)
-                    {
-                        exists = ParseNodeAndUpdate(n, taskName, nodeValue);
-                        if (exists)
-                            break;
-                    }
-                    return exists;
-                }
-            }
-            return false;
-        }
-
-        #endregion Node update
-
         #region CopyNode, CopyNodes
 
         public static void CopyNodes(TreeNodeCollection to, TreeNodeCollection from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)

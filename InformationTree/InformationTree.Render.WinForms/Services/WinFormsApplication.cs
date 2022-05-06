@@ -58,7 +58,6 @@ namespace InformationTree.Render.WinForms.Services
 
         #region extern
 
-        // TODO: Maybe remove these kinds of windows DllImport
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, ExactSpelling = true, SetLastError = true)]
         private static extern void MoveWindow(IntPtr hwnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
