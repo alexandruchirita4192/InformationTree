@@ -6,11 +6,9 @@ using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Services;
-using InformationTree.Forms;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.TextProcessing;
-using NLog;
 
 namespace InformationTree.Tree
 {
@@ -18,8 +16,6 @@ namespace InformationTree.Tree
     [Obsolete("Break into many classes with many purposes")]
     public static class TreeNodeHelper
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
         #region Properties
 
         #region FileName
@@ -79,6 +75,8 @@ namespace InformationTree.Tree
         private static TreeNode oldSelection;
 
         #endregion Properties
+
+        // TODO: Maybe use a mediator like MediatR to handle all events, commands, etc. (each of those could be a separate command handler class)
 
         #region CopyNode, CopyNodes
 
