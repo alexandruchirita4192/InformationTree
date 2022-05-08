@@ -23,6 +23,7 @@
     <Content Include="xt3.ico" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="NLog" Version="4.7.15" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />

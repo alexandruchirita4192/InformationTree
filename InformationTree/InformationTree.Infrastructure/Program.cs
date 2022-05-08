@@ -1,18 +1,49 @@
 ﻿using Castle.Windsor;
 using InformationTree.Domain.Services;
+using InformationTree.Infrastructure.MediatR;
 
-namespace InformationTree.Infrastructure
+namespace InformationTree.Infrastructure;
+
+public static class Program
 {
-    public static class Program
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    public static void Main(string[] args)
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        public static void Main()
+        var container = new WindsorContainer();
+        container.Install(new WindsorInstaller());
+
+        var mediatorSelfTest = container.Resolve<IConfigurationReader>()
+            ?.GetConfiguration()
+            ?.ApplicationFeatures
+            ?.MediatorSelfTest ?? false;
+
+        if (mediatorSelfTest)
         {
-            var container = new WindsorContainer();
-            container.Install(new WindsorInstaller());
+            var writer = new WrappingWriter(Console.Out); // TODO: Console output not working. Remove wrapper or fix.
+            try
+            {
+                writer.WriteLine($"Starting MediatR with Castle Windsor self-test at {DateTime.Now}");
+                var mediator = container.BuildMediator(writer);
+
+                var mediatorSelfTestFunc = () => TestRunner.Run(mediator, writer, "MediatoR.CastleWindsor.SelfTest");
+                Task.Run(() => mediatorSelfTestFunc())
+                    .Wait();
+            }
+            catch (Exception ex)
+            {
+                writer.WriteLine($"MediatR self-test failed with exception: {ex}.");
+            }
+            finally
+            {
+                writer.WriteLine($"MediatR self-test finished at {DateTime.Now}. Press enter to exit.");
+            }
+            File.WriteAllText("MediatR.SelfTest.txt", writer.Contents);
+        }
+        else
+        {
             var application = container.Resolve<IApplication>();
             application.Run();
         }
