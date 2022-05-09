@@ -1,11 +1,11 @@
-﻿using System.Net.NetworkInformation;
+﻿using InformationTree.Infrastructure.MediatR.Test.Requests;
 using MediatR;
 using MediatR.Pipeline;
 
 namespace InformationTree.Infrastructure.MediatR.Test.Handlers.PostProcessors;
 
 public class ConstrainedRequestPostProcessor<TRequest, TResponse>
-: IRequestPostProcessor<TRequest, TResponse>
+    : IRequestPostProcessor<TRequest, TResponse>
 where TRequest : Ping, IRequest<TResponse>
 {
     private readonly TextWriter _writer;
