@@ -22,7 +22,7 @@ public static class Program
 
         if (mediatorSelfTest)
         {
-            var writer = new WrappingWriter(Console.Out); // TODO: Console output not working. Remove wrapper or fix.
+            var writer = new StringWriter();
             try
             {
                 writer.WriteLine($"Starting MediatR with Castle Windsor self-test at {DateTime.Now}");
@@ -40,7 +40,7 @@ public static class Program
             {
                 writer.WriteLine($"MediatR self-test finished at {DateTime.Now}. Press enter to exit.");
             }
-            File.WriteAllText("MediatR.SelfTest.txt", writer.Contents);
+            File.WriteAllText("MediatR.SelfTest.txt", writer.ToString());
         }
         else
         {

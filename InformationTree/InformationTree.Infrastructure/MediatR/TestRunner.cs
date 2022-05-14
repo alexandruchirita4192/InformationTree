@@ -8,7 +8,7 @@ namespace InformationTree.Infrastructure.MediatR
 {
     public static class TestRunner
     {
-        public static async Task Run(IMediator mediator, WrappingWriter writer, string projectName, bool testStreams = false)
+        public static async Task Run(IMediator mediator, StringWriter writer, string projectName, bool testStreams = false)
         {
             await writer.WriteLineAsync("===============");
             await writer.WriteLineAsync(projectName);
@@ -110,7 +110,7 @@ namespace InformationTree.Infrastructure.MediatR
             var isOverriddenHandlerForBaseExceptionWorks = await IsOverriddenHandlerForBaseExceptionWorks(mediator, writer).ConfigureAwait(false);
 
             await writer.WriteLineAsync("---------------");
-            var contents = writer.Contents;
+            var contents = writer.ToString();
             var order = new[] {
             contents.IndexOf("- Starting Up", StringComparison.OrdinalIgnoreCase),
             contents.IndexOf("-- Handling Request", StringComparison.OrdinalIgnoreCase),
@@ -178,7 +178,7 @@ namespace InformationTree.Infrastructure.MediatR
             await writer.WriteLineAsync();
         }
 
-        private static async Task<bool> IsHandlerForSameExceptionWorks(IMediator mediator, WrappingWriter writer)
+        private static async Task<bool> IsHandlerForSameExceptionWorks(IMediator mediator, StringWriter writer)
         {
             var isHandledCorrectly = false;
 
@@ -197,7 +197,7 @@ namespace InformationTree.Infrastructure.MediatR
             return isHandledCorrectly;
         }
 
-        private static async Task<bool> IsHandlerForBaseExceptionWorks(IMediator mediator, WrappingWriter writer)
+        private static async Task<bool> IsHandlerForBaseExceptionWorks(IMediator mediator, StringWriter writer)
         {
             var isHandledCorrectly = false;
 
@@ -216,7 +216,7 @@ namespace InformationTree.Infrastructure.MediatR
             return isHandledCorrectly;
         }
 
-        private static async Task<bool> IsHandlerForLessSpecificExceptionWorks(IMediator mediator, WrappingWriter writer)
+        private static async Task<bool> IsHandlerForLessSpecificExceptionWorks(IMediator mediator, StringWriter writer)
         {
             var isHandledCorrectly = false;
 
@@ -235,7 +235,7 @@ namespace InformationTree.Infrastructure.MediatR
             return isHandledCorrectly;
         }
 
-        private static async Task<bool> IsPreferredHandlerForBaseExceptionWorks(IMediator mediator, WrappingWriter writer)
+        private static async Task<bool> IsPreferredHandlerForBaseExceptionWorks(IMediator mediator, StringWriter writer)
         {
             var isHandledCorrectly = false;
 
@@ -255,7 +255,7 @@ namespace InformationTree.Infrastructure.MediatR
             return isHandledCorrectly;
         }
 
-        private static async Task<bool> IsOverriddenHandlerForBaseExceptionWorks(IMediator mediator, WrappingWriter writer)
+        private static async Task<bool> IsOverriddenHandlerForBaseExceptionWorks(IMediator mediator, StringWriter writer)
         {
             var isHandledCorrectly = false;
 
@@ -275,10 +275,10 @@ namespace InformationTree.Infrastructure.MediatR
             return isHandledCorrectly;
         }
 
-        private static bool IsExceptionHandledBy<TException, THandler>(WrappingWriter writer)
+        private static bool IsExceptionHandledBy<TException, THandler>(StringWriter writer)
             where TException : Exception
         {
-            var messages = writer.Contents.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).ToList();
+            var messages = writer.ToString().Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).ToList();
 
             return messages[messages.Count - 2].Contains(typeof(THandler).FullName)
                    && messages[messages.Count - 3].Contains(typeof(TException).FullName);

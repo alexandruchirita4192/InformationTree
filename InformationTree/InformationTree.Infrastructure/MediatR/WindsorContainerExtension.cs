@@ -3,9 +3,11 @@ using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
 using InformationTree.Infrastructure.MediatR.Test.Handlers.Behaviors;
 using InformationTree.Infrastructure.MediatR.Test.Handlers.EventHandlers;
+using InformationTree.Infrastructure.MediatR.Test.Handlers.ExceptionHandlers;
 using InformationTree.Infrastructure.MediatR.Test.Handlers.PostProcessors;
 using InformationTree.Infrastructure.MediatR.Test.Handlers.PreProcessors;
 using InformationTree.Infrastructure.MediatR.Test.Requests;
+using InformationTree.Infrastructure.MediatR.Test.Responses;
 using MediatR;
 using MediatR.Pipeline;
 
@@ -13,7 +15,7 @@ namespace InformationTree.Infrastructure.MediatR;
 
 public static class WindsorContainerExtension
 {
-    public static IMediator BuildMediator(this IWindsorContainer container, WrappingWriter writer)
+    public static IMediator BuildMediator(this IWindsorContainer container, StringWriter writer)
     {
         container.Kernel.Resolver.AddSubResolver(new CollectionResolver(container.Kernel));
         container.Kernel.AddHandlersFilter(new ContravariantFilter());
@@ -43,8 +45,12 @@ public static class WindsorContainerExtension
         container.Register(Component.For(typeof(IRequestPreProcessor<>)).ImplementedBy(typeof(GenericRequestPreProcessor<>)).NamedAutomatically("PreProcessor"));
         container.Register(Component.For(typeof(IRequestPostProcessor<,>)).ImplementedBy(typeof(GenericRequestPostProcessor<,>)).NamedAutomatically("PostProcessor"));
         container.Register(Component.For(typeof(IRequestPostProcessor<,>), typeof(ConstrainedRequestPostProcessor<,>)).NamedAutomatically("ConstrainedRequestPostProcessor"));
+        container.Register(Component.For(typeof(IRequestExceptionHandler<PingResource, Pong, ConnectionException>)).ImplementedBy(typeof(ConnectionExceptionHandler)));
+        container.Register(Component.For(typeof(IRequestExceptionHandler<PingResource, Pong, ForbiddenException>)).ImplementedBy(typeof(AccessDeniedExceptionHandler)));
+        container.Register(Component.For(typeof(IRequestExceptionHandler<PingNewResource, Pong, ServerException>)).ImplementedBy(typeof(ServerExceptionHandler)));
+        container.Register(Component.For(typeof(AsyncRequestExceptionHandler<PingResource, Pong>)).ImplementedBy(typeof(CommonExceptionHandler)));
         container.Register(Component.For(typeof(INotificationHandler<>), typeof(ConstrainedPingedHandler<>)).NamedAutomatically("ConstrainedPingedHandler"));
-
+        
         var mediator = container.Resolve<IMediator>();
 
         return mediator;
