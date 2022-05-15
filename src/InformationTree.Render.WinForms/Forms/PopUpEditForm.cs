@@ -418,12 +418,13 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handle this function in a MediatR handler and give access to the form or controls which require update (and this has to work without them too, for right click in the main form)
         private void btnPgpEncryptData_Click(object sender, EventArgs e)
         {
             var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
             var decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
             
-            if (string.IsNullOrWhiteSpace(decryptedData))
+            if (decryptedData.IsEmpty())
             {
                 _popUpService.ShowError("No data to encrypt.");
                 return;

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
@@ -26,9 +27,7 @@ namespace InformationTree.Tree
         {
             get
             {
-                if (!string.IsNullOrEmpty(fileName))
-                    return fileName;
-                return "Data.xml"; // TODO: Move to constants
+                return fileName.IsEmpty() ? WinFormsConstants.DefaultFileName : fileName;
             }
             set
             {

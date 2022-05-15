@@ -10,7 +10,10 @@ using InformationTree.Domain.Services;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
-    [Obsolete("Break into many classes later")] // TODO: file parsing in one file, figures drawing in another
+    [Obsolete("Break into many classes later")] // TODO: 1. file parsing in one file
+    // (file parsing methods with parameter for frame should work because all depend on frame;
+    // frame methods might be transformed to an extension of frame also),
+    // TODO: 2. figures drawing in another (remaining in this file as is)
     public class GraphicsFile : IGraphicsFile, IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -42,11 +45,6 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
         #endregion Constructor
 
         #region Methods
-
-        public void ParseFile(string fileName)
-        {
-            ParseLines(File.ReadAllLines(fileName));
-        }
 
         public void ParseLines(string[] lines)
         {
@@ -186,11 +184,6 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 if (breakFromLoop)
                     break;
             }
-        }
-
-        public void ParseLines(string lines)
-        {
-            ParseLines(lines.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries));
         }
 
         public void Show(D.Graphics graphics)

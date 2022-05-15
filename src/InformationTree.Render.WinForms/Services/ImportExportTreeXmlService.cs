@@ -15,6 +15,7 @@ namespace InformationTree.Render.WinForms.Services
             _exportTreeToXmlService = exportTreeToXmlService;
         }
 
+        // TODO: Fix with MediatR handlers because the actions were always the same (code is also duplicated regarding the called actions, they only need to have the required control access to do the stuff)
         // TODO: Too many actions!! Maybe change with some real events with an event dispatcher?????? Does it break everything? What is the best practice??
         public (TreeNodeData rootNode, string fileName) SaveCurrentTreeAndLoadAnother(
             Action<string> afterSaveDoWithFileName,

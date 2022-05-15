@@ -1355,12 +1355,13 @@ namespace InformationTree.Forms
             MainForm_DoubleClick(sender, e);
         }
 
-        // TODO: Create another feature for this kind of alerts that might get annoying
         private void lblChangeTreeType_Click(object sender, EventArgs e)
         {
             if (_randomTimer == null)
                 return;
-
+            if (_configuration.ApplicationFeatures.EnableAlerts == false)
+                return;
+            
             if (!_randomTimer.Enabled)
             {
                 _randomTimer.Elapsed += RandomTimer_Elapsed; // timer disposed in Dispose(bool)
@@ -1374,10 +1375,12 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: Maybe move this to a separate service for alerts
+        // TODO: I guess better this will be handled as an MediatR event and this will be solved, it will be separate handler for alerts (if possible with the timer access and all)
         private void RandomTimer_ChangeIntervalAndSound()
         {
             if (_randomTimer == null)
+                return;
+            if (_configuration.ApplicationFeatures.EnableAlerts == false)
                 return;
 
             var ticks = DateTime.Now.Ticks;
@@ -1397,6 +1400,11 @@ namespace InformationTree.Forms
 
         private void RandomTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (_configuration.ApplicationFeatures.EnableAlerts == false)
+                return;
+            if (_configuration.ApplicationFeatures.EnableExtraSound == false)
+                return;
+
             _soundProvider.PlaySystemSound(_systemSoundNumber);
             RandomTimer_ChangeIntervalAndSound();
         }
@@ -1416,13 +1424,13 @@ namespace InformationTree.Forms
         private void encryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _popUpService.ShowWarning("Not implemented.");
-            // TODO: Create a feature for this and deactivate it at first not showing something without any working code
+            // TODO: Call handler from btnPgpEncryptData_Click after it is a MediatR handler
         }
 
         private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _popUpService.ShowWarning("Not implemented.");
-            // TODO: Create a feature for this and deactivate it at first not showing something without any working code
+            // TODO: Call handler from btnPgpEncryptData_Click after it is a MediatR handler
         }
 
         private void btnExportToRtf_Click(object sender, EventArgs e)

@@ -11,6 +11,9 @@ namespace InformationTree.TextProcessing
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        // TODO: 1. Find common code because it seems copy-paste and both could call an internal method
+        // TODO: 2. Move to a string extension class or TreeNodeData class
+        // (need to see it's use cases, how it's used when it's called to see it's proper place and if the method could do more or not)
         public static string GetTextAndProcentCompleted(string attrText, ref decimal attrPercentCompleted, bool getTextWithoutProgress = false)
         {
             // The format of text is:

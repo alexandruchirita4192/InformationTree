@@ -12,5 +12,7 @@ namespace InformationTree.Render.WinForms
 
             public static readonly Font DefaultFont = new Font(DefaultFontFamily, DefaultFontSize, FontStyle.Regular);
         }
+
+        public const string DefaultFileName = "Data.xml";
     }
 }
