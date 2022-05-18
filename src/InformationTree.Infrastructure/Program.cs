@@ -28,7 +28,7 @@ public static class Program
                 writer.WriteLine($"Starting MediatR with Castle Windsor self-test at {DateTime.Now}");
                 var mediator = container.BuildMediator(writer);
 
-                var mediatorSelfTestFunc = () => TestRunner.Run(mediator, writer, "MediatoR.CastleWindsor.SelfTest");
+                var mediatorSelfTestFunc = () => TestRunner.Run(mediator, writer, "MediatoR.CastleWindsor.SelfTest", true);
                 Task.Run(() => mediatorSelfTestFunc())
                     .Wait();
             }
