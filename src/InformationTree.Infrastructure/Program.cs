@@ -1,7 +1,7 @@
 ﻿using Castle.Windsor;
 using InformationTree.Domain.Services;
 using InformationTree.Infrastructure.MediatR;
-using InformationTree.Infrastructure.MediatR.Test;
+using InformationTree.Infrastructure.MediatR.SelfTest;
 
 namespace InformationTree.Infrastructure;
 
