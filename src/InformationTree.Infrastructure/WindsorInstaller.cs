@@ -1,4 +1,5 @@
-﻿using Castle.MicroKernel.Registration;
+﻿using System.Reflection;
+using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using InformationTree.Domain.Services;
@@ -6,6 +7,8 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Computation;
 using InformationTree.Extra.Graphics.Services;
 using InformationTree.Extra.Sound;
+using InformationTree.Forms;
+using InformationTree.Infrastructure.MediatR;
 using InformationTree.PgpEncryption;
 using InformationTree.Render.WinForms.Services;
 
@@ -34,6 +37,8 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<IExportTreeToXmlService>().ImplementedBy<ExportTreeToXmlService>().LifeStyle.Singleton);
             container.Register(Component.For<IImportTreeFromXmlService>().ImplementedBy<ImportTreeFromXmlService>().LifeStyle.Singleton);
             container.Register(Component.For<IImportExportTreeXmlService>().ImplementedBy<ImportExportTreeXmlService>().LifeStyle.Singleton);
+            
+            container.RegisterMediatorForUsageFrom(typeof(MainForm).Assembly);
         }
     }
 }
