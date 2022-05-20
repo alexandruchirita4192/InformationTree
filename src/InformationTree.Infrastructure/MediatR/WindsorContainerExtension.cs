@@ -1,4 +1,5 @@
-﻿using Castle.MicroKernel.Registration;
+﻿using System.Diagnostics;
+using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
 using InformationTree.Infrastructure.MediatR.Test.Handlers.Behaviors;
@@ -52,8 +53,7 @@ public static class WindsorContainerExtension
             || !service.IsConstructedGenericType
             || !(service.GetGenericTypeDefinition()
             ?.IsAssignableTo(typeof(IRequestExceptionHandler<,,>)) ?? false)
-            || genericArguments.Length != 3
-            || !(genericArguments[0].BaseType?.IsClass ?? false))
+            || genericArguments.Length != 3)
             {
                 return resolvedType;
             }
@@ -64,7 +64,8 @@ public static class WindsorContainerExtension
             var exceptionType = genericArguments[2];
 
             // Check if the base request type is valid
-            if (!baseRequestType.IsClass
+            if (baseRequestType == null
+            || !baseRequestType.IsClass
             || baseRequestType == typeof(object)
             || ((!baseRequestType.GetInterfaces()
                 ?.Any(i => i.IsAssignableFrom(typeof(IRequest<>)))) ?? true))
@@ -75,9 +76,13 @@ public static class WindsorContainerExtension
             var exceptionHandlerInterfaceType = typeof(IRequestExceptionHandler<,,>).MakeGenericType(baseRequestType, response, exceptionType);
             var enumerableExceptionHandlerInterfaceType = typeof(IEnumerable<>).MakeGenericType(exceptionHandlerInterfaceType);
 
-            // This is assumed Array because this method calls ResolveAll when a IEnumerable<> is passed as argument
             var firstArray = serviceFactory.Invoke(enumerableExceptionHandlerInterfaceType) as Array;
+            Debug.Assert(firstArray != null, $"Array '{nameof(firstArray)}' should not be null because this method calls ResolveAll when a {typeof(IEnumerable<>).FullName} " +
+                $"is passed as argument in argument named '{nameof(type)}'");
+
             var secondArray = resolvedType is Array ? resolvedType as Array : new[] { resolvedType };
+            Debug.Assert(secondArray != null, $"Array '{nameof(secondArray)}' should not be null because '{nameof(resolvedType)}' is an array or created as an array");
+
             var resultArray = Array.CreateInstance(typeof(object), firstArray.Length + secondArray.Length);
             Array.Copy(firstArray, resultArray, firstArray.Length);
             Array.Copy(secondArray, 0, resultArray, firstArray.Length, secondArray.Length);
