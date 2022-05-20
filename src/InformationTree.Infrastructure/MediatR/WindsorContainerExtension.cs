@@ -14,7 +14,7 @@ namespace InformationTree.Infrastructure.MediatR;
 
 public static class WindsorContainerExtension
 {
-    public static IMediator BuildMediator(this IWindsorContainer container, StringWriter writer)
+    public static IMediator BuildMediatorForSelfTest(this IWindsorContainer container, StringWriter writer)
     {
         container.Kernel.Resolver.AddSubResolver(new CollectionResolver(container.Kernel));
         container.Kernel.AddHandlersFilter(new ContravariantFilter());

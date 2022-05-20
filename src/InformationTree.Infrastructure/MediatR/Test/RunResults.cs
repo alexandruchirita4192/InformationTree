@@ -1,4 +1,4 @@
-﻿namespace InformationTree.Infrastructure.MediatR;
+﻿namespace InformationTree.Infrastructure.MediatR.Test;
 
 public class RunResults
 {

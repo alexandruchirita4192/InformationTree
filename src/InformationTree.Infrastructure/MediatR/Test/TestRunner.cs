@@ -4,7 +4,7 @@ using InformationTree.Infrastructure.MediatR.Test.Requests;
 using InformationTree.Infrastructure.MediatR.Test.Responses;
 using MediatR;
 
-namespace InformationTree.Infrastructure.MediatR
+namespace InformationTree.Infrastructure.MediatR.Test
 {
     public static class TestRunner
     {
@@ -61,38 +61,38 @@ namespace InformationTree.Infrastructure.MediatR
                     {
                         if (i == 0)
                         {
-                            failedSing = !(s.Message.Contains("Singing do"));
+                            failedSing = !s.Message.Contains("Singing do");
                         }
                         else if (i == 1)
                         {
-                            failedSing = !(s.Message.Contains("Singing re"));
+                            failedSing = !s.Message.Contains("Singing re");
                         }
                         else if (i == 2)
                         {
-                            failedSing = !(s.Message.Contains("Singing mi"));
+                            failedSing = !s.Message.Contains("Singing mi");
                         }
                         else if (i == 3)
                         {
-                            failedSing = !(s.Message.Contains("Singing fa"));
+                            failedSing = !s.Message.Contains("Singing fa");
                         }
                         else if (i == 4)
                         {
-                            failedSing = !(s.Message.Contains("Singing so"));
+                            failedSing = !s.Message.Contains("Singing so");
                         }
                         else if (i == 5)
                         {
-                            failedSing = !(s.Message.Contains("Singing la"));
+                            failedSing = !s.Message.Contains("Singing la");
                         }
                         else if (i == 6)
                         {
-                            failedSing = !(s.Message.Contains("Singing ti"));
+                            failedSing = !s.Message.Contains("Singing ti");
                         }
                         else if (i == 7)
                         {
-                            failedSing = !(s.Message.Contains("Singing do"));
+                            failedSing = !s.Message.Contains("Singing do");
                         }
 
-                        failedSing = failedSing || (++i) > 10;
+                        failedSing = failedSing || ++i > 10;
                     }
                 }
                 catch (Exception e)
@@ -243,8 +243,8 @@ namespace InformationTree.Infrastructure.MediatR
 
             try
             {
-                await mediator.Send(new Test.Handlers.ExceptionHandlers.Overrides.PingResourceTimeout { Message = "Ping to ISS resource (preferred)" });
-                isHandledCorrectly = IsExceptionHandledBy<TaskCanceledException, Test.Handlers.ExceptionHandlers.Overrides.CommonExceptionHandler>(writer);
+                await mediator.Send(new Handlers.ExceptionHandlers.Overrides.PingResourceTimeout { Message = "Ping to ISS resource (preferred)" });
+                isHandledCorrectly = IsExceptionHandledBy<TaskCanceledException, Handlers.ExceptionHandlers.Overrides.CommonExceptionHandler>(writer);
             }
             catch (Exception e)
             {
@@ -264,7 +264,7 @@ namespace InformationTree.Infrastructure.MediatR
             try
             {
                 await mediator.Send(new PingNewResource { Message = "Ping to ISS resource (override)" });
-                isHandledCorrectly = IsExceptionHandledBy<ServerException, Test.Handlers.ExceptionHandlers.Overrides.ServerExceptionHandler>(writer);
+                isHandledCorrectly = IsExceptionHandledBy<ServerException, Handlers.ExceptionHandlers.Overrides.ServerExceptionHandler>(writer);
             }
             catch (Exception e)
             {

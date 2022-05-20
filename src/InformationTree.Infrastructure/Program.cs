@@ -1,6 +1,7 @@
 ﻿using Castle.Windsor;
 using InformationTree.Domain.Services;
 using InformationTree.Infrastructure.MediatR;
+using InformationTree.Infrastructure.MediatR.Test;
 
 namespace InformationTree.Infrastructure;
 
@@ -26,7 +27,7 @@ public static class Program
             try
             {
                 writer.WriteLine($"Starting MediatR with Castle Windsor self-test at {DateTime.Now}");
-                var mediator = container.BuildMediator(writer);
+                var mediator = container.BuildMediatorForSelfTest(writer);
 
                 var mediatorSelfTestFunc = () => TestRunner.Run(mediator, writer, "MediatoR.CastleWindsor.SelfTest", true);
                 Task.Run(() => mediatorSelfTestFunc())
