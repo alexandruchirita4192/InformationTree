@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain;
+using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms;
@@ -39,6 +40,7 @@ namespace InformationTree.Tree
 
         // TODO: Create a new class for keeping state of the tree
         public static bool IsSafeToSave;
+
         public static bool ReadOnlyState;
 
         private static bool _treeUnchanged;
@@ -69,9 +71,6 @@ namespace InformationTree.Tree
 
         public static int TreeNodeCounter = 0;
         private static TreeNodeCollection nodes;
-
-        private static TreeNode currentSelection;
-        private static TreeNode oldSelection;
 
         #endregion Properties
 
@@ -451,12 +450,17 @@ namespace InformationTree.Tree
                 return 0;
 
             var tagData = node.ToTreeNodeData(treeNodeDataCachingService);
+            return CalculateDataSizeFromNodeAndChildren(tagData, treeNodeDataCachingService);
+        }
+
+        public static int CalculateDataSizeFromNodeAndChildren(TreeNodeData tagData, ITreeNodeDataCachingService treeNodeDataCachingService)
+        {
             if (tagData == null)
                 return 0;
 
             var size = tagData.Data == null ? 0 : tagData.Data.Length;
-            foreach (TreeNode n in node.Nodes)
-                size += CalculateDataSizeFromNodeAndChildren(n, treeNodeDataCachingService);
+            foreach (TreeNodeData nd in tagData.Children)
+                size += CalculateDataSizeFromNodeAndChildren(nd, treeNodeDataCachingService);
             return size;
         }
 
@@ -464,39 +468,40 @@ namespace InformationTree.Tree
 
         #region Node move
 
-        public static void UpdateCurrentSelection(TreeNode node)
+        public static void MoveNode(TreeView tv,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
         {
-            oldSelection = currentSelection;
-            currentSelection = node;
-        }
-
-        public static void MoveNode(TreeView tv, ITreeNodeDataCachingService treeNodeDataCachingService)
-        {
-            if (oldSelection == null)
+            var oldSelectionObj = treeNodeSelectionCachingService.GetOldSelectionFromCache();
+            if (oldSelectionObj == null)
                 return;
 
-            bool removedNode = false;
-            if (currentSelection != null)
+            if (oldSelectionObj is TreeNode oldSelection)
             {
-                var parentSelected = currentSelection.Parent;
-                if (parentSelected != null)
+                bool removedNode = false;
+                var currentSelectionObj = treeNodeSelectionCachingService.GetCurrentSelectionFromCache();
+                if (currentSelectionObj is TreeNode currentSelection)
                 {
-                    parentSelected.Nodes.Remove(oldSelection);
-                    removedNode = true;
+                    var parentSelected = currentSelection.Parent;
+                    if (parentSelected != null)
+                    {
+                        parentSelected.Nodes.Remove(oldSelection);
+                        removedNode = true;
+                    }
+
+                    if (!removedNode)
+                        tv.Nodes.Remove(oldSelection);
+
+                    var currentSelectionTagData = currentSelection.ToTreeNodeData(treeNodeDataCachingService);
+                    if (string.IsNullOrEmpty(currentSelection.Text) &&
+                        currentSelectionTagData != null && string.IsNullOrEmpty(currentSelectionTagData.Data) &&
+                        currentSelection.Parent == null &&
+                        currentSelection.Nodes.Count == 0)
+                        tv.Nodes.Add(oldSelection);
+                    else
+                        currentSelection.Nodes.Add(oldSelection);
                 }
             }
-
-            if (!removedNode)
-                tv.Nodes.Remove(oldSelection);
-
-            var currentSelectionTagData = currentSelection.ToTreeNodeData(treeNodeDataCachingService);
-            if (string.IsNullOrEmpty(currentSelection.Text) &&
-                currentSelectionTagData != null && string.IsNullOrEmpty(currentSelectionTagData.Data) &&
-                currentSelection.Parent == null &&
-                currentSelection.Nodes.Count == 0)
-                tv.Nodes.Add(oldSelection);
-            else
-                currentSelection.Nodes.Add(oldSelection);
         }
 
         #endregion Node move

@@ -1,5 +1,5 @@
 ﻿using System;
-using InformationTree.Domain.Requests;
+using InformationTree.Domain.Requests.Base;
 using MediatR.Pipeline;
 using NLog;
 
@@ -11,7 +11,8 @@ namespace InformationTree.Render.WinForms.Handlers.ExceptionHandlers
 
         protected override void Execute(BaseRequest request, Exception exception)
         {
-            _logger.Error(exception, "Error while processing MediatR request {0}", request.GetType().Name);
+            _logger.Error("Error while processing MediatR request {0}", request.GetType().Name);
+            _logger.Error(exception);
         }
     }
 }

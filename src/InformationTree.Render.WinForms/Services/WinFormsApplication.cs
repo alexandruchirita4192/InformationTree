@@ -7,6 +7,7 @@ using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.Tree;
+using MediatR;
 using NLog;
 
 namespace InformationTree.Render.WinForms.Services
@@ -27,6 +28,8 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
+        private readonly IMediator _mediator;
+        private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
 
         public WinFormsApplication(
             IConfigurationReader configurationReader,
@@ -40,7 +43,9 @@ namespace InformationTree.Render.WinForms.Services
             ITreeNodeDataCachingService treeNodeDataCachingService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
-            IImportExportTreeXmlService importExportTreeXmlService)
+            IImportExportTreeXmlService importExportTreeXmlService,
+            IMediator mediator,
+            ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
@@ -54,6 +59,8 @@ namespace InformationTree.Render.WinForms.Services
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
             _importExportTreeXmlService = importExportTreeXmlService;
+            _mediator = mediator;
+            _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
         }
 
         #region extern
@@ -200,7 +207,9 @@ namespace InformationTree.Render.WinForms.Services
                 _treeNodeDataCachingService,
                 _importTreeFromXmlService,
                 _exportTreeToXmlService,
-                _importExportTreeXmlService
+                _importExportTreeXmlService,
+                _mediator,
+                _treeNodeSelectionCachingService
                 ));
         }
 

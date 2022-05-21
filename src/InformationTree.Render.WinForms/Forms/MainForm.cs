@@ -1,7 +1,15 @@
-﻿using InformationTree.Domain;
+﻿using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Timers;
+using System.Windows.Forms;
+using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
@@ -10,13 +18,8 @@ using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
+using MediatR;
 using NLog;
-using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Timers;
-using System.Windows.Forms;
 
 namespace InformationTree.Forms
 {
@@ -38,7 +41,9 @@ namespace InformationTree.Forms
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
-        
+        private readonly IMediator _mediator;
+        private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
+
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -57,7 +62,9 @@ namespace InformationTree.Forms
             ITreeNodeDataCachingService treeNodeDataCachingService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
-            IImportExportTreeXmlService importExportTreeXmlService)
+            IImportExportTreeXmlService importExportTreeXmlService,
+            IMediator mediator,
+            ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -71,9 +78,11 @@ namespace InformationTree.Forms
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
             _importExportTreeXmlService = importExportTreeXmlService;
-            
+            _mediator = mediator;
+            _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
+
             InitializeComponent();
-            
+
             // SetStyleTo(this, Color.Black, Color.White);
 
             nudMilliseconds.Maximum = 999;
@@ -117,7 +126,7 @@ namespace InformationTree.Forms
             root.CopyToTreeView(tvTaskList, _treeNodeDataCachingService, true);
             TreeNodeHelper.FileName = fileName;
 
-            var loadedExisting = !root.IsEmptyData;
+            var loadedExisting = !root.IsEmptyData || root.Children.Any();
             if (loadedExisting)
             {
                 tvTaskList.CollapseAll();
@@ -125,7 +134,7 @@ namespace InformationTree.Forms
 
                 var countNodes = tvTaskList.GetNodeCount(true);
                 TreeNodeHelper.TreeNodeCounter = countNodes;
-                
+
                 UpdateShowUntilNumber();
                 ShowStartupAlertForm();
             }
@@ -141,7 +150,20 @@ namespace InformationTree.Forms
 
             _configuration = _configurationReader.GetConfiguration();
 
-            InitializeComponent_AddEvents();
+            // Add events
+            var addEventsRequest = new MainFormInitializeComponentAddEventsRequest
+            {
+                Form = this,
+                TaskListTreeView = tvTaskList,
+                StyleCheckedListBox = clbStyle,
+                FontFamilyComboBox = cbFontFamily,
+                FontSizeNumericUpDown = nudFontSize
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(addEventsRequest);
+            }).Wait();
+
             HideComponentsBasedOnFeatures();
         }
 
@@ -149,7 +171,7 @@ namespace InformationTree.Forms
         {
             if (_configuration == null)
                 return;
-            
+
             // Let the designer add it by default and remove it based on configuration if it's not enabled (helping with changes in designer)
             if (!_configuration.ApplicationFeatures.EnableExtraGraphics)
                 tbTreeChange.Controls.Remove(tbGraphics);
@@ -164,68 +186,6 @@ namespace InformationTree.Forms
                 return;
             toolStripItem.Visible = visibleAndEnabled;
             toolStripItem.Enabled = visibleAndEnabled;
-        }
-
-        private void InitializeComponent_AddEvents()
-        {
-            if (IsDisposed)
-                return;
-            MouseWheel += tvTaskList_MouseClick;
-
-            if (tvTaskList == null)
-                return;
-            tvTaskList.AfterSelect += tvTaskList_AfterSelect;
-            tvTaskList.FontChanged += tvTaskList_FontChanged;
-            tvTaskList.ControlAdded += tvTaskList_ControlAdded;
-            tvTaskList.ControlRemoved += tvTaskList_ControlRemoved;
-            tvTaskList.DoubleClick += tvTaskList_DoubleClick;
-            tvTaskList.KeyDown += tvTaskList_KeyDown;
-            tvTaskList.KeyUp += MainForm_KeyUp;
-            tvTaskList.MouseClick += tvTaskList_MouseClick;
-            tvTaskList.MouseMove += tvTaskList_MouseMove;
-
-            if (clbStyle == null)
-                return;
-            clbStyle.ItemCheck += clbStyle_ItemCheck;
-
-            if (cbFontFamily == null)
-                return;
-            cbFontFamily.SelectedIndexChanged += cbFontFamily_SelectedIndexChanged;
-
-            if (nudFontSize == null)
-                return;
-            nudFontSize.ValueChanged += nudFontSize_ValueChanged;
-        }
-
-        private void InitializeComponent_RemoveEvents()
-        {
-            if (IsDisposed)
-                return;
-            MouseWheel -= tvTaskList_MouseClick;
-
-            if (tvTaskList == null)
-                return;
-            tvTaskList.AfterSelect -= tvTaskList_AfterSelect;
-            tvTaskList.FontChanged -= tvTaskList_FontChanged;
-            tvTaskList.ControlAdded -= tvTaskList_ControlAdded;
-            tvTaskList.ControlRemoved -= tvTaskList_ControlRemoved;
-            tvTaskList.DoubleClick -= tvTaskList_DoubleClick;
-            tvTaskList.KeyDown -= tvTaskList_KeyDown;
-            tvTaskList.KeyUp -= MainForm_KeyUp;
-            tvTaskList.MouseClick -= tvTaskList_MouseClick;
-            tvTaskList.MouseMove -= tvTaskList_MouseMove;
-
-            if (clbStyle == null)
-                return;
-            clbStyle.ItemCheck -= clbStyle_ItemCheck;
-
-            if (cbFontFamily == null)
-                return;
-            cbFontFamily.SelectedIndexChanged -= cbFontFamily_SelectedIndexChanged;
-
-            if (nudFontSize == null)
-                return;
-            nudFontSize.ValueChanged -= nudFontSize_ValueChanged;
         }
 
         /// <summary>
@@ -266,17 +226,12 @@ namespace InformationTree.Forms
 
         #endregion ctor
 
-        #region Constants
-
-
-        #endregion Constants
-
         #region Properties
 
         private bool _clbStyle_ItemCheckEntered { get; set; }
 
         private ICanvasForm _canvasForm;
-        
+
         private Stopwatch _timer = new();
         private System.Timers.Timer _randomTimer = new();
         private static int _systemSoundNumber = -1;
@@ -374,99 +329,43 @@ namespace InformationTree.Forms
 
         #region Handlers
 
-        private void tvTaskList_AfterSelect(object sender, TreeViewEventArgs e)
+        public async void tvTaskList_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            try
-            {
-                InitializeComponent_RemoveEvents();
-
-                var node = e.Node;
-                if (node == null)
-                    return;
-
-                var percentCompleted = nudCompleteProgress.Value;
-                tbTaskName.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref percentCompleted, true);
-                nudCompleteProgress.Value = percentCompleted;
-
-                var treeNodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
-
-                TreeNodeHelper.UpdateCurrentSelection(node.Text == null && treeNodeData != null && treeNodeData.IsEmptyData ? null : node);
-
-                tbAddedDate.Text = (treeNodeData.AddedDate.HasValue ? treeNodeData.AddedDate.Value.ToFormattedString() : "-");
-                tbLastChangeDate.Text = (treeNodeData.LastChangeDate.HasValue ? treeNodeData.LastChangeDate.Value.ToFormattedString() : "-");
-                tbAddedNumber.Text = treeNodeData.AddedNumber.ToString();
-
-                tbTaskName.BackColor = treeNodeData.GetTaskNameColor();
-                
-                nudUrgency.Value = treeNodeData.Urgency;
-                tbLink.Text = treeNodeData.Link;
-                cbIsStartupAlert.Checked = treeNodeData.IsStartupAlert;
-                nudCompleteProgress.Value = treeNodeData.PercentCompleted;
-                tbCategory.Text = treeNodeData.Category;
-
-                var sizeBytes = TreeNodeHelper.CalculateDataSizeFromNodeAndChildren(node, _treeNodeDataCachingService);
-                var sizeMb = sizeBytes / 1024 / 1024;
-                tbDataSize.Text = $"{sizeBytes}b {sizeMb}M";
-
-                gbTimeSpent.Enabled = true;
-                var timeSpanTotal = !string.IsNullOrEmpty(node.Name) ? TimeSpan.FromMilliseconds(long.Parse(node.Name)) : new TimeSpan(0);
-                nudHours.Value = timeSpanTotal.Hours;
-                nudMinutes.Value = timeSpanTotal.Minutes;
-                nudSeconds.Value = timeSpanTotal.Seconds;
-                nudMilliseconds.Value = timeSpanTotal.Milliseconds;
-
-                if (node.NodeFont != null)
-                {
-                    var defaultSize = 8;
-                    var size = ((decimal)node.NodeFont.Size) > nudFontSize.Maximum ? defaultSize : ((decimal)node.NodeFont.Size);
-                    size = size < nudFontSize.Minimum ? defaultSize : size;
-                    nudFontSize.Value = size;
-                }
-
-                if (!_clbStyle_ItemCheckEntered)
-                {
-                    if (node != null && node.NodeFont != null)
-                    {
-                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Regular);
-                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Italic);
-                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Bold);
-                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Strikeout);
-                        UpdateCheckedListBoxBasedOnFont(node, clbStyle, FontStyle.Underline);
-
-                        // Update font family based on current font
-                        if (node.NodeFont.FontFamily != null && cbFontFamily.Items.Count != 0)
-                            for (int i = 0; i < cbFontFamily.Items.Count; i++)
-                            {
-                                var fontFamily = cbFontFamily.Items[i] as string;
-                                if (fontFamily != null && fontFamily == node.NodeFont.FontFamily.Name)
-                                {
-                                    cbFontFamily.SelectedIndex = i;
-                                    break;
-                                }
-                            }
-                    }
-
-                    tbTextColor.Text = node.ForeColor.Name;
-                    tbBackgroundColor.Text = node.BackColor.Name;
-                }
-            }
-            finally
-            {
-                InitializeComponent_AddEvents();
-            }
-        }
-
-        private void UpdateCheckedListBoxBasedOnFont(TreeNode node, CheckedListBox clb, FontStyle fontStyle)
-        {
-            if (node == null || node.NodeFont == null || clb == null)
+            if (e.Node == null)
                 return;
 
-            int idx = clb.Items.IndexOf(fontStyle);
-            
-            var itemChecked = ((node.NodeFont.Style & fontStyle) != 0) || (node.NodeFont.Style == fontStyle);
-            var checkedState = ((!clb.GetItemChecked(idx)) && itemChecked) || fontStyle == FontStyle.Regular ? CheckState.Checked : CheckState.Unchecked;
-            
-            clb.SetItemCheckState(idx, checkedState);
+            var taskListAfterSelectRequest = new TaskListAfterSelectRequest
+            {
+                TaskListTreeView = tvTaskList,
+                Form = this,
+                SelectedNode = e.Node,
+                SelectedNodeData = e.Node
+                    .ToTreeNodeData(_treeNodeDataCachingService),
+                TaskPercentCompleted = nudCompleteProgress.Value,
+                StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                TimeSpentGroupBox = gbTimeSpent,
+                StyleCheckedListBox = clbStyle,
+                FontFamilyComboBox = cbFontFamily,
+                TaskNameTextBox = tbTaskName,
+                AddedDateTextBox = tbAddedDate,
+                LastChangeDateTextBox = tbLastChangeDate,
+                AddedNumberTextBox = tbAddedNumber,
+                UrgencyNumericUpDown = nudUrgency,
+                LinkTextBox = tbLink,
+                IsStartupAlertCheckBox = cbIsStartupAlert,
+                CompleteProgressNumericUpDown = nudCompleteProgress,
+                CategoryTextBox = tbCategory,
+                DataSizeTextBox = tbDataSize,
+                HoursNumericUpDown = nudHours,
+                MinutesNumericUpDown = nudMinutes,
+                SecondsNumericUpDown = nudSeconds,
+                MillisecondsNumericUpDown = nudMilliseconds,
+                FontSizeNumericUpDown = nudFontSize,
+                TextColorTextBox = tbTextColor,
+                BackgroundColorTextBox = tbBackgroundColor,
+            };
+
+            await _mediator.Send(taskListAfterSelectRequest);
         }
 
         private void btnNoTask_Click(object sender, EventArgs e)
@@ -492,32 +391,56 @@ namespace InformationTree.Forms
             //nudUrgency.Value = 0;
         }
 
-        private void btnUpdateText_Click(object sender, EventArgs e)
+        private async void btnUpdateText_Click(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-            if (selectedNode != null)
+            if (tvTaskList.SelectedNode == null)
+                return;
+
+            var taskPercentCompleted = nudCompleteProgress.Value;
+            var updateTextClickRequest = new UpdateTextClickRequest
             {
-                var taskPercentCompleted = nudCompleteProgress.Value;
-                var taskName = TextProcessingHelper.GetTextAndProcentCompleted(tbTaskName.Text, ref taskPercentCompleted, true);
-                var link = tbLink.Text;
-                var urgency = (int)nudUrgency.Value;
-                var category = tbCategory.Text;
-                var isStartupAlert = cbIsStartupAlert.Checked;
+                SelectedNode = tvTaskList.SelectedNode
+                    .ToTreeNodeData(_treeNodeDataCachingService),
+                TaskPercentCompleted = taskPercentCompleted,
+                TaskName = TextProcessingHelper.GetTextAndProcentCompleted(tbTaskName.Text, ref taskPercentCompleted, true),
+                Link = tbLink.Text,
+                Urgency = (int)nudUrgency.Value,
+                Category = tbCategory.Text,
+                IsStartupAlert = cbIsStartupAlert.Checked,
+                TaskListTreeView = tvTaskList,
+                AfterSelectRequest = new TaskListAfterSelectRequest
+                {
+                    TaskListTreeView = tvTaskList,
+                    Form = this,
+                    SelectedNode = tvTaskList.SelectedNode,
+                    SelectedNodeData = tvTaskList.SelectedNode
+                        .ToTreeNodeData(_treeNodeDataCachingService),
+                    TaskPercentCompleted = nudCompleteProgress.Value,
+                    StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                    TimeSpentGroupBox = gbTimeSpent,
+                    StyleCheckedListBox = clbStyle,
+                    FontFamilyComboBox = cbFontFamily,
+                    TaskNameTextBox = tbTaskName,
+                    AddedDateTextBox = tbAddedDate,
+                    LastChangeDateTextBox = tbLastChangeDate,
+                    AddedNumberTextBox = tbAddedNumber,
+                    UrgencyNumericUpDown = nudUrgency,
+                    LinkTextBox = tbLink,
+                    IsStartupAlertCheckBox = cbIsStartupAlert,
+                    CompleteProgressNumericUpDown = nudCompleteProgress,
+                    CategoryTextBox = tbCategory,
+                    DataSizeTextBox = tbDataSize,
+                    HoursNumericUpDown = nudHours,
+                    MinutesNumericUpDown = nudMinutes,
+                    SecondsNumericUpDown = nudSeconds,
+                    MillisecondsNumericUpDown = nudMilliseconds,
+                    FontSizeNumericUpDown = nudFontSize,
+                    TextColorTextBox = tbTextColor,
+                    BackgroundColorTextBox = tbBackgroundColor,
+                }
+            };
 
-                var data = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
-                data.Urgency = urgency;
-                data.Link = link;
-                data.Category = category;
-                data.IsStartupAlert = isStartupAlert;
-                data.PercentCompleted = taskPercentCompleted;
-                data.LastChangeDate = DateTime.Now;
-
-                selectedNode.Text = taskName;
-
-                tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
-
-                TreeNodeHelper.TreeUnchanged = false;
-            }
+            await _mediator.Send(updateTextClickRequest);
         }
 
         private void btnAddTask_Click(object sender, EventArgs e)
@@ -573,7 +496,7 @@ namespace InformationTree.Forms
                 treeNodeData.Link = link;
                 treeNodeData.IsStartupAlert = false;
                 treeNodeData.PercentCompleted = taskPercentCompleted;
-                
+
                 node.Text = taskName;
 
                 if (tvTaskList.SelectedNode == null)
@@ -606,7 +529,7 @@ namespace InformationTree.Forms
                 var itemOrItems = deletedItemsWithName == 1 ? " item" : " items";
                 var messageBoxText = $"Delete {deletedItemsWithName} {itemOrItems} with name {taskName}?";
                 var messageBoxCaption = $"Delete";
-                
+
                 var result = _popUpService.ShowQuestion(messageBoxText, messageBoxCaption);
                 if (result == PopUpResult.Yes)
                 {
@@ -703,7 +626,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
+        public void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null && cbFontFamily.SelectedItem != null)
             {
@@ -716,7 +639,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void nudFontSize_ValueChanged(object sender, EventArgs e)
+        public void nudFontSize_ValueChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
             {
@@ -730,7 +653,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
+        public void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (_clbStyle_ItemCheckEntered)
                 return;
@@ -764,7 +687,6 @@ namespace InformationTree.Forms
 
                     TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
                 }
-
             }
             finally
             {
@@ -939,7 +861,7 @@ namespace InformationTree.Forms
             btnResetException.Enabled = true;
         }
 
-        private void tvTaskList_MouseMove(object sender, MouseEventArgs e)
+        public void tvTaskList_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.X == _oldX && e.Y == _oldY)
                 return;
@@ -972,7 +894,7 @@ namespace InformationTree.Forms
             {
                 var tagData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                 var data = tagData.Data ?? string.Empty;
-                
+
                 var form = new PopUpEditForm(
                     _canvasFormFactory,
                     _popUpService,
@@ -992,7 +914,7 @@ namespace InformationTree.Forms
                     {
                         var td = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
                         td.Data = d;
-                        
+
                         var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(d);
                         selectedNode.ToolTipText = TextProcessingHelper.GetToolTipText(selectedNode.Text +
                             (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
@@ -1008,7 +930,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void tvTaskList_DoubleClick(object sender, EventArgs e)
+        public void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
             if (node != null)
@@ -1096,7 +1018,7 @@ namespace InformationTree.Forms
 
         private void btnMoveNode_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService);
+            TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService, _treeNodeSelectionCachingService);
             TreeNodeHelper.TreeUnchanged = false;
         }
 
@@ -1105,7 +1027,8 @@ namespace InformationTree.Forms
             var afterSaveDoWithFileName = new Action<string>((fileName) => TreeNodeHelper.FileName = fileName);
             var beforeLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.WaitCursor));
             var afterLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.Default));
-            var afterLoad = new Action(() => {
+            var afterLoad = new Action(() =>
+            {
                 tvTaskList.InvokeWrapper(tv => { tv.CollapseAll(); tv.Refresh(); });
                 TreeNodeHelper.IsSafeToSave = true;
                 UpdateShowUntilNumber();
@@ -1142,8 +1065,7 @@ namespace InformationTree.Forms
                 var searchText = tbSearchBox.Text;
 
                 TreeNodeHelper.ClearStyleAdded(tvTaskList.Nodes);
-                
-                
+
                 if (searchText.Length < 3)
                     return;
 
@@ -1159,24 +1081,24 @@ namespace InformationTree.Forms
             if (_canvasForm == null || _canvasForm.IsDisposed)
             {
                 var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
-                
+
                 _canvasForm = _canvasFormFactory.Create(figureLines);
             }
-            
+
             _canvasForm.Show();
         }
 
-        private void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
+        public void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
         {
             TreeNodeHelper.TreeUnchanged = false;
         }
 
-        private void tvTaskList_ControlRemoved(object sender, ControlEventArgs e)
+        public void tvTaskList_ControlRemoved(object sender, ControlEventArgs e)
         {
             TreeNodeHelper.TreeUnchanged = false;
         }
 
-        private void tvTaskList_FontChanged(object sender, EventArgs e)
+        public void tvTaskList_FontChanged(object sender, EventArgs e)
         {
             TreeNodeHelper.TreeUnchanged = false;
         }
@@ -1205,9 +1127,9 @@ namespace InformationTree.Forms
         {
             if (tbCommand.Lines.Length <= 0)
                 return;
-                
+
             var figureLines = tbCommand.Lines;
-            
+
             if (_canvasForm == null || _canvasForm.IsDisposed)
             {
                 _canvasForm = _canvasFormFactory.Create(figureLines);
@@ -1305,12 +1227,12 @@ namespace InformationTree.Forms
             TreeNodeHelper.TreeUnchanged = !TreeNodeHelper.TreeUnchanged;
         }
 
-        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        public void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             _isControlPressed = false;
         }
 
-        private void tvTaskList_KeyDown(object sender, KeyEventArgs e)
+        public void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control)
                 _isControlPressed = true;
@@ -1331,13 +1253,13 @@ namespace InformationTree.Forms
             }
         }
 
-        private void tvTaskList_MouseClick(object sender, MouseEventArgs e)
+        public void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
             if (_isControlPressed && tvTaskList != null)
             {
                 var deltaFloat = (float)e.Delta;
                 var changedSize = deltaFloat / 120f;
-                
+
                 TreeNodeHelper.UpdateSizeOfTreeNodes(tvTaskList.Nodes, changedSize);
             }
         }
@@ -1361,7 +1283,7 @@ namespace InformationTree.Forms
                 return;
             if (_configuration.ApplicationFeatures.EnableAlerts == false)
                 return;
-            
+
             if (!_randomTimer.Enabled)
             {
                 _randomTimer.Elapsed += RandomTimer_Elapsed; // timer disposed in Dispose(bool)
@@ -1441,7 +1363,7 @@ namespace InformationTree.Forms
 
             var treeNodeData = ParseTreeRecursively(selectedNode);
             var exportedRtf = _exportNodeToRtfService.GetRtfExport(treeNodeData);
-            
+
             Clipboard.SetText(exportedRtf, TextDataFormat.Rtf);
         }
 

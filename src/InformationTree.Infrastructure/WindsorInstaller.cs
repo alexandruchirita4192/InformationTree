@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Castle.MicroKernel.Registration;
+﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using InformationTree.Domain.Services;
@@ -37,7 +36,8 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<IExportTreeToXmlService>().ImplementedBy<ExportTreeToXmlService>().LifeStyle.Singleton);
             container.Register(Component.For<IImportTreeFromXmlService>().ImplementedBy<ImportTreeFromXmlService>().LifeStyle.Singleton);
             container.Register(Component.For<IImportExportTreeXmlService>().ImplementedBy<ImportExportTreeXmlService>().LifeStyle.Singleton);
-            
+            container.Register(Component.For<ITreeNodeSelectionCachingService>().ImplementedBy<TreeNodeSelectionCachingService>().LifeStyle.Singleton);
+
             container.RegisterMediatorForUsageFrom(typeof(MainForm).Assembly);
         }
     }
