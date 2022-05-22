@@ -127,13 +127,21 @@ namespace InformationTree.Forms
             var loadedExisting = !root.IsEmptyData || root.Children.Any();
             if (loadedExisting)
             {
-                tvTaskList.CollapseAll();
-                tvTaskList.Refresh();
-
-                var countNodes = tvTaskList.GetNodeCount(true);
-                TreeNodeHelper.TreeNodeCounter = countNodes;
-
-                UpdateShowUntilNumber();
+                var treeViewCollapseAndRefreshRequest = new TreeViewCollapseAndRefreshRequest
+                {
+                    TreeView = tvTaskList
+                };
+                var updateNodeCountRequest = new UpdateNodeCountRequest
+                {
+                    TreeView = tvTaskList,
+                    ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                    ShowFromNumberNumericUpDown = nudShowFromNumber,
+                };
+                Task.Run(async () =>
+                {
+                    await _mediator.Send(treeViewCollapseAndRefreshRequest);
+                    return await _mediator.Send(updateNodeCountRequest);
+                }).Wait();
                 ShowStartupAlertForm();
             }
 
@@ -254,8 +262,7 @@ namespace InformationTree.Forms
 
         public void SaveTree()
         {
-            var treeNodeData = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
-            _exportTreeToXmlService.SaveTree(treeNodeData, TreeNodeHelper.FileName);
+            _exportTreeToXmlService.SaveTree(TaskListRoot, TreeNodeHelper.FileName);
         }
 
         public void ClearStyleAdded()
@@ -287,18 +294,6 @@ namespace InformationTree.Forms
         #endregion Public methods
 
         #region Private methods
-
-        private void UpdateShowUntilNumber()
-        {
-            var countNodes = tvTaskList.GetNodeCount(true);
-            TreeNodeHelper.TreeNodeCounter = countNodes;
-            nudShowUntilNumber.Minimum = 0;
-            nudShowUntilNumber.Maximum = countNodes;
-            nudShowUntilNumber.Value = countNodes;
-            nudShowFromNumber.Minimum = 0;
-            nudShowFromNumber.Maximum = countNodes;
-            nudShowFromNumber.Value = 0;
-        }
 
         private int ParseToDelete(TreeNode selectedTask, string taskName, bool fakeDelete)
         {
@@ -508,7 +503,16 @@ namespace InformationTree.Forms
                 //TreeNodeHelper.TreeUnchanged = false; // on control add it is added too
             }
 
-            UpdateShowUntilNumber();
+            var updateNodeCountRequest = new UpdateNodeCountRequest
+            {
+                TreeView = tvTaskList,
+                ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                ShowFromNumberNumericUpDown = nudShowFromNumber,
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(updateNodeCountRequest);
+            }).Wait();
 
             // TODO: Fix properly
             btnUpdateText_Click(sender, e); // workaround fix for some weirdly added spaces
@@ -532,7 +536,17 @@ namespace InformationTree.Forms
                     ParseToDelete(selectedTask, taskName, false);
 
                     btnNoTask_Click(this, EventArgs.Empty);
-                    UpdateShowUntilNumber();
+
+                    var updateNodeCountRequest = new UpdateNodeCountRequest
+                    {
+                        TreeView = tvTaskList,
+                        ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                        ShowFromNumberNumericUpDown = nudShowFromNumber,
+                    };
+                    Task.Run(async () =>
+                    {
+                        return await _mediator.Send(updateNodeCountRequest);
+                    }).Wait();
                 }
             }
 
@@ -931,18 +945,15 @@ namespace InformationTree.Forms
             if (node != null)
             {
                 var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
+                if (tagData != null && tagData.Link.IsNotEmpty())
                 {
-                    var afterSaveDoWithFileName = new Action<string>((fileName) => TreeNodeHelper.FileName = fileName);
-                    var afterLoad = new Action(() =>
-                    {
-                        tvTaskList.InvokeWrapper(tv => { tv.CollapseAll(); tv.Refresh(); });
-                        TreeNodeHelper.IsSafeToSave = true;
-                        UpdateShowUntilNumber();
-                    });
-                    var currentRoot = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
-
-                    (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, this, tagData.Link, afterLoad);
+                    (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
+                        TaskListRoot,
+                        this,
+                        tvTaskList,
+                        nudShowUntilNumber,
+                        nudShowFromNumber,
+                        tagData.Link);
                 }
             }
             else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
@@ -1017,17 +1028,13 @@ namespace InformationTree.Forms
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
-            var afterSaveDoWithFileName = new Action<string>((fileName) => TreeNodeHelper.FileName = fileName);
-            var beforeLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.WaitCursor));
-            var afterLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.Default));
-            var afterLoad = new Action(() =>
-            {
-                tvTaskList.InvokeWrapper(tv => { tv.CollapseAll(); tv.Refresh(); });
-                TreeNodeHelper.IsSafeToSave = true;
-                UpdateShowUntilNumber();
-            });
-            var currentRoot = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
-            (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, this, null, afterLoad);
+            (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
+                TaskListRoot,
+                this,
+                tvTaskList,
+                nudShowUntilNumber,
+                nudShowFromNumber,
+                null);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)
@@ -1099,8 +1106,7 @@ namespace InformationTree.Forms
         private void ShowStartupAlertForm()
         {
             var alertNodesRoot = new TreeNodeData();
-            var root = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
-            var haveAlerts = _importTreeFromXmlService.LoadTreeNodesByCategory(root, alertNodesRoot, true);
+            var haveAlerts = _importTreeFromXmlService.LoadTreeNodesByCategory(TaskListRoot, alertNodesRoot, true);
 
             if (haveAlerts)
             {
