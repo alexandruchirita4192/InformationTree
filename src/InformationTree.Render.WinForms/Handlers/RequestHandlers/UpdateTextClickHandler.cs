@@ -38,7 +38,11 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             await _mediator.Send(request.AfterSelectRequest, cancellationToken);
 
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            await _mediator.Send(setTreeStateRequest, cancellationToken);
 
             if (request.TaskListTreeView is TreeView tvTaskList)
             {

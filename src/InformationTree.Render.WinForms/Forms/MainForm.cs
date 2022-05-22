@@ -124,7 +124,7 @@ namespace InformationTree.Forms
             {
                 TreeUnchanged = true,
                 IsSafeToSave = true,
-                File = new FileInfo { FileName = fileName }
+                FileInfo = new FileInfo { FileName = fileName }
             };
             Task.Run(async () =>
             {
@@ -461,7 +461,14 @@ namespace InformationTree.Forms
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
 
-                    TreeNodeHelper.TreeUnchanged = false;
+                    var setTreeStateRequest = new SetTreeStateRequest
+                    {
+                        TreeUnchanged = false
+                    };
+                    Task.Run(async () =>
+                    {
+                        return await _mediator.Send(setTreeStateRequest);
+                    }).Wait();
                 }
             }
             else if (selectedNodeLastChildren != null && selectedNodeLastChildren.Text.Equals(taskName /* StartsWith + " [" */))
@@ -475,7 +482,14 @@ namespace InformationTree.Forms
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
 
-                    TreeNodeHelper.TreeUnchanged = false;
+                    var setTreeStateRequest = new SetTreeStateRequest
+                    {
+                        TreeUnchanged = false
+                    };
+                    Task.Run(async () =>
+                    {
+                        return await _mediator.Send(setTreeStateRequest);
+                    }).Wait();
                 }
             }
             else //insert
@@ -921,7 +935,8 @@ namespace InformationTree.Forms
                 addedNumberLowerThan,
                 addedNumberHigherThan,
                 CopyNodeFilterType.FilterByAddedNumber,
-                _treeNodeDataCachingService);
+                _treeNodeDataCachingService,
+                _mediator);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -939,7 +954,8 @@ namespace InformationTree.Forms
                 urgencyNumberLowerThan,
                 urgencyNumberHigherThan,
                 CopyNodeFilterType.FilterByUrgency,
-                _treeNodeDataCachingService);
+                _treeNodeDataCachingService,
+                _mediator);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -951,7 +967,9 @@ namespace InformationTree.Forms
         {
             if (TreeNodeHelper.ReadOnlyState)
             {
-                TreeNodeHelper.ShowAllTasks(tvTaskList);
+                TreeNodeHelper.ShowAllTasks(
+                    tvTaskList,
+                    _mediator);
                 gbTask.Enabled = true;
                 gbStyleChange.Enabled = true;
                 gbTimeSpent.Enabled = true;
@@ -1054,13 +1072,22 @@ namespace InformationTree.Forms
                 var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 if (tagData != null && tagData.Link.IsNotEmpty())
                 {
-                    (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
+                    (_, var fileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
                         TaskListRoot,
                         this,
                         tvTaskList,
                         nudShowUntilNumber,
                         nudShowFromNumber,
                         tagData.Link);
+                    
+                    var setTreeStateRequest = new SetTreeStateRequest
+                    {
+                        FileInfo = new FileInfo { FileName = fileName }
+                    };
+                    Task.Run(async () =>
+                    {
+                        return await _mediator.Send(setTreeStateRequest);
+                    }).Wait();
                 }
             }
             else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
@@ -1117,10 +1144,28 @@ namespace InformationTree.Forms
                 }
 
                 var auxFileName = TreeNodeHelper.FileName;
-                TreeNodeHelper.FileName = tagData.Link;
+
+                var setTreeStateFileInfoRequest = new SetTreeStateRequest
+                {
+                    FileInfo = new FileInfo { FileName = tagData.Link }
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateFileInfoRequest);
+                }).Wait();
+                
                 var root = treeView.ToTreeNodeData(_treeNodeDataCachingService);
                 _exportTreeToXmlService.SaveTree(root, TreeNodeHelper.FileName);
-                TreeNodeHelper.FileName = auxFileName;
+
+                setTreeStateFileInfoRequest = new SetTreeStateRequest
+                {
+                    FileInfo = new FileInfo { FileName = auxFileName }
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateFileInfoRequest);
+                }).Wait();                
+                
                 node.Nodes.Clear();
             }
 
@@ -1150,13 +1195,22 @@ namespace InformationTree.Forms
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
-            (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
+            (_, var fileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
                 TaskListRoot,
                 this,
                 tvTaskList,
                 nudShowUntilNumber,
                 nudShowFromNumber,
                 null);
+
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                FileInfo = new FileInfo { FileName = fileName }
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)

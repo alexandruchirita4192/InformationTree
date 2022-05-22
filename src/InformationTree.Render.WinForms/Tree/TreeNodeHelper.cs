@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.TextProcessing;
+using MediatR;
 
 namespace InformationTree.Tree
 {
@@ -410,7 +413,8 @@ namespace InformationTree.Tree
             decimal filterLowerThan,
             decimal filterHigherThan,
             CopyNodeFilterType filterType,
-            ITreeNodeDataCachingService treeNodeDataCachingService)
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            IMediator mediator)
         {
             if (nodes == null)
                 nodes = new TreeNode().Nodes;
@@ -425,16 +429,31 @@ namespace InformationTree.Tree
             // let tvTaskList with only addedNumber < addedNumberLowerThan
             tv.Nodes.Clear();
             CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, (int)filterHigherThan, (int)filterLowerThan, filterType);
-            ReadOnlyState = true;
+
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                ReadOnlyState = true
+            };
+            Task.Run(async () =>
+            {
+                return await mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
-        public static void ShowAllTasks(TreeView tv)
+        public static void ShowAllTasks(TreeView tv, IMediator mediator)
         {
             if (ReadOnlyState)
             {
                 tv.Nodes.Clear();
                 CopyNodes(tv.Nodes, nodes, null, null);
-                ReadOnlyState = false;
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    ReadOnlyState = false
+                };
+                Task.Run(async () =>
+                {
+                    return await mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 

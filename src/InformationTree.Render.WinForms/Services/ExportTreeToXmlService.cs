@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using MediatR;
 
 namespace InformationTree.Render.WinForms.Services
 {
     public class ExportTreeToXmlService : IExportTreeToXmlService
     {
         private readonly ICompressionProvider _compressionProvider;
+        private readonly IMediator _mediator;
 
-        public ExportTreeToXmlService(ICompressionProvider compressionProvider)
+        public ExportTreeToXmlService(
+            ICompressionProvider compressionProvider,
+            IMediator mediator)
         {
             _compressionProvider = compressionProvider;
+            _mediator = mediator;
         }
 
         public string DateTimeToString(DateTime? dt)
@@ -43,9 +48,16 @@ namespace InformationTree.Render.WinForms.Services
                 _streamWriter.WriteLine("</root>");
                 _streamWriter.Close();
 
-                TreeNodeHelper.TreeUnchanged = true;
-                TreeNodeHelper.TreeSaved = true;
-                TreeNodeHelper.TreeSavedAt = DateTime.Now;
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = true,
+                    TreeSaved = true,
+                    TreeSavedAt = DateTime.Now
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 

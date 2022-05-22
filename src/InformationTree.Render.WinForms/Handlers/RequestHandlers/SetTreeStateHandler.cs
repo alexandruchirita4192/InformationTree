@@ -19,9 +19,15 @@ namespace InformationTree.Render.WinForms.Handlers
                 TreeNodeHelper.TreeNodeCounter = request.TreeNodeCounter.Value;
             if (request.TreeUnchanged.HasValue)
                 TreeNodeHelper.TreeUnchanged = request.TreeUnchanged.Value;
-            if (request.File != null)
-                TreeNodeHelper.FileName = request.File.FileName;
-
+            if (request.TreeSaved.HasValue)
+                TreeNodeHelper.TreeSaved = request.TreeSaved.Value;
+            if (request.TreeSavedAt.HasValue)
+                TreeNodeHelper.TreeSavedAt = request.TreeSavedAt.Value;
+            if (request.ReadOnlyState.HasValue)
+                TreeNodeHelper.ReadOnlyState = request.ReadOnlyState.Value;
+            if (request.FileInfo != null)
+                TreeNodeHelper.FileName = request.FileInfo.FileName;
+            
             return Task.FromResult(new BaseResponse());
         }
     }
