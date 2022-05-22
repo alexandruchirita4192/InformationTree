@@ -49,11 +49,13 @@ namespace InformationTree.Forms
             if (disposing)
             {
                 if (grafx != null)
-                    grafx = null;
+                    grafx.Dispose();
                 if (context != null)
-                    context = null;
-                RunTimer = null;
-                GraphicsFile = null;
+                    context.Dispose();
+                if (RunTimer != null)
+                    RunTimer.Dispose();
+                if (GraphicsFile != null)
+                    GraphicsFile.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -83,10 +85,7 @@ namespace InformationTree.Forms
         {
             context.MaximumBuffer = new D.Size(this.Width + 1, this.Height + 1);
             if (grafx != null)
-            {
                 grafx.Dispose();
-                grafx = null;
-            }
             grafx = context.Allocate(this.CreateGraphics(),
                 new D.Rectangle(0, 0, this.Width, this.Height));
 

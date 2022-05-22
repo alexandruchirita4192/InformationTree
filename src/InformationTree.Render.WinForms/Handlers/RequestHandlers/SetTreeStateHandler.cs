@@ -17,6 +17,8 @@ namespace InformationTree.Render.WinForms.Handlers
                 TreeNodeHelper.IsSafeToSave = request.IsSafeToSave.Value;
             if (request.TreeNodeCounter.HasValue)
                 TreeNodeHelper.TreeNodeCounter = request.TreeNodeCounter.Value;
+            if (request.TreeUnchanged.HasValue)
+                TreeNodeHelper.TreeUnchanged = request.TreeUnchanged.Value;
             if (request.File != null)
                 TreeNodeHelper.FileName = request.File.FileName;
 

@@ -7,6 +7,7 @@ public class SetTreeStateRequest : IRequest<BaseResponse>
 {
     public bool? IsSafeToSave { get; set; }
     public int? TreeNodeCounter { get; set; }
+    public bool? TreeUnchanged { get; set; }
     public FileInfo File { get; set; }
 }
 

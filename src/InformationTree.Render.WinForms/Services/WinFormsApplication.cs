@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
@@ -181,13 +183,27 @@ namespace InformationTree.Render.WinForms.Services
 
                     if (result == PopUpResult.Confirm)
                     {
-                        TreeNodeHelper.IsSafeToSave = true;
-                        TreeNodeHelper.TreeUnchanged = false;
+                        var setTreeStateRequest = new SetTreeStateRequest
+                        {
+                            IsSafeToSave = true,
+                            TreeUnchanged = false
+                        };
+                        Task.Run(async () =>
+                        {
+                            return await _mediator.Send(setTreeStateRequest);
+                        }).Wait();
                     }
                     else if (result == PopUpResult.NotConfirm)
                     {
-                        TreeNodeHelper.IsSafeToSave = false;
-                        TreeNodeHelper.TreeUnchanged = true;
+                        var setTreeStateRequest = new SetTreeStateRequest
+                        {
+                            IsSafeToSave = false,
+                            TreeUnchanged = true
+                        };
+                        Task.Run(async () =>
+                        {
+                            return await _mediator.Send(setTreeStateRequest);
+                        }).Wait();
                     }
                 }
 

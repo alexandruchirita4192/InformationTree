@@ -117,12 +117,19 @@ namespace InformationTree.Forms
                 clbStyle.Items.Add(FontStyle.Strikeout);
             }
 
-            TreeNodeHelper.TreeUnchanged = true;
-            TreeNodeHelper.IsSafeToSave = true;
-
             (var root, var fileName) = _importTreeFromXmlService.LoadTree(TreeNodeHelper.FileName, this);
             root.CopyToTreeView(tvTaskList, _treeNodeDataCachingService, true);
-            TreeNodeHelper.FileName = fileName;
+
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = true,
+                IsSafeToSave = true,
+                File = new FileInfo { FileName = fileName }
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
 
             var loadedExisting = !root.IsEmptyData || root.Children.Any();
             if (loadedExisting)
@@ -275,7 +282,7 @@ namespace InformationTree.Forms
             if (btnResetException == null)
                 return;
 
-            if (!TreeNodeHelper.IsSafeToSave || !String.IsNullOrEmpty(message))
+            if (!TreeNodeHelper.IsSafeToSave || message.IsNotEmpty())
             {
                 btnResetException.Enabled = true;
                 btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
@@ -618,7 +625,14 @@ namespace InformationTree.Forms
                 var percentage = (decimal)TreeNodeHelper.GetPercentageFromChildren(selectedNode);
                 selectedNode.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(selectedNode.Text, ref percentage, true);
 
-                TreeNodeHelper.TreeUnchanged = false;
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = false
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 
@@ -632,7 +646,14 @@ namespace InformationTree.Forms
                 TextProcessingHelper.GetTextAndProcentCompleted(selectedNode.Text, ref percentage, true);
                 TreeNodeHelper.SetPercentageToChildren(selectedNode, (double)percentage);
 
-                TreeNodeHelper.TreeUnchanged = false;
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = false
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 
@@ -645,7 +666,15 @@ namespace InformationTree.Forms
                 if (cbFontFamily.SelectedItem is string fontFamily)
                     tvTaskList.SelectedNode.NodeFont = new Font(fontFamily, (float)nudFontSize.Value, oldFont.Style);
 
-                TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
+                // on font changed is added too??
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = false
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 
@@ -657,8 +686,16 @@ namespace InformationTree.Forms
                 if (oldFont != null)
                 {
                     tvTaskList.SelectedNode.NodeFont = new Font(oldFont.FontFamily, (float)nudFontSize.Value, oldFont.Style);
-
-                    TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
+                    
+                    // on font changed is added too??
+                    var setTreeStateRequest = new SetTreeStateRequest
+                    {
+                        TreeUnchanged = false
+                    };
+                    Task.Run(async () =>
+                    {
+                        return await _mediator.Send(setTreeStateRequest);
+                    }).Wait();
                 }
             }
         }
@@ -695,7 +732,15 @@ namespace InformationTree.Forms
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(tvTaskList.SelectedNode));
 
-                    TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
+                    // on font changed is added too??
+                    var setTreeStateRequest = new SetTreeStateRequest
+                    {
+                        TreeUnchanged = false
+                    };
+                    Task.Run(async () =>
+                    {
+                        return await _mediator.Send(setTreeStateRequest);
+                    }).Wait();
                 }
             }
             finally
@@ -722,7 +767,15 @@ namespace InformationTree.Forms
             {
                 tvTaskList.SelectedNode.ForeColor = Color.FromName(tbTextColor.Text);
 
-                TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
+                // on font changed is added too??
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = false
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 
@@ -732,7 +785,15 @@ namespace InformationTree.Forms
             {
                 tvTaskList.SelectedNode.BackColor = Color.FromName(tbBackgroundColor.Text);
 
-                TreeNodeHelper.TreeUnchanged = false; // on font changed is added too??
+                // on font changed is added too??
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = false
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
         }
 
@@ -785,7 +846,14 @@ namespace InformationTree.Forms
                     _popUpService.ShowMessage($"Cannot move task up! Current index is {selectedIndex}.");
             }
 
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
         private void btnMoveTaskDown_Click(object sender, EventArgs e)
@@ -819,12 +887,27 @@ namespace InformationTree.Forms
                     _popUpService.ShowMessage($"Cannot move task down! Current index is {selectedIndex}.");
             }
 
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
         private void btnResetException_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.IsSafeToSave = true;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                IsSafeToSave = true
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
+
             ChangeResetExceptionButton(null);
         }
 
@@ -877,7 +960,14 @@ namespace InformationTree.Forms
 
         private void btnDoNotSave_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.IsSafeToSave = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                IsSafeToSave = false
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
             btnResetException.Enabled = true;
         }
 
@@ -941,7 +1031,14 @@ namespace InformationTree.Forms
 
                         tbTaskName.BackColor = tagData.GetTaskNameColor();
 
-                        TreeNodeHelper.TreeUnchanged = false;
+                        var setTreeStateRequest = new SetTreeStateRequest
+                        {
+                            TreeUnchanged = false
+                        };
+                        Task.Run(async () =>
+                        {
+                            return await _mediator.Send(setTreeStateRequest);
+                        }).Wait();
                     }
                 };
 
@@ -1027,13 +1124,28 @@ namespace InformationTree.Forms
                 node.Nodes.Clear();
             }
 
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
         private void btnMoveNode_Click(object sender, EventArgs e)
         {
             TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService, _treeNodeSelectionCachingService);
-            TreeNodeHelper.TreeUnchanged = false;
+            
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
         private void btnGoToDefaultTree_Click(object sender, EventArgs e)
@@ -1100,17 +1212,32 @@ namespace InformationTree.Forms
 
         public void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
         {
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
-        public void tvTaskList_ControlRemoved(object sender, ControlEventArgs e)
+        public async void tvTaskList_ControlRemoved(object sender, ControlEventArgs e)
         {
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            await _mediator.Send(setTreeStateRequest);
         }
 
-        public void tvTaskList_FontChanged(object sender, EventArgs e)
+        public async void tvTaskList_FontChanged(object sender, EventArgs e)
         {
-            TreeNodeHelper.TreeUnchanged = false;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            await _mediator.Send(setTreeStateRequest);
         }
 
         private void ShowStartupAlertForm()
@@ -1195,7 +1322,14 @@ namespace InformationTree.Forms
                 var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 nodeData.Data += commandData + Environment.NewLine;
 
-                TreeNodeHelper.TreeUnchanged = false;
+                var setTreeStateRequest = new SetTreeStateRequest
+                {
+                    TreeUnchanged = false
+                };
+                Task.Run(async () =>
+                {
+                    return await _mediator.Send(setTreeStateRequest);
+                }).Wait();
             }
 
             if (cbUseDefaultsChecked)
@@ -1233,7 +1367,14 @@ namespace InformationTree.Forms
 
         private void lblUnchanged_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.TreeUnchanged = !TreeNodeHelper.TreeUnchanged;
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = !TreeNodeHelper.TreeUnchanged
+            };
+            Task.Run(async () =>
+            {
+                return await _mediator.Send(setTreeStateRequest);
+            }).Wait();
         }
 
         public void MainForm_KeyUp(object sender, KeyEventArgs e)

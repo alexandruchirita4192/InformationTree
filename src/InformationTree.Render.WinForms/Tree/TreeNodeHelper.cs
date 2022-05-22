@@ -58,8 +58,7 @@ namespace InformationTree.Tree
                     File.AppendAllText("TreeUnchangedIssue.txt", $"Tree unchanged set as {value} was called by {new StackTrace()} at {DateTime.Now}");
                     _treeUnchanged = value;
 
-                    if (TreeUnchangedChangeDelegate != null)
-                        TreeUnchangedChangeDelegate(value);
+                    TreeUnchangedChangeDelegate?.Invoke(value);
                 }
             }
         }
@@ -431,11 +430,11 @@ namespace InformationTree.Tree
 
         public static void ShowAllTasks(TreeView tv)
         {
-            if (TreeNodeHelper.ReadOnlyState)
+            if (ReadOnlyState)
             {
                 tv.Nodes.Clear();
-                TreeNodeHelper.CopyNodes(tv.Nodes, nodes, null, null);
-                TreeNodeHelper.ReadOnlyState = false;
+                CopyNodes(tv.Nodes, nodes, null, null);
+                ReadOnlyState = false;
             }
         }
 
