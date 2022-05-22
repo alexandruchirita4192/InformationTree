@@ -448,22 +448,19 @@ namespace InformationTree.Forms
                 }
                 else
                 {
-                    using (var decryptedStream = decryptedData.ToStream())
-                    {
-                        using (var outputStream = new MemoryStream())
-                        {
-                            _encryptionAndSigningProvider.EncryptFromFile(decryptedStream, outputStream, _pgpPublicKeyFile, true, true);
+                    using var decryptedStream = decryptedData.ToStream();
+                    using var outputStream = new MemoryStream();
+                    
+                    _encryptionAndSigningProvider.EncryptFromFile(decryptedStream, outputStream, _pgpPublicKeyFile, true, true);
 
-                            using (var reader = new StreamReader(outputStream))
-                            {
-                                var resultedText = reader.ReadToEnd();
-                                if (tbData.Text != resultedText)
-                                {
-                                    data = null;
-                                    tbData.Text = resultedText;
-                                    lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
-                                }
-                            }
+                    using (var reader = new StreamReader(outputStream))
+                    {
+                        var resultedText = reader.ReadToEnd();
+                        if (tbData.Text != resultedText)
+                        {
+                            data = null;
+                            tbData.Text = resultedText;
+                            lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
                         }
                     }
                 }
