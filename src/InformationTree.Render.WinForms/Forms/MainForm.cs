@@ -120,9 +120,7 @@ namespace InformationTree.Forms
             TreeNodeHelper.TreeUnchanged = true;
             TreeNodeHelper.IsSafeToSave = true;
 
-            var beforeLoad = new Action(() => this.InvokeWrapper(f => f.Cursor = Cursors.WaitCursor));
-            var afterLoad = new Action(() => this.InvokeWrapper(f => f.Cursor = Cursors.Default));
-            (var root, var fileName) = _importTreeFromXmlService.LoadTree(TreeNodeHelper.FileName, beforeLoad, afterLoad);
+            (var root, var fileName) = _importTreeFromXmlService.LoadTree(TreeNodeHelper.FileName, this);
             root.CopyToTreeView(tvTaskList, _treeNodeDataCachingService, true);
             TreeNodeHelper.FileName = fileName;
 
@@ -936,8 +934,6 @@ namespace InformationTree.Forms
                 if (tagData != null && !string.IsNullOrEmpty(tagData.Link))
                 {
                     var afterSaveDoWithFileName = new Action<string>((fileName) => TreeNodeHelper.FileName = fileName);
-                    var beforeLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.WaitCursor));
-                    var afterLoadInside = new Action(() => this.InvokeWrapper(t => t.Cursor = Cursors.Default));
                     var afterLoad = new Action(() =>
                     {
                         tvTaskList.InvokeWrapper(tv => { tv.CollapseAll(); tv.Refresh(); });
@@ -946,7 +942,7 @@ namespace InformationTree.Forms
                     });
                     var currentRoot = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
 
-                    (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, tagData.Link, beforeLoadInside, afterLoadInside, afterLoad);
+                    (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, this, tagData.Link, afterLoad);
                 }
             }
             else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
@@ -1031,7 +1027,7 @@ namespace InformationTree.Forms
                 UpdateShowUntilNumber();
             });
             var currentRoot = tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
-            (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, null, beforeLoadInside, afterLoadInside, afterLoad);
+            (_, TreeNodeHelper.FileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(afterSaveDoWithFileName, currentRoot, this, null, afterLoad);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Services;
 
@@ -20,16 +21,15 @@ namespace InformationTree.Render.WinForms.Services
         public (TreeNodeData rootNode, string fileName) SaveCurrentTreeAndLoadAnother(
             Action<string> afterSaveDoWithFileName,
             TreeNodeData currentRoot,
+            Component controlToSetWaitCursor,
             string fileName,
-            Action beforeLoadInside,
-            Action afterLoadInside,
             Action afterLoad)
         {
             _exportTreeToXmlService.SaveTree(currentRoot, fileName);
             
             afterSaveDoWithFileName?.Invoke(fileName);
 
-            var returnData = _importTreeFromXmlService.LoadTree(fileName, beforeLoadInside, afterLoadInside);
+            var returnData = _importTreeFromXmlService.LoadTree(fileName, controlToSetWaitCursor);
 
             afterLoad?.Invoke();
 

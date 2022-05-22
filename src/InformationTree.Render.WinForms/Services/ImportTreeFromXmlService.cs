@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
+using System.Windows.Forms;
 using System.Xml;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.TextProcessing;
+using MediatR;
 using NLog;
 
 namespace InformationTree.Render.WinForms.Services
@@ -20,28 +24,30 @@ namespace InformationTree.Render.WinForms.Services
     public class ImportTreeFromXmlService : IImportTreeFromXmlService
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        
+
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ISoundProvider _soundProvider;
         private readonly IPopUpService _popUpService;
         private readonly ICompressionProvider _compressionProvider;
-        
+        private readonly IMediator _mediator;
+
         public ImportTreeFromXmlService(
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ISoundProvider soundProvider,
             IPopUpService popUpService,
-            ICompressionProvider compressionProvider)
+            ICompressionProvider compressionProvider,
+            IMediator mediator)
         {
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _soundProvider = soundProvider;
             _popUpService = popUpService;
             _compressionProvider = compressionProvider;
+            _mediator = mediator;
         }
 
         public (TreeNodeData rootNode, string fileName) LoadTree(
             string fileName,
-            Action beforeLoad,
-            Action afterLoad
+            Component controlToSetWaitCursor
             )
         {
             var fileNameExists = File.Exists(fileName);
@@ -50,7 +56,7 @@ namespace InformationTree.Render.WinForms.Services
                 var result = _popUpService.ShowCancelableQuestion($"Use default XML file {fileName}?", "Choose data file");
                 if (result == PopUpResult.Yes)
                 {
-                    var rootNode = LoadXML(fileName, beforeLoad, afterLoad);
+                    var rootNode = LoadXML(fileName, controlToSetWaitCursor);
                     return (rootNode, fileName);
                 }
                 else if (result == PopUpResult.Cancel)
@@ -65,7 +71,7 @@ namespace InformationTree.Render.WinForms.Services
             if (selectedFile.IsNotEmpty())
             {
                 fileName = selectedFile;
-                var rootNode = LoadXML(fileName, beforeLoad, afterLoad);
+                var rootNode = LoadXML(fileName, controlToSetWaitCursor);
                 return (rootNode, fileName);
             }
 
@@ -102,14 +108,23 @@ namespace InformationTree.Render.WinForms.Services
 
         public TreeNodeData LoadXML(
             string fileName,
-            Action beforeLoad,
-            Action afterLoad 
+            Component controlToSetWaitCursor
             )
         {
             var rootNode = new TreeNodeData();
             try
             {
-                beforeLoad?.Invoke();
+                if (controlToSetWaitCursor is Control control)
+                {
+                    var waitCursorRequest = new SetControlCursorRequest
+                    {
+                        Control = control,
+                        IsWaitCursor = true
+                    };
+                    Task.Run(async () => await _mediator.Send(waitCursorRequest))
+                        .Wait();
+                }
+
                 SplashForm.ShowDefaultSplashScreen(_graphicsFileRecursiveGenerator);
                 var xDoc = new XmlDocument();
                 xDoc.Load(fileName);
@@ -119,9 +134,9 @@ namespace InformationTree.Render.WinForms.Services
                     foreach (XmlElement child in xDoc.DocumentElement.ChildNodes)
                     {
                         var newNode = GetNewNodeFromTextNameAttr(child.Attributes);
-                        
+
                         rootNode.Children.Add(newNode);
-                        
+
                         if (child.HasChildNodes)
                             LoadTreeNodes(child, newNode);
                     }
@@ -130,7 +145,18 @@ namespace InformationTree.Render.WinForms.Services
             finally
             {
                 SplashForm.CloseForm();
-                afterLoad?.Invoke();
+
+                if (controlToSetWaitCursor is Control control)
+                {
+                    var defaultCursorRequest = new SetControlCursorRequest
+                    {
+                        Control = control,
+                        IsWaitCursor = false
+                    };
+                    Task.Run(async () => await _mediator.Send(defaultCursorRequest))
+                        .Wait();
+                }
+
                 _soundProvider.PlaySystemSound(4);
             }
 
@@ -170,34 +196,44 @@ namespace InformationTree.Render.WinForms.Services
                     case Constants.XmlAttributes.XmlAttrText:
                         attrText = decodedAttrValue;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrName:
                         attrName = decodedAttrValue;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrBold:
                         attrBold = true;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrItalic:
                         attrItalic = true;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrUnderline:
                         attrUnderline = true;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrStrikeout:
                         attrStrikeout = true;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrFontFamily:
                         attrFontFamily = FontFamily.Families.FirstOrDefault(f => f.Name == decodedAttrValue)
                             ?? WinFormsConstants.FontDefaults.DefaultFontFamily;
                         break;
+
                     case Constants.XmlAttributes.XmlAttrData:
                         attrData = _compressionProvider.Decompress(decodedAttrValue);
                         break;
+
                     case Constants.XmlAttributes.XmlAttrAddedDate:
                         attrAddedDate = decodedAttrValue.ToDateTime(_logger);
                         break;
+
                     case Constants.XmlAttributes.XmlAttrLastChangeDate:
                         attrLastChangeDate = decodedAttrValue.ToDateTime(_logger);
                         break;
+
                     case Constants.XmlAttributes.XmlAttrCategory:
                         attrCategory = decodedAttrValue;
                         break;

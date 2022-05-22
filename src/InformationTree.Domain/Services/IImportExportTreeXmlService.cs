@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using InformationTree.Domain.Entities;
 
 namespace InformationTree.Domain.Services
@@ -12,9 +13,8 @@ namespace InformationTree.Domain.Services
         public (TreeNodeData rootNode, string fileName) SaveCurrentTreeAndLoadAnother(
             Action<string> afterSaveDoWithFileName,
             TreeNodeData currentRoot,
+            Component controlToSetWaitCursor,
             string fileName,
-            Action beforeLoadInside,
-            Action afterLoadInside,
             Action afterLoad);
     }
 }
