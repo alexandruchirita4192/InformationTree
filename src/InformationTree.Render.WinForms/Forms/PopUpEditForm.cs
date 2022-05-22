@@ -9,7 +9,6 @@ using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
-using InformationTree.Tree;
 using NLog;
 using RicherTextBox.Controls;
 
@@ -26,7 +25,7 @@ namespace InformationTree.Forms
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly IConfigurationReader _configurationReader;
         private readonly Configuration _configuration;
-        
+
         private ICanvasForm _canvasForm;
         private Button tbExitPopUpAndSave;
         private RicherTextBox.Controls.RicherTextBox tbData;
@@ -87,7 +86,7 @@ namespace InformationTree.Forms
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _configurationReader = configurationReader;
-            
+
             _configuration = _configurationReader.GetConfiguration();
 
             InitializeComponent();
@@ -104,7 +103,7 @@ namespace InformationTree.Forms
         {
             if (_configuration == null)
                 return;
-            
+
             SetVisibleAndEnabled(btnCalculate, _configuration.RicherTextBoxFeatures.EnableCalculation);
             SetVisibleAndEnabled(btnShowGraphics, _configuration.ApplicationFeatures.EnableExtraGraphics);
             SetVisibleAndEnabled(btnPgpEncryptData, _configuration.TreeFeatures.EnableManualEncryption);
@@ -113,12 +112,12 @@ namespace InformationTree.Forms
             SetVisibleAndEnabled(cbKeepCrypt, _configuration.TreeFeatures.EnableManualEncryption);
             SetVisibleAndEnabled(cbFromFile, _configuration.TreeFeatures.EnableManualEncryption);
         }
-        
+
         private void SetVisibleAndEnabled(Control control, bool visibleAndEnabled)
         {
             if (control == null)
                 return;
-            
+
             control.Visible = visibleAndEnabled;
             control.Enabled = visibleAndEnabled;
         }
@@ -152,18 +151,19 @@ namespace InformationTree.Forms
             if (richTextBoxBackColor != Constants.Colors.DefaultBackGroundColor)
                 tbData.BackColor = Constants.Colors.DefaultBackGroundColor;
 
-            if (tbData?.TextBox?.Text != null)
-            {
-                for (int i = 0; i < tbData.TextBox.Text.Length; i++)
-                {
-                    tbData.TextBox.Select(i, 1);
-                    if (tbData.TextBox.SelectionColor == Constants.Colors.DefaultBackGroundColor)
-                        tbData.TextBox.SelectionColor = Constants.Colors.DefaultForeGroundColor;
+            UpdateRichTextBoxSelectionColor();
+        }
 
-                    if (tbData.TextBox.SelectionBackColor != Constants.Colors.DefaultBackGroundColor)
-                        tbData.TextBox.SelectionBackColor = Constants.Colors.DefaultBackGroundColor;
-                }
-            }
+        private void UpdateRichTextBoxSelectionColor()
+        {
+            if (tbData?.TextBox == null)
+                return;
+            
+            if (tbData.TextBox.SelectionColor != Constants.Colors.DefaultForeGroundColor)
+                tbData.TextBox.SelectionColor = Constants.Colors.DefaultForeGroundColor;
+
+            if (tbData.TextBox.SelectionBackColor != Constants.Colors.DefaultBackGroundColor)
+                tbData.TextBox.SelectionBackColor = Constants.Colors.DefaultBackGroundColor;
         }
 
         private void InitializeRicherTextBoxControlAndSaveAndCloseButton()
@@ -382,7 +382,7 @@ namespace InformationTree.Forms
 
             if (titleOverride.IsNotEmpty())
                 form.Text = titleOverride;
-            
+
             WinFormsApplication.CenterForm(form, this);
 
             form.FormClosed += PgpDecryptForm_FormClosed;
@@ -419,13 +419,13 @@ namespace InformationTree.Forms
         {
             var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
             var decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
-            
+
             if (decryptedData.IsEmpty())
             {
                 _popUpService.ShowError("No data to encrypt.");
                 return;
             }
-            
+
             if (FromFile)
             {
                 _pgpPublicKeyFile = _popUpService.GetPublicKeyFile();
@@ -541,7 +541,7 @@ namespace InformationTree.Forms
         private void btnCalculate_Click(object sender, EventArgs e)
         {
             // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service which should implement basic calculation functions
-            
+
             _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
         }
 
