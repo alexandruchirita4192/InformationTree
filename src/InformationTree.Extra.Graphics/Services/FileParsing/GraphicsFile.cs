@@ -1,19 +1,17 @@
-﻿using InformationTree.Extra.Graphics.Computation;
-using InformationTree.Graphics;
-using D = System.Drawing;
-using InformationTree.Domain.Services.Graphics;
-using InformationTree.Extra.Graphics.Domain;
+﻿using System.Timers;
 using InformationTree.Domain.Entities.Graphics;
-using System.Timers;
-using NLog;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
+using InformationTree.Domain.Services.Graphics;
+using InformationTree.Extra.Graphics.Computation;
+using InformationTree.Extra.Graphics.Domain;
+using InformationTree.Graphics;
+using NLog;
+using D = System.Drawing;
 
 namespace InformationTree.Extra.Graphics.Services.FileParsing
 {
     [Obsolete("Break into many classes later")] // TODO: 1. file parsing in one file
-    // (file parsing methods with parameter for frame should work because all depend on frame;
-    // frame methods might be transformed to an extension of frame also),
-    // TODO: 2. figures drawing in another (remaining in this file as is)
     public class GraphicsFile : IGraphicsFile, IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -24,7 +22,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
         #region Properties
 
         public Frame Frame { get; private set; }
-        public System.Timers.Timer RunTimer { get; set; }
+        public System.Timers.Timer RunTimer { get; private set; }
 
         #endregion Properties
 
@@ -53,10 +51,10 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
             var debugMessage = lines.Length <= 50 ? $"Parsing lines:{Environment.NewLine} {string.Join(Environment.NewLine, lines)}" : $"Parsing too many lines: {lines.Length} lines. Printing them to log is skipped.";
             _logger.Debug(debugMessage);
-            
+
             foreach (var line in lines)
             {
-                if (string.IsNullOrEmpty(line))
+                if (line.IsEmpty())
                     continue;
 
                 var words = line.Split(' ');
@@ -201,16 +199,16 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void GoToFrame(string positionStr)
         {
-            if (string.IsNullOrEmpty(positionStr))
-                return;
-            Frame.GoToFrame(int.Parse(positionStr));
+            if (positionStr.IsNotEmpty()
+            && int.TryParse(positionStr, out int position))
+                Frame.GoToFrame(position);
         }
 
         public void ChangeToNextFrame(string addNextFrameIfNextFrameIsNullStr)
         {
-            if (string.IsNullOrEmpty(addNextFrameIfNextFrameIsNullStr))
-                return;
-            Frame.ChangeToNextFrame(bool.Parse(addNextFrameIfNextFrameIsNullStr));
+            if (addNextFrameIfNextFrameIsNullStr.IsNotEmpty()
+            && bool.TryParse(addNextFrameIfNextFrameIsNullStr, out bool addNextFrameIfNextFrameIsNull))
+                Frame.ChangeToNextFrame(addNextFrameIfNextFrameIsNull);
         }
 
         public void ChangeToPreviousFrame()
@@ -235,32 +233,32 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void Cycle(string intervalStr)
         {
-            if (RunTimer == null)
-                return;
-            if (string.IsNullOrEmpty(intervalStr))
+            if (intervalStr.IsEmpty())
                 return;
 
-            try
+            if (int.TryParse(intervalStr, out int interval))
             {
-                // Start timer
-                RunTimer.Enabled = false;
-                var interval = int.Parse(intervalStr);
-                RunTimer.Interval = interval;
-                RunTimer.Enabled = true;                
-            }
-            catch (Exception ex)
-            {
-                // Stop timer
-                RunTimer.Enabled = false;
+                try
+                {
+                    // Start timer
+                    RunTimer.Enabled = false;
+                    RunTimer.Interval = interval;
+                    RunTimer.Enabled = true;
+                }
+                catch (Exception ex)
+                {
+                    // Stop timer
+                    RunTimer.Enabled = false;
 
-                _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(Cycle)} parsing '{intervalStr}' issue.");
-                _popUpService.ShowError(ex.Message, $"{nameof(FrameRelativeToPoint)} Error");
+                    _logger.Error(ex, $"{nameof(GraphicsFile)}.{nameof(Cycle)} parsing '{intervalStr}' issue.");
+                    _popUpService.ShowError(ex.Message, $"{nameof(FrameRelativeToPoint)} Error");
+                }
             }
         }
 
         public void FrameRelativeToPoint(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            if (parameters.IsEmpty())
                 return;
             try
             {
@@ -279,7 +277,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                             X = int.Parse(words[2]),
                             Y = int.Parse(words[3])
                         };
-                        
+
                         Frame.TranslateCenter(oldPoint, newPoint);
                         break;
                 }
@@ -293,7 +291,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         private void AllRelativeToPoint(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            if (parameters.IsEmpty())
                 return;
             try
             {
@@ -312,7 +310,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                             X = int.Parse(words[2]),
                             Y = int.Parse(words[3])
                         };
-                        
+
                         Frame.TranslateCenterAllFrames(oldPoint, newPoint);
                         break;
                 }
@@ -340,7 +338,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void GenerateFigureLines(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            if (parameters.IsEmpty())
                 return;
             var words = parameters.Split(' ');
             double _radius;
@@ -378,7 +376,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void AddFigure(string figureLine)
         {
-            if (string.IsNullOrEmpty(figureLine))
+            if (figureLine.IsEmpty())
                 return;
             var figure = FigureFactory.GetFigure(figureLine);
             if (figure == null)
@@ -388,9 +386,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void AddText(string textLine)
         {
-            if (string.IsNullOrEmpty(textLine))
-                return;
-            if (Frame == null)
+            if (textLine.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
@@ -400,9 +396,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void AddFigureOnce(string figureLine)
         {
-            if (string.IsNullOrEmpty(figureLine))
-                return;
-            if (Frame == null)
+            if (figureLine.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
@@ -416,9 +410,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void InitRotate(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
-                return;
-            if (Frame == null)
+            if (parameters.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
@@ -428,9 +420,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void Rotate(string positionStr)
         {
-            if (string.IsNullOrEmpty(positionStr))
-                return;
-            if (Frame == null)
+            if (positionStr.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
@@ -440,9 +430,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void AddRotateAround(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
-                return;
-            if (Frame == null)
+            if (parameters.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
@@ -452,9 +440,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void SetPoints(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
-                return;
-            if (Frame == null)
+            if (parameters.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
@@ -464,9 +450,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void SetColor(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
-                return;
-            if (Frame == null)
+            if (parameters.IsEmpty())
                 return;
             var figures = Frame.GetActiveFrameOrThis().Figures;
             if (figures == null)
