@@ -11,6 +11,7 @@ namespace InformationTree.TextProcessing
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        // TODO: 0. Maybe break this into 2 separate properties. Why keep 2 information types in one property?
         // TODO: 1. Find common code because it seems copy-paste and both could call an internal method
         // TODO: 2. Move to a string extension class or TreeNodeData class
         // (need to see it's use cases, how it's used when it's called to see it's proper place and if the method could do more or not)
