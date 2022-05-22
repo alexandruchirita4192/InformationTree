@@ -78,7 +78,13 @@ namespace InformationTree.Tree
 
         #region CopyNode, CopyNodes
 
-        public static void CopyNodes(TreeNodeCollection to, TreeNodeCollection from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
+        public static void CopyNodes(
+            TreeNodeCollection to,
+            TreeNodeCollection from,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            int? filterHigherThan = null,
+            int? filterLowerThan = null,
+            CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
         {
             if (from == null)
                 throw new Exception("from is null");
@@ -87,10 +93,16 @@ namespace InformationTree.Tree
                 throw new Exception("to is null");
 
             foreach (TreeNode node in from)
-                CopyNode(to, node, treeNodeDataCachingService, addedNumberHigherThan, addedNumberLowerThan, type);
+                CopyNode(to, node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
         }
 
-        public static void CopyNode(TreeNodeCollection to, TreeNode from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1)
+        public static void CopyNode(
+            TreeNodeCollection to,
+            TreeNode from,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            int? filterHigherThan = null,
+            int? filterLowerThan = null,
+            CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
         {
             if (from == null)
                 throw new Exception("from is null");
@@ -99,13 +111,19 @@ namespace InformationTree.Tree
                 throw new Exception("to is null");
 
             var node = new TreeNode();
-            CopyNode(node, from, treeNodeDataCachingService, addedNumberHigherThan, addedNumberLowerThan, type);
+            CopyNode(node, from, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
 
-            if ((addedNumberLowerThan == null && addedNumberHigherThan == null) || (addedNumberLowerThan != null && addedNumberHigherThan != null))
+            if ((filterLowerThan == null && filterHigherThan == null) || (filterLowerThan != null && filterHigherThan != null))
                 to.Add(node);
         }
 
-        public static void CopyNode(TreeNode to, TreeNode from, ITreeNodeDataCachingService treeNodeDataCachingService, int? addedNumberHigherThan = null, int? addedNumberLowerThan = null, int type = -1) // TODO: Change type to an enum explaining clearly what it means
+        public static void CopyNode(
+            TreeNode to,
+            TreeNode from,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            int? filterHigherThan = null,
+            int? filterLowerThan = null,
+            CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
         {
             if (from == null)
                 throw new Exception("from is null");
@@ -117,9 +135,11 @@ namespace InformationTree.Tree
                 throw new Exception("to.Nodes is null");
 
             var tagData = from.ToTreeNodeData(treeNodeDataCachingService);
-            if ((type == 0) && (tagData.AddedNumber >= addedNumberLowerThan) || (tagData.AddedNumber < addedNumberHigherThan))
+            
+            // Filter nodes by added number or urgency depending on the type
+            if ((filterType == CopyNodeFilterType.FilterByAddedNumber) && (tagData.AddedNumber >= filterLowerThan) || (tagData.AddedNumber < filterHigherThan))
                 return;
-            else if ((type == 1) && (tagData.Urgency >= addedNumberLowerThan) || (tagData.Urgency < addedNumberHigherThan))
+            else if ((filterType == CopyNodeFilterType.FilterByUrgency) && (tagData.Urgency >= filterLowerThan) || (tagData.Urgency < filterHigherThan))
                 return;
 
             var toTag = to.ToTreeNodeData(treeNodeDataCachingService);
@@ -135,7 +155,7 @@ namespace InformationTree.Tree
             to.BackColor = from.BackColor.IsEmpty ? Constants.Colors.DefaultBackGroundColor : from.BackColor;
 
             foreach (TreeNode node in from.Nodes)
-                CopyNode(to.Nodes, node, treeNodeDataCachingService, addedNumberHigherThan, addedNumberLowerThan, type);
+                CopyNode(to.Nodes, node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
         }
 
         #endregion CopyNode, CopyNodes
@@ -386,7 +406,12 @@ namespace InformationTree.Tree
 
         #region Node show by urgency or added number
 
-        public static void ShowNodesFromTaskToNumberOfTask(TreeView tv, decimal addedNumberLowerThan, decimal addedNumberHigherThan, int type, ITreeNodeDataCachingService treeNodeDataCachingService)
+        public static void ShowNodesFromTaskToNumberOfTask(
+            TreeView tv,
+            decimal filterLowerThan,
+            decimal filterHigherThan,
+            CopyNodeFilterType filterType,
+            ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             if (nodes == null)
                 nodes = new TreeNode().Nodes;
@@ -400,7 +425,7 @@ namespace InformationTree.Tree
 
             // let tvTaskList with only addedNumber < addedNumberLowerThan
             tv.Nodes.Clear();
-            CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, (int)addedNumberHigherThan, (int)addedNumberLowerThan, type);
+            CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, (int)filterHigherThan, (int)filterLowerThan, filterType);
             ReadOnlyState = true;
         }
 

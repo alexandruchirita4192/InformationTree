@@ -833,7 +833,12 @@ namespace InformationTree.Forms
             var addedNumberLowerThan = nudShowUntilNumber.Value;
             var addedNumberHigherThan = nudShowFromNumber.Value;
 
-            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(tvTaskList, addedNumberLowerThan, addedNumberHigherThan, 0, _treeNodeDataCachingService);
+            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(
+                tvTaskList,
+                addedNumberLowerThan,
+                addedNumberHigherThan,
+                CopyNodeFilterType.FilterByAddedNumber,
+                _treeNodeDataCachingService);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -843,10 +848,15 @@ namespace InformationTree.Forms
 
         private void btnShowFromToUrgencyNumber_Click(object sender, EventArgs e)
         {
-            var addedNumberLowerThan = nudShowToUrgencyNumber.Value;
-            var addedNumberHigherThan = nudShowFromUrgencyNumber.Value;
+            var urgencyNumberLowerThan = nudShowToUrgencyNumber.Value;
+            var urgencyNumberHigherThan = nudShowFromUrgencyNumber.Value;
 
-            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(tvTaskList, addedNumberLowerThan, addedNumberHigherThan, 1, _treeNodeDataCachingService);
+            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(
+                tvTaskList,
+                urgencyNumberLowerThan,
+                urgencyNumberHigherThan,
+                CopyNodeFilterType.FilterByUrgency,
+                _treeNodeDataCachingService);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
