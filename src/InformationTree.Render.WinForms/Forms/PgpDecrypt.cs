@@ -16,7 +16,6 @@ namespace InformationTree.Forms
 
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionProvider _encryptionAndSigningProvider;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
 
         #endregion Fields
 
@@ -46,13 +45,11 @@ namespace InformationTree.Forms
         public PgpDecrypt(
             IPopUpService popUpService,
             IPGPEncryptionProvider encryptionAndSigningProvider,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
             bool fromFile)
             : this()
         {
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
             
             DecryptFromFile = fromFile;
 
@@ -96,19 +93,15 @@ namespace InformationTree.Forms
             {
                 var textToFind = form.TextToFind;
 
-                if (WinFormsApplication.MainForm?.TaskList?.Nodes == null)
+                if (WinFormsApplication.MainForm?.TaskListRoot == null)
                     return;
 
-                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind, _treeNodeDataCachingService);
-                if (node != null)
+                var nodeData = WinFormsApplication.MainForm.TaskListRoot.GetFirstNode(textToFind);
+                if (nodeData != null)
                 {
-                    var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                    if (nodeData != null)
-                    {
-                        PgpPrivateKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
+                    PgpPrivateKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
 
-                        _popUpService.ShowMessage($"Private key taken from data of node {node.Text}", $"Node {node.Text} used");
-                    }
+                    _popUpService.ShowMessage($"Private key taken from data of node {nodeData.Text}", $"Node {nodeData.Text} used");
                 }
 
                 if (PgpPrivateKeyText.IsEmpty() &&

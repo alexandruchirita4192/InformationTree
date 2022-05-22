@@ -236,13 +236,11 @@ namespace InformationTree.Forms
         private System.Timers.Timer _randomTimer = new();
         private static int _systemSoundNumber = -1;
 
-        // TODO: Use TreeNodeData here instead of TaskList
-        [Obsolete("Use another tree using TreeNodeData instead and maybe an adapter from one to another")]
-        public TreeView TaskList
+        public TreeNodeData TaskListRoot
         {
             get
             {
-                return tvTaskList;
+                return tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
             }
         }
 
@@ -900,7 +898,6 @@ namespace InformationTree.Forms
                     _popUpService,
                     _encryptionAndSigningProvider,
                     _configurationReader,
-                    _treeNodeDataCachingService,
                     selectedNode.Text,
                     data);
 

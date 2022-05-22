@@ -82,7 +82,36 @@ namespace InformationTree.Render.WinForms.Extensions
                 )
                 : Constants.Colors.DataBackGroundColor;
         }
-        
+
+        public static TreeNodeData GetFirstNode(this TreeNodeData rootNode, string text)
+        {
+            TreeNodeData ret = null;
+            text = text.ToLower();
+            
+            if (rootNode.Children.Count > 0)
+            {
+                foreach (TreeNodeData child in rootNode.Children)
+                {
+                    var nodeData = child.Data.IsNotEmpty() ? child.Data : null;
+                    var foundInText = child.Text.IsNotEmpty()
+                        && child.Text.ToLower().Split('[')[0].Contains(text);
+                    var foundInData = nodeData != null && nodeData.ToLower().Contains(text);
+                    var foundCondition = foundInText || foundInData;
+                    if (foundCondition)
+                        return child;
+
+                    if (child.Children.Count > 0)
+                    {
+                        ret = GetFirstNode(child, text);
+                        if (ret != null)
+                            return ret;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         private static Font GetFont(TreeNodeFont nodeFont, FontStyle fontStyle)
         {
             return nodeFont == null

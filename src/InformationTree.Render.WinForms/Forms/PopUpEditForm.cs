@@ -25,7 +25,6 @@ namespace InformationTree.Forms
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly IConfigurationReader _configurationReader;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
         private readonly Configuration _configuration;
         
         private ICanvasForm _canvasForm;
@@ -82,14 +81,12 @@ namespace InformationTree.Forms
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            IConfigurationReader configurationReader,
-            ITreeNodeDataCachingService treeNodeDataCachingService)
+            IConfigurationReader configurationReader)
         {
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _configurationReader = configurationReader;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
             
             _configuration = _configurationReader.GetConfiguration();
 
@@ -131,10 +128,9 @@ namespace InformationTree.Forms
             IPopUpService popUpService,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             IConfigurationReader configurationReader,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
             string title,
             string data)
-            : this(canvasFormFactory, popUpService, encryptionAndSigningProvider, configurationReader, treeNodeDataCachingService)
+            : this(canvasFormFactory, popUpService, encryptionAndSigningProvider, configurationReader)
         {
             Text += $": {title}";
 
@@ -382,7 +378,7 @@ namespace InformationTree.Forms
 
         private void GetPrivateKeyWithPassword(string titleOverride = null)
         {
-            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, _treeNodeDataCachingService, FromFile);
+            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, FromFile);
 
             if (titleOverride.IsNotEmpty())
                 form.Text = titleOverride;
@@ -515,19 +511,15 @@ namespace InformationTree.Forms
             {
                 var textToFind = form.TextToFind;
 
-                if (WinFormsApplication.MainForm?.TaskList?.Nodes == null)
+                if (WinFormsApplication.MainForm?.TaskListRoot == null)
                     return;
 
-                var node = TreeNodeHelper.GetFirstNode(WinFormsApplication.MainForm.TaskList.Nodes, textToFind, _treeNodeDataCachingService);
-                if (node != null)
+                var nodeData = WinFormsApplication.MainForm.TaskListRoot.GetFirstNode(textToFind);
+                if (nodeData != null)
                 {
-                    var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                    if (nodeData != null)
-                    {
-                        _pgpPublicKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
+                    _pgpPublicKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
 
-                        _popUpService.ShowMessage($"Public key taken from data of node {node.Text}", $"Node {node.Text} used");
-                    }
+                    _popUpService.ShowMessage($"Public key taken from data of node {nodeData.Text}", $"Node {nodeData.Text} used");
                 }
 
                 if (string.IsNullOrEmpty(_pgpPublicKeyText) && _popUpService.ShowQuestion("You did not select a valid public key node. Try to select again?") == PopUpResult.Yes)

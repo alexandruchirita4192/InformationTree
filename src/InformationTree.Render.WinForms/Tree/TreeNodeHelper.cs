@@ -70,7 +70,7 @@ namespace InformationTree.Tree
         public static Action<bool> TreeUnchangedChangeDelegate;
 
         public static int TreeNodeCounter = 0;
-        private static TreeNodeCollection nodes;
+        private static TreeNodeCollection nodes; // TODO: Create a service to cache the whole tree nodes collection
 
         #endregion Properties
 
@@ -311,32 +311,6 @@ namespace InformationTree.Tree
         #endregion Nodes completed/unfinished
 
         #region Node search
-
-        public static TreeNode GetFirstNode(TreeNodeCollection nodes, string text, ITreeNodeDataCachingService treeNodeDataCachingService)
-        {
-            TreeNode ret = null;
-            text = text.ToLower();
-            if (nodes.Count > 0)
-            {
-                foreach (TreeNode node in nodes)
-                {
-                    var nodeTagData = node.ToTreeNodeData(treeNodeDataCachingService);
-                    var nodeData = nodeTagData != null && !string.IsNullOrEmpty(nodeTagData.Data) ? nodeTagData.Data : null;
-                    var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text)) || (nodeData != null && nodeData.ToLower().Contains(text));
-
-                    if (foundCondition)
-                        return node;
-
-                    if (node.Nodes != null && node.Nodes.Count > 0)
-                        ret = GetFirstNode(node.Nodes, text, treeNodeDataCachingService);
-
-                    if (ret != null)
-                        return ret;
-                }
-            }
-
-            return null;
-        }
 
         public static void ExpandParents(TreeNode node)
         {
