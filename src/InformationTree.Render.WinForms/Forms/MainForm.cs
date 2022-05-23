@@ -10,6 +10,7 @@ using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
+using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
@@ -44,7 +45,7 @@ namespace InformationTree.Forms
         private readonly IMediator _mediator;
         private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
         private readonly IListCachingService _listCachingService;
-        
+
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -83,7 +84,7 @@ namespace InformationTree.Forms
             _mediator = mediator;
             _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
             _listCachingService = listCachingService;
-            
+
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -120,7 +121,12 @@ namespace InformationTree.Forms
                 clbStyle.Items.Add(FontStyle.Strikeout);
             }
 
-            (var root, var fileName) = _importTreeFromXmlService.LoadTree(TreeNodeHelper.FileName, this);
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
+            (var root, var fileName) = _importTreeFromXmlService.LoadTree(getTreeStateResponse.FileName, this);
             root.CopyToTreeView(tvTaskList, _treeNodeDataCachingService, true);
 
             var setTreeStateRequest = new SetTreeStateRequest
@@ -272,7 +278,12 @@ namespace InformationTree.Forms
 
         public void SaveTree()
         {
-            _exportTreeToXmlService.SaveTree(TaskListRoot, TreeNodeHelper.FileName);
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
+            _exportTreeToXmlService.SaveTree(TaskListRoot, getTreeStateResponse.FileName);
         }
 
         public void ClearStyleAdded()
@@ -285,12 +296,17 @@ namespace InformationTree.Forms
             if (btnResetException == null)
                 return;
 
-            if (!TreeNodeHelper.IsSafeToSave || message.IsNotEmpty())
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+            
+            if (!getTreeStateResponse.IsSafeToSave || message.IsNotEmpty())
             {
                 btnResetException.Enabled = true;
                 btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
                 btnResetException.ForeColor = Constants.Colors.ExceptionColor;
-                btnResetException.Text = "Reset exception: " + message.Substring(0, 10);
+                btnResetException.Text = $"Reset exception: {message.Substring(0, 10)}";
             }
             else
             {
@@ -703,7 +719,7 @@ namespace InformationTree.Forms
                 if (oldFont != null)
                 {
                     tvTaskList.SelectedNode.NodeFont = new Font(oldFont.FontFamily, (float)nudFontSize.Value, oldFont.Style);
-                    
+
                     // on font changed is added too??
                     var setTreeStateRequest = new SetTreeStateRequest
                     {
@@ -970,7 +986,12 @@ namespace InformationTree.Forms
 
         private void btnShowAll_Click(object sender, EventArgs e)
         {
-            if (TreeNodeHelper.ReadOnlyState)
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
+            if (getTreeStateResponse.ReadOnlyState)
             {
                 TreeNodeHelper.ShowAllTasks(
                     tvTaskList,
@@ -1086,7 +1107,7 @@ namespace InformationTree.Forms
                         nudShowUntilNumber,
                         nudShowFromNumber,
                         tagData.Link);
-                    
+
                     var setTreeStateRequest = new SetTreeStateRequest
                     {
                         FileInfo = new FileInfo { FileName = fileName }
@@ -1150,7 +1171,12 @@ namespace InformationTree.Forms
                     TreeNodeHelper.CopyNodes(treeView.Nodes, node.Nodes, _treeNodeDataCachingService);
                 }
 
-                var auxFileName = TreeNodeHelper.FileName;
+                var getTreeStateRequest = new GetTreeStateRequest();
+                if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+                .Result is not GetTreeStateResponse getTreeStateResponse)
+                    return;
+
+                var auxFileName = getTreeStateResponse.FileName;
 
                 var setTreeStateFileInfoRequest = new SetTreeStateRequest
                 {
@@ -1160,9 +1186,14 @@ namespace InformationTree.Forms
                 {
                     return await _mediator.Send(setTreeStateFileInfoRequest);
                 }).Wait();
-                
+
+                getTreeStateRequest = new GetTreeStateRequest();
+                if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+                .Result is not GetTreeStateResponse getTreeStateResponseUpdated)
+                    return;
+
                 var root = treeView.ToTreeNodeData(_treeNodeDataCachingService);
-                _exportTreeToXmlService.SaveTree(root, TreeNodeHelper.FileName);
+                _exportTreeToXmlService.SaveTree(root, getTreeStateResponseUpdated.FileName);
 
                 setTreeStateFileInfoRequest = new SetTreeStateRequest
                 {
@@ -1171,8 +1202,8 @@ namespace InformationTree.Forms
                 Task.Run(async () =>
                 {
                     return await _mediator.Send(setTreeStateFileInfoRequest);
-                }).Wait();                
-                
+                }).Wait();
+
                 node.Nodes.Clear();
             }
 
@@ -1189,7 +1220,7 @@ namespace InformationTree.Forms
         private void btnMoveNode_Click(object sender, EventArgs e)
         {
             TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService, _treeNodeSelectionCachingService);
-            
+
             var setTreeStateRequest = new SetTreeStateRequest
             {
                 TreeUnchanged = false
@@ -1428,9 +1459,14 @@ namespace InformationTree.Forms
 
         private void lblUnchanged_Click(object sender, EventArgs e)
         {
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
             var setTreeStateRequest = new SetTreeStateRequest
             {
-                TreeUnchanged = !TreeNodeHelper.TreeUnchanged
+                TreeUnchanged = !getTreeStateResponse.TreeUnchanged
             };
             Task.Run(async () =>
             {

@@ -6,7 +6,7 @@ using InformationTree.Domain.Responses;
 using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers;
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
 
 public class TreeViewCollapseAndRefreshHandler : IRequestHandler<TreeViewCollapseAndRefreshRequest, BaseResponse>
 {

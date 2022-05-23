@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
+using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
@@ -171,15 +172,20 @@ namespace InformationTree.Render.WinForms.Services
             {
                 if (SplashForm.HasInstance())
                     return;
+                
+                var getTreeStateRequest = new GetTreeStateRequest();
+                if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+                .Result is not GetTreeStateResponse getTreeStateResponse)
+                    return;
 
-                var isDataChanged = !TreeNodeHelper.TreeUnchanged && TreeNodeHelper.IsSafeToSave;
+                var isDataChanged = !getTreeStateResponse.TreeUnchanged && getTreeStateResponse.IsSafeToSave;
                 if (isDataChanged)
                 {
-                    var notSafeToChangeCaption = !TreeNodeHelper.IsSafeToSave ? "[HadException]" : string.Empty;
-                    var alreadySavedMessage = TreeNodeHelper.TreeSaved ? $"[Tree already saved at {TreeNodeHelper.TreeSavedAt}]" : string.Empty;
-                    var unchangedMessage = TreeNodeHelper.TreeUnchanged && !TreeNodeHelper.TreeSaved ? $"[Tree unchanged]" : string.Empty;
+                    var notSafeToChangeCaption = !getTreeStateResponse.IsSafeToSave ? "[HadException]" : string.Empty;
+                    var alreadySavedMessage = getTreeStateResponse.TreeSaved ? $"[Tree already saved at {getTreeStateResponse.TreeSavedAt}]" : string.Empty;
+                    var unchangedMessage = getTreeStateResponse.TreeUnchanged && !getTreeStateResponse.TreeSaved ? $"[Tree unchanged]" : string.Empty;
                     var title = $"Do you want to save your work? {alreadySavedMessage}{unchangedMessage}{notSafeToChangeCaption}";
-                    var message = $"There are unsaved changes in {TreeNodeHelper.FileName}.";
+                    var message = $"There are unsaved changes in {getTreeStateResponse.FileName}.";
 
                     var result = _popUpService.Confirm(message, title);
 

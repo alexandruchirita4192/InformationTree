@@ -7,6 +7,7 @@ using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
+using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.TextProcessing;
 using InformationTree.Tree;
@@ -37,7 +38,12 @@ namespace InformationTree.Render.WinForms.Services
 
         public void SaveTree(TreeNodeData treeNodeData, string fileName)
         {
-            if (TreeNodeHelper.IsSafeToSave && !TreeNodeHelper.TreeUnchanged)
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
+            if (getTreeStateResponse.IsSafeToSave && !getTreeStateResponse.TreeUnchanged)
             {
                 var _streamWriter = new StreamWriter(fileName, false, Encoding.UTF8);
                 //Write the header

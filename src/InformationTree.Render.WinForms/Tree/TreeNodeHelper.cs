@@ -9,6 +9,7 @@ using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
+using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
@@ -420,8 +421,13 @@ namespace InformationTree.Tree
                 listCachingService.Set(NodesListKey, nodes);
             }
 
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
             // copy all
-            if (!ReadOnlyState)
+            if (!getTreeStateResponse.ReadOnlyState)
             {
                 nodes.Clear();
                 CopyNodes(nodes, tv.Nodes, treeNodeDataCachingService, null, null);
@@ -454,11 +460,16 @@ namespace InformationTree.Tree
                 listCachingService.Set(NodesListKey, nodes);
             }
 
-            if (ReadOnlyState)
+            var getTreeStateRequest = new GetTreeStateRequest();
+            if (Task.Run(async () => await mediator.Send(getTreeStateRequest))
+            .Result is not GetTreeStateResponse getTreeStateResponse)
+                return;
+
+            if (getTreeStateResponse.ReadOnlyState)
             {
                 tv.Nodes.Clear();
                 CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, null, null);
-                
+
                 var setTreeStateRequest = new SetTreeStateRequest
                 {
                     ReadOnlyState = false
