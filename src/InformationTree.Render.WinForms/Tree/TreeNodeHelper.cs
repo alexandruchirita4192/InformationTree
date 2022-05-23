@@ -21,6 +21,8 @@ namespace InformationTree.Tree
     [Obsolete("Break into many classes with many purposes")]
     public static class TreeNodeHelper
     {
+        private const string NodesListKey = "Nodes";
+
         #region Properties
 
         #region FileName
@@ -72,7 +74,6 @@ namespace InformationTree.Tree
         public static Action<bool> TreeUnchangedChangeDelegate;
 
         public static int TreeNodeCounter = 0;
-        private static TreeNodeCollection nodes; // TODO: Create a service to cache the whole tree nodes collection
 
         #endregion Properties
 
@@ -89,10 +90,9 @@ namespace InformationTree.Tree
             CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
         {
             if (from == null)
-                throw new Exception("from is null");
-
+                throw new ArgumentNullException(nameof(from));
             if (to == null)
-                throw new Exception("to is null");
+                throw new ArgumentNullException(nameof(to));
 
             foreach (TreeNode node in from)
                 CopyNode(to, node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
@@ -107,10 +107,9 @@ namespace InformationTree.Tree
             CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
         {
             if (from == null)
-                throw new Exception("from is null");
-
+                throw new ArgumentNullException(nameof(from));
             if (to == null)
-                throw new Exception("to is null");
+                throw new ArgumentNullException(nameof(to));
 
             var node = new TreeNode();
             CopyNode(node, from, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
@@ -128,16 +127,14 @@ namespace InformationTree.Tree
             CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
         {
             if (from == null)
-                throw new Exception("from is null");
-
+                throw new ArgumentNullException(nameof(from));
             if (to == null)
-                throw new Exception("to is null");
-
+                throw new ArgumentNullException(nameof(to));
             if (to.Nodes == null)
-                throw new Exception("to.Nodes is null");
+                throw new ArgumentNullException(nameof(to.Nodes));
 
             var tagData = from.ToTreeNodeData(treeNodeDataCachingService);
-            
+
             // Filter nodes by added number or urgency depending on the type
             if ((filterType == CopyNodeFilterType.FilterByAddedNumber) && (tagData.AddedNumber >= filterLowerThan) || (tagData.AddedNumber < filterHigherThan))
                 return;
@@ -414,16 +411,21 @@ namespace InformationTree.Tree
             decimal filterHigherThan,
             CopyNodeFilterType filterType,
             ITreeNodeDataCachingService treeNodeDataCachingService,
-            IMediator mediator)
+            IMediator mediator,
+            IListCachingService listCachingService)
         {
-            if (nodes == null)
+            if (listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
+            {
                 nodes = new TreeNode().Nodes;
+                listCachingService.Set(NodesListKey, nodes);
+            }
 
             // copy all
             if (!ReadOnlyState)
             {
                 nodes.Clear();
-                CopyNodes(nodes, tv.Nodes, null, null);
+                CopyNodes(nodes, tv.Nodes, treeNodeDataCachingService, null, null);
+                listCachingService.Set(NodesListKey, nodes);
             }
 
             // let tvTaskList with only addedNumber < addedNumberLowerThan
@@ -440,12 +442,23 @@ namespace InformationTree.Tree
             }).Wait();
         }
 
-        public static void ShowAllTasks(TreeView tv, IMediator mediator)
+        public static void ShowAllTasks(
+            TreeView tv,
+            IMediator mediator,
+            ITreeNodeDataCachingService treeNodeDataCachingService,
+            IListCachingService listCachingService)
         {
+            if (listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
+            {
+                nodes = new TreeNode().Nodes;
+                listCachingService.Set(NodesListKey, nodes);
+            }
+
             if (ReadOnlyState)
             {
                 tv.Nodes.Clear();
-                CopyNodes(tv.Nodes, nodes, null, null);
+                CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, null, null);
+                
                 var setTreeStateRequest = new SetTreeStateRequest
                 {
                     ReadOnlyState = false

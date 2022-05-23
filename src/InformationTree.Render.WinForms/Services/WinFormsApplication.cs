@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,6 +31,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
+        private readonly IListCachingService _listCachingService;
 
         public WinFormsApplication(
             IConfigurationReader configurationReader,
@@ -47,7 +47,8 @@ namespace InformationTree.Render.WinForms.Services
             IExportTreeToXmlService exportTreeToXmlService,
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
-            ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
+            ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
+            IListCachingService listCachingService)
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
@@ -63,6 +64,7 @@ namespace InformationTree.Render.WinForms.Services
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
+            _listCachingService = listCachingService;
         }
 
         #region extern
@@ -146,7 +148,7 @@ namespace InformationTree.Render.WinForms.Services
 
             Application.EnableVisualStyles();
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            
+
             try
             {
                 Application.SetCompatibleTextRenderingDefault(false); // this should be called before the first form is created
@@ -225,7 +227,8 @@ namespace InformationTree.Render.WinForms.Services
                 _exportTreeToXmlService,
                 _importExportTreeXmlService,
                 _mediator,
-                _treeNodeSelectionCachingService
+                _treeNodeSelectionCachingService,
+                _listCachingService
                 ));
         }
 

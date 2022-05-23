@@ -43,7 +43,8 @@ namespace InformationTree.Forms
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
-
+        private readonly IListCachingService _listCachingService;
+        
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -64,7 +65,8 @@ namespace InformationTree.Forms
             IExportTreeToXmlService exportTreeToXmlService,
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
-            ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
+            ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
+            IListCachingService listCachingService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -80,7 +82,8 @@ namespace InformationTree.Forms
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
-
+            _listCachingService = listCachingService;
+            
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -936,7 +939,8 @@ namespace InformationTree.Forms
                 addedNumberHigherThan,
                 CopyNodeFilterType.FilterByAddedNumber,
                 _treeNodeDataCachingService,
-                _mediator);
+                _mediator,
+                _listCachingService);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -955,7 +959,8 @@ namespace InformationTree.Forms
                 urgencyNumberHigherThan,
                 CopyNodeFilterType.FilterByUrgency,
                 _treeNodeDataCachingService,
-                _mediator);
+                _mediator,
+                _listCachingService);
             btnShowAll.Enabled = true;
 
             gbTask.Enabled = false;
@@ -969,7 +974,9 @@ namespace InformationTree.Forms
             {
                 TreeNodeHelper.ShowAllTasks(
                     tvTaskList,
-                    _mediator);
+                    _mediator,
+                    _treeNodeDataCachingService,
+                    _listCachingService);
                 gbTask.Enabled = true;
                 gbStyleChange.Enabled = true;
                 gbTimeSpent.Enabled = true;
