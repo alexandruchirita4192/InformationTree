@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -133,7 +134,13 @@ namespace InformationTree.Forms
             {
                 TreeUnchanged = true,
                 IsSafeToSave = true,
-                FileInfo = new FileInfo { FileName = fileName }
+                FileInformation = new FileInformation { FileName = fileName }
+            };
+            setTreeStateRequest.TreeUnchangedValueChanged += (s, e) =>
+            {
+                File.AppendAllText("TreeUnchangedIssue.txt", $"Tree unchanged set as {e.NewValue} was called by {new StackTrace()} at {DateTime.Now}");
+
+                lblUnchanged.Text = (e.NewValue ? "Tree unchanged (do not save)" : "Tree changed (save)");
             };
             Task.Run(async () =>
             {
@@ -162,10 +169,6 @@ namespace InformationTree.Forms
             }
 
             btnShowAll.Enabled = false;
-            TreeNodeHelper.TreeUnchangedChangeDelegate = (a) =>
-            {
-                lblUnchanged.Text = (a ? "Tree unchanged (do not save)" : "Tree changed (save)");
-            };
 
             _isControlPressed = false;
             StartPosition = FormStartPosition.CenterScreen;
@@ -300,7 +303,7 @@ namespace InformationTree.Forms
             if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
             .Result is not GetTreeStateResponse getTreeStateResponse)
                 return;
-            
+
             if (!getTreeStateResponse.IsSafeToSave || message.IsNotEmpty())
             {
                 btnResetException.Enabled = true;
@@ -1110,7 +1113,7 @@ namespace InformationTree.Forms
 
                     var setTreeStateRequest = new SetTreeStateRequest
                     {
-                        FileInfo = new FileInfo { FileName = fileName }
+                        FileInformation = new FileInformation { FileName = fileName }
                     };
                     Task.Run(async () =>
                     {
@@ -1180,7 +1183,7 @@ namespace InformationTree.Forms
 
                 var setTreeStateFileInfoRequest = new SetTreeStateRequest
                 {
-                    FileInfo = new FileInfo { FileName = tagData.Link }
+                    FileInformation = new FileInformation { FileName = tagData.Link }
                 };
                 Task.Run(async () =>
                 {
@@ -1197,7 +1200,7 @@ namespace InformationTree.Forms
 
                 setTreeStateFileInfoRequest = new SetTreeStateRequest
                 {
-                    FileInfo = new FileInfo { FileName = auxFileName }
+                    FileInformation = new FileInformation { FileName = auxFileName }
                 };
                 Task.Run(async () =>
                 {
@@ -1243,7 +1246,7 @@ namespace InformationTree.Forms
 
             var setTreeStateRequest = new SetTreeStateRequest
             {
-                FileInfo = new FileInfo { FileName = fileName }
+                FileInformation = new FileInformation { FileName = fileName }
             };
             Task.Run(async () =>
             {

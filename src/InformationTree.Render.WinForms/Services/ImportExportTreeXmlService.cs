@@ -35,7 +35,7 @@ namespace InformationTree.Render.WinForms.Services
 
             var setTreeStateRequest = new SetTreeStateRequest
             {
-                FileInfo = new FileInfo { FileName = fileName }
+                FileInformation = new FileInformation { FileName = fileName }
             };
             Task.Run(async () =>
             {

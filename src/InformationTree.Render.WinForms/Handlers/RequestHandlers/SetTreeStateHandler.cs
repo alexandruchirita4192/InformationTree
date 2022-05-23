@@ -1,33 +1,46 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
-using InformationTree.Tree;
+using InformationTree.Domain.Services;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers
 {
     public class SetTreeStateHandler : IRequestHandler<SetTreeStateRequest, BaseResponse>
     {
+        private readonly ITreeStateCachingService _treeNodeStateCachingService;
+
+        public SetTreeStateHandler(ITreeStateCachingService treeNodeStateCachingService)
+        {
+            _treeNodeStateCachingService = treeNodeStateCachingService;
+        }
+
         public Task<BaseResponse> Handle(SetTreeStateRequest request, CancellationToken cancellationToken)
         {
-            // TODO: Later move all these to some tree state set by a service in a cache for example
+            var treeNodeState = _treeNodeStateCachingService.GetTreeNodeState()
+                ?? new TreeState();
 
             if (request.IsSafeToSave.HasValue)
-                TreeNodeHelper.IsSafeToSave = request.IsSafeToSave.Value;
+                treeNodeState.IsSafeToSave = request.IsSafeToSave.Value;
             if (request.TreeNodeCounter.HasValue)
-                TreeNodeHelper.TreeNodeCounter = request.TreeNodeCounter.Value;
+                treeNodeState.TreeNodeCounter = request.TreeNodeCounter.Value;
             if (request.TreeUnchanged.HasValue)
-                TreeNodeHelper.TreeUnchanged = request.TreeUnchanged.Value;
+                treeNodeState.TreeUnchanged = request.TreeUnchanged.Value;
             if (request.TreeSaved.HasValue)
-                TreeNodeHelper.TreeSaved = request.TreeSaved.Value;
+                treeNodeState.TreeSaved = request.TreeSaved.Value;
             if (request.TreeSavedAt.HasValue)
-                TreeNodeHelper.TreeSavedAt = request.TreeSavedAt.Value;
+                treeNodeState.TreeSavedAt = request.TreeSavedAt.Value;
             if (request.ReadOnlyState.HasValue)
-                TreeNodeHelper.ReadOnlyState = request.ReadOnlyState.Value;
-            if (request.FileInfo != null)
-                TreeNodeHelper.FileName = request.FileInfo.FileName;
+                treeNodeState.ReadOnlyState = request.ReadOnlyState.Value;
+            if (request.FileInformation != null)
+                treeNodeState.FileName = request.FileInformation.FileName;
+            if (request.TreeUnchangedValueChangeEventAdded)
+                treeNodeState.TreeUnchangedValueChanged += (s, e) => request.InvokeTreeUnchangedValueChangeEvent(s, e);
             
+            _treeNodeStateCachingService.CacheTreeNodeState(treeNodeState);
+
             return Task.FromResult(new BaseResponse());
         }
     }

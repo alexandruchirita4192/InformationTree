@@ -83,5 +83,7 @@ namespace InformationTree.Domain
             public const string DateTimeFormatSeparatedWithDot = "dd.MM.yyyy HH:mm:ss";
             public const string DateTimeFormatSeparatedWithSlash = "dd/MM/yyyy HH:mm:ss";
         }
+
+        public const string DefaultFileName = "Data.xml";
     }
 }

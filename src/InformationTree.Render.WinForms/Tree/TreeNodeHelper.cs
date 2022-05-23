@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
-using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
@@ -23,60 +20,6 @@ namespace InformationTree.Tree
     public static class TreeNodeHelper
     {
         private const string NodesListKey = "Nodes";
-
-        #region Properties
-
-        #region FileName
-
-        private static string fileName;
-
-        public static string FileName
-        {
-            get
-            {
-                return fileName.IsEmpty() ? WinFormsConstants.DefaultFileName : fileName;
-            }
-            set
-            {
-                fileName = value;
-            }
-        }
-
-        #endregion FileName
-
-        // TODO: Create a new class for keeping state of the tree
-        public static bool IsSafeToSave;
-
-        public static bool ReadOnlyState;
-
-        private static bool _treeUnchanged;
-
-        public static bool TreeUnchanged
-        {
-            get
-            {
-                return _treeUnchanged;
-            }
-            set
-            {
-                if (_treeUnchanged != value)
-                {
-                    File.AppendAllText("TreeUnchangedIssue.txt", $"Tree unchanged set as {value} was called by {new StackTrace()} at {DateTime.Now}");
-                    _treeUnchanged = value;
-
-                    TreeUnchangedChangeDelegate?.Invoke(value);
-                }
-            }
-        }
-
-        public static bool TreeSaved { get; set; }
-        public static DateTime TreeSavedAt { get; set; }
-
-        public static Action<bool> TreeUnchangedChangeDelegate;
-
-        public static int TreeNodeCounter = 0;
-
-        #endregion Properties
 
         // TODO: Maybe use a mediator like MediatR to handle all events, commands, etc. (each of those could be a separate command handler class)
 

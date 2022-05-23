@@ -6,26 +6,36 @@ namespace InformationTree.Render.WinForms.Services
 {
     public class TreeNodeSelectionCachingService : ITreeNodeSelectionCachingService
     {
+        private readonly object _lock = new();
         private TreeNode currentSelection;
         private TreeNode oldSelection;
 
         public void AddToCache(MarshalByRefObject treeNode)
         {
-            if (treeNode is TreeNode node)
+            lock (_lock)
             {
-                oldSelection = currentSelection;
-                currentSelection = node;
+                if (treeNode is TreeNode node)
+                {
+                    oldSelection = currentSelection;
+                    currentSelection = node;
+                }
             }
         }
 
         public MarshalByRefObject GetCurrentSelectionFromCache()
         {
-            return currentSelection;
+            lock (_lock)
+            {
+                return currentSelection;
+            }
         }
 
         public MarshalByRefObject GetOldSelectionFromCache()
         {
-            return oldSelection;
+            lock (_lock)
+            {
+                return oldSelection;
+            }
         }
     }
 }
