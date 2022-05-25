@@ -9,10 +9,13 @@ namespace InformationTree.Render.WinForms.Extensions
     {
         public static void Copy(this TreeNode destination, TreeNode source, bool includeChildren = false)
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
             destination.Text = source.Text;
             destination.Name = source.Name;
             destination.NodeFont = source.NodeFont;
-            destination.Tag = source.Tag;
+            destination.Tag = source.Tag; // TODO: Maybe create another TreeNodeData for the Tag, even if it requires other services?
             destination.ToolTipText = source.ToolTipText;
             destination.ImageIndex = source.ImageIndex;
             destination.SelectedImageIndex = source.SelectedImageIndex;
