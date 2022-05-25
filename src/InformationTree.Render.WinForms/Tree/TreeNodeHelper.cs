@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
@@ -37,6 +38,8 @@ namespace InformationTree.Tree
                 throw new ArgumentNullException(nameof(from));
             if (to == null)
                 throw new ArgumentNullException(nameof(to));
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
 
             foreach (TreeNode node in from)
                 CopyNode(to, node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
@@ -54,6 +57,8 @@ namespace InformationTree.Tree
                 throw new ArgumentNullException(nameof(from));
             if (to == null)
                 throw new ArgumentNullException(nameof(to));
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
 
             var node = new TreeNode();
             CopyNode(node, from, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
@@ -76,6 +81,8 @@ namespace InformationTree.Tree
                 throw new ArgumentNullException(nameof(to));
             if (to.Nodes == null)
                 throw new ArgumentNullException(nameof(to.Nodes));
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
 
             var tagData = from.ToTreeNodeData(treeNodeDataCachingService);
 
@@ -107,6 +114,9 @@ namespace InformationTree.Tree
 
         public static double GetPercentageFromChildren(TreeNode topNode)
         {
+            if (topNode == null)
+                throw new ArgumentNullException(nameof(topNode));
+
             var sum = 0.0;
             var nr = 0;
             foreach (TreeNode node in topNode.Nodes)
@@ -135,6 +145,11 @@ namespace InformationTree.Tree
 
         public static void SetPercentageToChildren(TreeNode topNode, double percentage)
         {
+            if (topNode == null)
+                throw new ArgumentNullException(nameof(topNode));
+            if (percentage < 0 || percentage > 100)
+                throw new ArgumentOutOfRangeException(nameof(percentage));
+
             foreach (TreeNode node in topNode.Nodes)
             {
                 if (node != null)
@@ -153,6 +168,13 @@ namespace InformationTree.Tree
 
         public static int ParseToDelete(TreeView tv, TreeNode topNode, string nodeNameToDelete, bool fakeDelete = true)
         {
+            if (tv == null)
+                throw new ArgumentNullException(nameof(tv));
+            if (topNode == null)
+                throw new ArgumentNullException(nameof(topNode));
+            if (nodeNameToDelete.IsEmpty())
+                throw new ArgumentNullException(nameof(nodeNameToDelete));
+
             int ret = 0;
             if (topNode.Text.Equals(nodeNameToDelete /* StartsWith + " [" */))
             {
@@ -188,6 +210,9 @@ namespace InformationTree.Tree
 
         public static bool? TasksCompleteAreHidden(TreeView tv)
         {
+            if (tv == null)
+                throw new ArgumentNullException(nameof(tv));
+
             if (tv.Nodes.Count > 0)
             {
                 foreach (TreeNode node in tv.Nodes)
@@ -217,6 +242,11 @@ namespace InformationTree.Tree
 
         public static void ToggleCompletedTasks(TreeView tv, bool toggleCompletedTasksAreHidden, TreeNodeCollection nodes)
         {
+            if (tv == null)
+                throw new ArgumentNullException(nameof(tv));
+            if (nodes == null)
+                throw new ArgumentNullException(nameof(nodes));
+
             var foreColor = toggleCompletedTasksAreHidden ? Constants.Colors.DefaultForeGroundColor : Constants.Colors.DefaultBackGroundColor;
 
             if (tv.Nodes.Count > 0)
@@ -237,7 +267,7 @@ namespace InformationTree.Tree
 
         public static void MoveToNextUnfinishedNode(TreeView tv, TreeNode currentNode)
         {
-            if (currentNode == null)
+            if (tv == null || currentNode == null)
                 return;
 
             foreach (TreeNode node in currentNode.Nodes)
@@ -263,7 +293,7 @@ namespace InformationTree.Tree
                         return;
                     }
 
-                    if (object.ReferenceEquals(node, currentNode))
+                    if (ReferenceEquals(node, currentNode))
                         foundCurrentNode = true;
                 }
 
@@ -290,6 +320,11 @@ namespace InformationTree.Tree
 
         public static void SetStyleForSearch(TreeNodeCollection nodes, string text, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
+            if (nodes == null)
+                throw new ArgumentNullException(nameof(nodes));
+            if (text.IsEmpty())
+                throw new ArgumentNullException(nameof(text));
+
             text = text.ToLower();
             if (nodes.Count > 0)
             {
@@ -319,6 +354,9 @@ namespace InformationTree.Tree
 
         public static string[] GenerateStringGraphicsLinesFromTree(TreeView tvTaskList)
         {
+            if (tvTaskList == null)
+                throw new ArgumentNullException(nameof(tvTaskList));
+
             List<string> lines = new List<string>();
 
             foreach (TreeNode task in tvTaskList.Nodes)
@@ -329,6 +367,9 @@ namespace InformationTree.Tree
 
         public static void ClearStyleAdded(TreeNodeCollection col)
         {
+            if (col == null)
+                throw new ArgumentNullException(nameof(col));
+
             if (col.Count > 0)
             {
                 foreach (TreeNode node in col)
@@ -358,6 +399,15 @@ namespace InformationTree.Tree
             IMediator mediator,
             IListCachingService listCachingService)
         {
+            if (tv == null)
+                throw new ArgumentNullException(nameof(tv));
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (mediator == null)
+                throw new ArgumentNullException(nameof(mediator));
+            if (listCachingService == null)
+                throw new ArgumentNullException(nameof(listCachingService));
+
             if (listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
             {
                 nodes = new TreeNode().Nodes;
@@ -397,6 +447,15 @@ namespace InformationTree.Tree
             ITreeNodeDataCachingService treeNodeDataCachingService,
             IListCachingService listCachingService)
         {
+            if (tv == null)
+                throw new ArgumentNullException(nameof(tv));
+            if (mediator == null)
+                throw new ArgumentNullException(nameof(mediator));
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (listCachingService == null)
+                throw new ArgumentNullException(nameof(listCachingService));
+
             if (listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
             {
                 nodes = new TreeNode().Nodes;
@@ -432,6 +491,8 @@ namespace InformationTree.Tree
         {
             if (node == null)
                 return 0;
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
 
             var tagData = node.ToTreeNodeData(treeNodeDataCachingService);
             return CalculateDataSizeFromNodeAndChildren(tagData, treeNodeDataCachingService);
@@ -441,6 +502,8 @@ namespace InformationTree.Tree
         {
             if (tagData == null)
                 return 0;
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
 
             var size = tagData.Data == null ? 0 : tagData.Data.Length;
             foreach (TreeNodeData nd in tagData.Children)
@@ -456,6 +519,11 @@ namespace InformationTree.Tree
             ITreeNodeDataCachingService treeNodeDataCachingService,
             ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
         {
+            if (treeNodeDataCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (treeNodeSelectionCachingService == null)
+                throw new ArgumentNullException(nameof(treeNodeSelectionCachingService));
+
             var oldSelectionObj = treeNodeSelectionCachingService.GetOldSelectionFromCache();
             if (oldSelectionObj == null)
                 return;
@@ -497,6 +565,9 @@ namespace InformationTree.Tree
         /// <param name="changedSize">Font size changed to all the nodes (added or substracted from nodes size).</param>
         public static void UpdateSizeOfTreeNodes(TreeNodeCollection treeNodeCollection, float changedSize)
         {
+            if (treeNodeCollection == null)
+                throw new ArgumentNullException(nameof(treeNodeCollection));
+
             foreach (TreeNode node in treeNodeCollection)
             {
                 node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);
