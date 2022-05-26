@@ -947,64 +947,54 @@ namespace InformationTree.Forms
             ChangeResetExceptionButton(null);
         }
 
-        private void btnShowFromToNumberOfTask_Click(object sender, EventArgs e)
+        private async void btnShowFromToNumberOfTask_Click(object sender, EventArgs e)
         {
-            var addedNumberLowerThan = nudShowUntilNumber.Value;
-            var addedNumberHigherThan = nudShowFromNumber.Value;
-
-            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(
-                tvTaskList,
-                addedNumberLowerThan,
-                addedNumberHigherThan,
-                CopyNodeFilterType.FilterByAddedNumber,
-                _treeNodeDataCachingService,
-                _mediator,
-                _listCachingService);
-            btnShowAll.Enabled = true;
-
-            gbTask.Enabled = false;
-            gbStyleChange.Enabled = false;
-            gbTimeSpent.Enabled = false;
-        }
-
-        private void btnShowFromToUrgencyNumber_Click(object sender, EventArgs e)
-        {
-            var urgencyNumberLowerThan = nudShowToUrgencyNumber.Value;
-            var urgencyNumberHigherThan = nudShowFromUrgencyNumber.Value;
-
-            TreeNodeHelper.ShowNodesFromTaskToNumberOfTask(
-                tvTaskList,
-                urgencyNumberLowerThan,
-                urgencyNumberHigherThan,
-                CopyNodeFilterType.FilterByUrgency,
-                _treeNodeDataCachingService,
-                _mediator,
-                _listCachingService);
-            btnShowAll.Enabled = true;
-
-            gbTask.Enabled = false;
-            gbStyleChange.Enabled = false;
-            gbTimeSpent.Enabled = false;
-        }
-
-        private void btnShowAll_Click(object sender, EventArgs e)
-        {
-            var getTreeStateRequest = new GetTreeStateRequest();
-            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
-            .Result is not GetTreeStateResponse getTreeStateResponse)
-                return;
-
-            if (getTreeStateResponse.ReadOnlyState)
+            var request = new ShowTreeFilteredByRangeRequest
             {
-                TreeNodeHelper.ShowAllTasks(
-                    tvTaskList,
-                    _mediator,
-                    _treeNodeDataCachingService,
-                    _listCachingService);
-                gbTask.Enabled = true;
-                gbStyleChange.Enabled = true;
-                gbTimeSpent.Enabled = true;
-            }
+                TreeView = tvTaskList,
+                Min = (int)nudShowFromNumber.Value,
+                Max = (int)nudShowUntilNumber.Value,
+                FilterType = CopyNodeFilterType.FilterByAddedNumber,
+                ShowAllButton = btnShowAll,
+                TaskGroupBox = gbTask,
+                StyleChangeGroupBox = gbStyleChange,
+                TimeSpentGroupBox = gbTimeSpent
+            };
+            await _mediator.Send(request);
+        }
+
+        private async void btnShowFromToUrgencyNumber_Click(object sender, EventArgs e)
+        {
+            var request = new ShowTreeFilteredByRangeRequest
+            {
+                TreeView = tvTaskList,
+                Min = (int)nudShowFromUrgencyNumber.Value,
+                Max = (int)nudShowToUrgencyNumber.Value,
+                FilterType = CopyNodeFilterType.FilterByUrgency,
+                ShowAllButton = btnShowAll,
+                TaskGroupBox = gbTask,
+                StyleChangeGroupBox = gbStyleChange,
+                TimeSpentGroupBox = gbTimeSpent
+            };
+            await _mediator.Send(request);
+        }
+
+        private async void btnShowAll_Click(object sender, EventArgs e)
+        {
+            // TODO: Use ShowTreeFilteredByRangeRequest with filter none
+
+            var request = new ShowTreeFilteredByRangeRequest
+            {
+                TreeView = tvTaskList,
+                Min = (int)nudShowFromUrgencyNumber.Value,
+                Max = (int)nudShowToUrgencyNumber.Value,
+                FilterType = CopyNodeFilterType.NoFilter,
+                ShowAllButton = btnShowAll,
+                TaskGroupBox = gbTask,
+                StyleChangeGroupBox = gbStyleChange,
+                TimeSpentGroupBox = gbTimeSpent
+            };
+            await _mediator.Send(request);
         }
 
         private void btnDoNotSave_Click(object sender, EventArgs e)
@@ -1144,80 +1134,16 @@ namespace InformationTree.Forms
             }
         }
 
-        private void btnMakeSubTreeWithChildrenOfSelectedNode_Click(object sender, EventArgs e)
+        private async void btnMakeSubTreeWithChildrenOfSelectedNode_Click(object sender, EventArgs e)
         {
-            var useSelectedNode = cbUseSelectedNode.Checked;
-            var node = tvTaskList.SelectedNode;
-            if (node != null)
+            var request = new MakeSubTreeWithChildrenOfSelectedNodeRequest
             {
-                if (node.Nodes.Count == 0 && !useSelectedNode)
-                    return;
-
-                var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                tagData.Link = tbLink.Text;
-
-                var percentCompleted = 0M;
-                if (tagData.Link.IsEmpty() || !tagData.Link.EndsWith(".xml") || tagData.Link.Contains(" "))
-                    tagData.Link = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref percentCompleted, true).Replace(" ", "_") + ".xml";
-                tbLink.Text = tagData.Link;
-
-                var treeView = new TreeView();
-                if (useSelectedNode)
-                {
-                    var parentNode = new TreeNode();
-                    TreeNodeHelper.CopyNode(parentNode, node, _treeNodeDataCachingService);
-                    treeView.Nodes.Add(parentNode);
-                    tagData.Data = null;
-                }
-                else
-                {
-                    TreeNodeHelper.CopyNodes(treeView.Nodes, node.Nodes, _treeNodeDataCachingService);
-                }
-
-                var getTreeStateRequest = new GetTreeStateRequest();
-                if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
-                .Result is not GetTreeStateResponse getTreeStateResponse)
-                    return;
-
-                var auxFileName = getTreeStateResponse.FileName;
-
-                var setTreeStateFileInfoRequest = new SetTreeStateRequest
-                {
-                    FileInformation = new FileInformation { FileName = tagData.Link }
-                };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateFileInfoRequest);
-                }).Wait();
-
-                getTreeStateRequest = new GetTreeStateRequest();
-                if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
-                .Result is not GetTreeStateResponse getTreeStateResponseUpdated)
-                    return;
-
-                var root = treeView.ToTreeNodeData(_treeNodeDataCachingService);
-                _exportTreeToXmlService.SaveTree(root, getTreeStateResponseUpdated.FileName);
-
-                setTreeStateFileInfoRequest = new SetTreeStateRequest
-                {
-                    FileInformation = new FileInformation { FileName = auxFileName }
-                };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateFileInfoRequest);
-                }).Wait();
-
-                node.Nodes.Clear();
-            }
-
-            var setTreeStateRequest = new SetTreeStateRequest
-            {
-                TreeUnchanged = false
+                UseSelectedNode = cbUseSelectedNode.Checked,
+                SelectedTreeNode = tvTaskList.SelectedNode,
+                LinkText = tbLink.Text,
+                LinkTextBox = tbLink,
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(request);
         }
 
         private void btnMoveNode_Click(object sender, EventArgs e)

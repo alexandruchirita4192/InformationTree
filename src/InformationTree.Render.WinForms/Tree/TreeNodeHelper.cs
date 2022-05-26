@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
-using InformationTree.Domain.Requests;
-using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.TextProcessing;
-using MediatR;
 
 namespace InformationTree.Tree
 {
@@ -20,8 +16,6 @@ namespace InformationTree.Tree
     [Obsolete("Break into many classes with many purposes")]
     public static class TreeNodeHelper
     {
-        private const string NodesListKey = "Nodes";
-
         // TODO: Maybe use a mediator like MediatR to handle all events, commands, etc. (each of those could be a separate command handler class)
 
         #region CopyNode, CopyNodes
@@ -391,102 +385,7 @@ namespace InformationTree.Tree
 
         #endregion Node search
 
-        #region Node show by urgency or added number
-
-        public static void ShowNodesFromTaskToNumberOfTask(
-            TreeView tv,
-            decimal filterLowerThan,
-            decimal filterHigherThan,
-            CopyNodeFilterType filterType,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
-            IMediator mediator,
-            IListCachingService listCachingService)
-        {
-            if (tv == null)
-                throw new ArgumentNullException(nameof(tv));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
-            if (mediator == null)
-                throw new ArgumentNullException(nameof(mediator));
-            if (listCachingService == null)
-                throw new ArgumentNullException(nameof(listCachingService));
-
-            if (listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
-            {
-                nodes = new TreeNode().Nodes;
-                listCachingService.Set(NodesListKey, nodes);
-            }
-
-            var getTreeStateRequest = new GetTreeStateRequest();
-            if (Task.Run(async () => await mediator.Send(getTreeStateRequest))
-            .Result is not GetTreeStateResponse getTreeStateResponse)
-                return;
-
-            // copy all
-            if (!getTreeStateResponse.ReadOnlyState)
-            {
-                nodes.Clear();
-                CopyNodes(nodes, tv.Nodes, treeNodeDataCachingService, null, null);
-                listCachingService.Set(NodesListKey, nodes);
-            }
-
-            // let tvTaskList with only addedNumber < addedNumberLowerThan
-            tv.Nodes.Clear();
-            CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, (int)filterHigherThan, (int)filterLowerThan, filterType);
-
-            var setTreeStateRequest = new SetTreeStateRequest
-            {
-                ReadOnlyState = true
-            };
-            Task.Run(async () =>
-            {
-                return await mediator.Send(setTreeStateRequest);
-            }).Wait();
-        }
-
-        public static void ShowAllTasks(
-            TreeView tv,
-            IMediator mediator,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
-            IListCachingService listCachingService)
-        {
-            if (tv == null)
-                throw new ArgumentNullException(nameof(tv));
-            if (mediator == null)
-                throw new ArgumentNullException(nameof(mediator));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
-            if (listCachingService == null)
-                throw new ArgumentNullException(nameof(listCachingService));
-
-            if (listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
-            {
-                nodes = new TreeNode().Nodes;
-                listCachingService.Set(NodesListKey, nodes);
-            }
-
-            var getTreeStateRequest = new GetTreeStateRequest();
-            if (Task.Run(async () => await mediator.Send(getTreeStateRequest))
-            .Result is not GetTreeStateResponse getTreeStateResponse)
-                return;
-
-            if (getTreeStateResponse.ReadOnlyState)
-            {
-                tv.Nodes.Clear();
-                CopyNodes(tv.Nodes, nodes, treeNodeDataCachingService, null, null);
-
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    ReadOnlyState = false
-                };
-                Task.Run(async () =>
-                {
-                    return await mediator.Send(setTreeStateRequest);
-                }).Wait();
-            }
-        }
-
-        #endregion Node show by urgency or added number
+        
 
         #region Node data size calculation
 

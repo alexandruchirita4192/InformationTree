@@ -87,6 +87,7 @@ namespace InformationTree.Forms
             this.tbTaskEdit = new System.Windows.Forms.TabPage();
             this.gbCompletedPercent = new System.Windows.Forms.GroupBox();
             this.gbTaskOperations = new System.Windows.Forms.GroupBox();
+            this.btnExportToRtf = new System.Windows.Forms.Button();
             this.gbStyleChange = new System.Windows.Forms.GroupBox();
             this.tbTextColor = new System.Windows.Forms.TextBox();
             this.tbBackgroundColor = new System.Windows.Forms.TextBox();
@@ -165,7 +166,6 @@ namespace InformationTree.Forms
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnExportToRtf = new System.Windows.Forms.Button();
             this.gbTaskList.SuspendLayout();
             this.gbTask.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudCompleteProgress)).BeginInit();
@@ -652,6 +652,18 @@ namespace InformationTree.Forms
             this.gbTaskOperations.TabIndex = 14;
             this.gbTaskOperations.TabStop = false;
             this.gbTaskOperations.Text = "Task operations";
+            // 
+            // btnExportToRtf
+            // 
+            this.btnExportToRtf.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExportToRtf.Location = new System.Drawing.Point(8, 54);
+            this.btnExportToRtf.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnExportToRtf.Name = "btnExportToRtf";
+            this.btnExportToRtf.Size = new System.Drawing.Size(215, 27);
+            this.btnExportToRtf.TabIndex = 12;
+            this.btnExportToRtf.Text = "&Export to RTF";
+            this.btnExportToRtf.UseVisualStyleBackColor = true;
+            this.btnExportToRtf.Click += new System.EventHandler(this.btnExportToRtf_Click);
             // 
             // gbStyleChange
             // 
@@ -1177,6 +1189,7 @@ namespace InformationTree.Forms
             // 
             // btnShowAll
             // 
+            this.btnShowAll.Enabled = false;
             this.btnShowAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnShowAll.Location = new System.Drawing.Point(4, 552);
             this.btnShowAll.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -1606,18 +1619,6 @@ namespace InformationTree.Forms
             this.decryptToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.decryptToolStripMenuItem.Text = "Decrypt";
             this.decryptToolStripMenuItem.Click += new System.EventHandler(this.decryptToolStripMenuItem_Click);
-            // 
-            // btnExportToRtf
-            // 
-            this.btnExportToRtf.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExportToRtf.Location = new System.Drawing.Point(8, 54);
-            this.btnExportToRtf.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.btnExportToRtf.Name = "btnExportToRtf";
-            this.btnExportToRtf.Size = new System.Drawing.Size(215, 27);
-            this.btnExportToRtf.TabIndex = 12;
-            this.btnExportToRtf.Text = "&Export to RTF";
-            this.btnExportToRtf.UseVisualStyleBackColor = true;
-            this.btnExportToRtf.Click += new System.EventHandler(this.btnExportToRtf_Click);
             // 
             // MainForm
             // 

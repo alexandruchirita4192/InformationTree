@@ -35,6 +35,7 @@ namespace InformationTree.Render.WinForms.Extensions
             }
         }
 
+        // TODO: Create an adapter with that, to change from TreeNode to TreeNodeData and vice versa and remove the dependency requirement in extension parameters
         public static TreeNodeData ToTreeNodeData(this TreeNode treeNode, ITreeNodeDataCachingService treeNodeDataCachingService)
         {
             if (treeNode == null)
