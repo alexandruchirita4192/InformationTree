@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
@@ -32,14 +33,25 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         {
             if (request.TreeView is not TreeView tvTaskList)
                 return null;
-            if (request.ShowAllButton is not Button btnShowAll)
+            if (request.ControlsToEnableForFiltered == null || request.ControlsToEnableForFiltered.Count == 0)
                 return null;
-            if (request.TaskGroupBox is not GroupBox gbTask)
+            if (request.ControlsToEnableForNotFiltered == null || request.ControlsToEnableForNotFiltered.Count == 0)
                 return null;
-            if (request.StyleChangeGroupBox is not GroupBox gbStyleChange)
-                return null;
-            if (request.TimeSpentGroupBox is not GroupBox gbTimeSpent)
-                return null;
+            
+            var controlsToEnableForFiltered = new List<Control>();
+            foreach(var component in request.ControlsToEnableForFiltered)
+            {
+                if (component is not Control control)
+                    return null;
+                controlsToEnableForFiltered.Add(control);
+            }
+            var controlsToEnableForNotFiltered = new List<Control>();
+            foreach (var component in request.ControlsToEnableForNotFiltered)
+            {
+                if (component is not Control control)
+                    return null;
+                controlsToEnableForNotFiltered.Add(control);
+            }
             if (await _mediator.Send(new GetTreeStateRequest(), cancellationToken) is not GetTreeStateResponse getTreeStateResponse)
                 return null;
             if (IsProperState(request.FilterType, getTreeStateResponse.ReadOnlyState) == false)
@@ -51,7 +63,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 request.Min,
                 request.FilterType,
                 cancellationToken);
-            SetComponentsByFilterType(request.FilterType, btnShowAll, gbTask, gbStyleChange, gbTimeSpent);
+            SetComponentsByFilterType(request.FilterType, controlsToEnableForFiltered, controlsToEnableForNotFiltered);
             return new BaseResponse();
         }
 
@@ -62,15 +74,21 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 || (filterType == CopyNodeFilterType.FilterByUrgency && readOnlyState == false);
         }
 
-        private static void SetComponentsByFilterType(CopyNodeFilterType filterType, Button btnShowAll, GroupBox gbTask, GroupBox gbStyleChange, GroupBox gbTimeSpent)
+        private static void SetComponentsByFilterType(CopyNodeFilterType filterType, List<Control>  controlsToEnableForFiltered, List<Control> controlsToEnableForNotFiltered)
         {
-            var isShowAllEnabled = filterType != CopyNodeFilterType.NoFilter;
-            var areOthersEnabled = filterType == CopyNodeFilterType.NoFilter;
+            // Enable controls that restore state of tree only for the filtered state of the tree (expected btnShowAll)
+            var isFiltered = filterType != CopyNodeFilterType.NoFilter;
+            foreach (var control in controlsToEnableForFiltered)
+            {
+                control.Enabled = isFiltered;
+            }
 
-            btnShowAll.Enabled = isShowAllEnabled;
-            gbTask.Enabled = areOthersEnabled;
-            gbStyleChange.Enabled = areOthersEnabled;
-            gbTimeSpent.Enabled = areOthersEnabled;
+            // Enable editing of task in any way only for the not filtered state of the tree
+            var isNotFiltered = filterType == CopyNodeFilterType.NoFilter;
+            foreach (var control in controlsToEnableForNotFiltered)
+            {
+                control.Enabled = isNotFiltered;
+            }
         }
 
         private async Task ShowTasksBasedOn(
@@ -86,10 +104,12 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 _listCachingService.Set(NodesListKey, nodes);
             }
 
-            nodes.Clear();
             var isFiltered = filterType != CopyNodeFilterType.NoFilter;
             if (isFiltered)
             {
+                // Clear cache
+                nodes.Clear();
+
                 // Copy tree to cache to save current tree state
                 TreeNodeHelper.CopyNodes(nodes, tvTaskList.Nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
                 _listCachingService.Set(NodesListKey, nodes);
@@ -100,7 +120,10 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             }
             else
             {
-                // Copy tree back from cache to restore current tree state
+                // Clear tree view nodes
+                tvTaskList.Nodes.Clear();
+                
+                // Copy tree back from cache to tree view to restore current tree state
                 TreeNodeHelper.CopyNodes(tvTaskList.Nodes, nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
             }
 

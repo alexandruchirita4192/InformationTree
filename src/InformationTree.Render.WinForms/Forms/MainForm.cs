@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -892,7 +893,7 @@ namespace InformationTree.Forms
             }).Wait();
         }
 
-        private void btnMoveTaskDown_Click(object sender, EventArgs e)
+        private async void btnMoveTaskDown_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
             if (selectedNode != null && selectedNode.Parent != null && selectedNode.Parent.Nodes != null)
@@ -927,22 +928,16 @@ namespace InformationTree.Forms
             {
                 TreeUnchanged = false
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
         }
 
-        private void btnResetException_Click(object sender, EventArgs e)
+        private async void btnResetException_Click(object sender, EventArgs e)
         {
             var setTreeStateRequest = new SetTreeStateRequest
             {
                 IsSafeToSave = true
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
 
             ChangeResetExceptionButton(null);
         }
@@ -955,10 +950,13 @@ namespace InformationTree.Forms
                 Min = (int)nudShowFromNumber.Value,
                 Max = (int)nudShowUntilNumber.Value,
                 FilterType = CopyNodeFilterType.FilterByAddedNumber,
-                ShowAllButton = btnShowAll,
-                TaskGroupBox = gbTask,
-                StyleChangeGroupBox = gbStyleChange,
-                TimeSpentGroupBox = gbTimeSpent
+                ControlsToEnableForFiltered = new List<System.ComponentModel.Component> { btnShowAll },
+                ControlsToEnableForNotFiltered = new List<System.ComponentModel.Component> {
+                    gbTask, gbStyleChange, gbStyleChange, gbTimeSpent, gbTaskOperations, btnMoveNode,
+                    gbTreeToXML, btnShowFromToUrgencyNumber, btnShowFromToNumberOfTask, gbTaskDetails,
+                    nudShowFromUrgencyNumber, nudShowToUrgencyNumber, nudShowFromNumber, nudShowUntilNumber,
+                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentage, btnCalculatePercentage2,
+                }
             };
             await _mediator.Send(request);
         }
@@ -971,42 +969,43 @@ namespace InformationTree.Forms
                 Min = (int)nudShowFromUrgencyNumber.Value,
                 Max = (int)nudShowToUrgencyNumber.Value,
                 FilterType = CopyNodeFilterType.FilterByUrgency,
-                ShowAllButton = btnShowAll,
-                TaskGroupBox = gbTask,
-                StyleChangeGroupBox = gbStyleChange,
-                TimeSpentGroupBox = gbTimeSpent
+                ControlsToEnableForFiltered = new List<System.ComponentModel.Component> { btnShowAll },
+                ControlsToEnableForNotFiltered = new List<System.ComponentModel.Component> {
+                    gbTask, gbStyleChange, gbStyleChange, gbTimeSpent, gbTaskOperations, btnMoveNode,
+                    gbTreeToXML, btnShowFromToUrgencyNumber, btnShowFromToNumberOfTask, gbTaskDetails,
+                    nudShowFromUrgencyNumber, nudShowToUrgencyNumber, nudShowFromNumber, nudShowUntilNumber,
+                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentage, btnCalculatePercentage2,
+                }
             };
             await _mediator.Send(request);
         }
 
         private async void btnShowAll_Click(object sender, EventArgs e)
         {
-            // TODO: Use ShowTreeFilteredByRangeRequest with filter none
-
             var request = new ShowTreeFilteredByRangeRequest
             {
                 TreeView = tvTaskList,
                 Min = (int)nudShowFromUrgencyNumber.Value,
                 Max = (int)nudShowToUrgencyNumber.Value,
                 FilterType = CopyNodeFilterType.NoFilter,
-                ShowAllButton = btnShowAll,
-                TaskGroupBox = gbTask,
-                StyleChangeGroupBox = gbStyleChange,
-                TimeSpentGroupBox = gbTimeSpent
+                ControlsToEnableForFiltered = new List<System.ComponentModel.Component> { btnShowAll },
+                ControlsToEnableForNotFiltered = new List<System.ComponentModel.Component> {
+                    gbTask, gbStyleChange, gbStyleChange, gbTimeSpent, gbTaskOperations, btnMoveNode,
+                    gbTreeToXML, btnShowFromToUrgencyNumber, btnShowFromToNumberOfTask, gbTaskDetails,
+                    nudShowFromUrgencyNumber, nudShowToUrgencyNumber, nudShowFromNumber, nudShowUntilNumber,
+                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentage, btnCalculatePercentage2,
+                }
             };
             await _mediator.Send(request);
         }
 
-        private void btnDoNotSave_Click(object sender, EventArgs e)
+        private async void btnDoNotSave_Click(object sender, EventArgs e)
         {
             var setTreeStateRequest = new SetTreeStateRequest
             {
                 IsSafeToSave = false
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
             btnResetException.Enabled = true;
         }
 
@@ -1054,7 +1053,7 @@ namespace InformationTree.Forms
 
                 WinFormsApplication.CenterForm(form, this);
 
-                form.FormClosing += (s, ev) =>
+                form.FormClosing += async (s, ev) =>
                 {
                     var d = form.Data;
 
@@ -1074,10 +1073,7 @@ namespace InformationTree.Forms
                         {
                             TreeUnchanged = false
                         };
-                        Task.Run(async () =>
-                        {
-                            return await _mediator.Send(setTreeStateRequest);
-                        }).Wait();
+                        await _mediator.Send(setTreeStateRequest);
                     }
                 };
 
@@ -1085,7 +1081,7 @@ namespace InformationTree.Forms
             }
         }
 
-        public void tvTaskList_DoubleClick(object sender, EventArgs e)
+        public async void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
             if (node != null)
@@ -1105,10 +1101,7 @@ namespace InformationTree.Forms
                     {
                         FileInformation = new FileInformation { FileName = fileName }
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(setTreeStateRequest);
-                    }).Wait();
+                    await _mediator.Send(setTreeStateRequest);
                 }
             }
             else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
@@ -1146,7 +1139,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        private void btnMoveNode_Click(object sender, EventArgs e)
+        private async void btnMoveNode_Click(object sender, EventArgs e)
         {
             TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService, _treeNodeSelectionCachingService);
 
@@ -1154,13 +1147,10 @@ namespace InformationTree.Forms
             {
                 TreeUnchanged = false
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
         }
 
-        private void btnGoToDefaultTree_Click(object sender, EventArgs e)
+        private async void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
             (_, var fileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
                 TaskListRoot,
@@ -1174,10 +1164,7 @@ namespace InformationTree.Forms
             {
                 FileInformation = new FileInformation { FileName = fileName }
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
         }
 
         private void tbSearchBox_DoubleClick(object sender, EventArgs e)
@@ -1231,16 +1218,13 @@ namespace InformationTree.Forms
             _canvasForm.Show();
         }
 
-        public void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
+        public async void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
         {
             var setTreeStateRequest = new SetTreeStateRequest
             {
                 TreeUnchanged = false
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
         }
 
         public async void tvTaskList_ControlRemoved(object sender, ControlEventArgs e)
@@ -1386,21 +1370,16 @@ namespace InformationTree.Forms
             btnExecCommand_Click(sender, e);
         }
 
-        private void lblUnchanged_Click(object sender, EventArgs e)
+        private async void lblUnchanged_Click(object sender, EventArgs e)
         {
-            var getTreeStateRequest = new GetTreeStateRequest();
-            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
-            .Result is not GetTreeStateResponse getTreeStateResponse)
+            if (await _mediator.Send(new GetTreeStateRequest()) is not GetTreeStateResponse getTreeStateResponse)
                 return;
 
             var setTreeStateRequest = new SetTreeStateRequest
             {
                 TreeUnchanged = !getTreeStateResponse.TreeUnchanged
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
         }
 
         public void MainForm_KeyUp(object sender, KeyEventArgs e)
@@ -1482,6 +1461,7 @@ namespace InformationTree.Forms
                 return;
 
             var ticks = DateTime.Now.Ticks;
+            // TODO: Maybe remove unchecked but still make this work for exceptional cases (maybe with try-catch?)
             var ticksSeedAsInt = unchecked((int)ticks);
             var interval = 0;
 
