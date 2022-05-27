@@ -641,39 +641,25 @@ namespace InformationTree.Forms
             tvTaskList.CollapseAll();
         }
 
-        private async void btnCalculatePercentage_Click(object sender, EventArgs e)
+        private async void btnCalculatePercentageFromLeafsToSelectedNode_Click(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-
-            if (selectedNode != null)
+            var request = new CalculatePercentageRequest
             {
-                var percentage = (decimal)TreeNodeHelper.GetPercentageFromChildren(selectedNode);
-                selectedNode.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(selectedNode.Text, ref percentage, true);
-
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest);
-            }
+                SelectedNode = tvTaskList.SelectedNode,
+                Direction = CalculatePercentageDirection.FromLeafsToSelectedNode
+            };
+            await _mediator.Send(request);
         }
 
-        private async void btnCalculatePercentage2_Click(object sender, EventArgs e)
+        private async void btnCalculatePercentageFromSelectedNodeToLeafs_Click(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-
-            if (selectedNode != null)
+            var request = new CalculatePercentageRequest
             {
-                var percentage = 0.0M;
-                TextProcessingHelper.GetTextAndProcentCompleted(selectedNode.Text, ref percentage, true);
-                TreeNodeHelper.SetPercentageToChildren(selectedNode, (double)percentage);
-
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest);
-            }
+                SelectedNode = tvTaskList.SelectedNode,
+                Direction = CalculatePercentageDirection.FromSelectedNodeToLeafs
+            };
+            await _mediator.Send(request);
+            
         }
 
         public async void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
@@ -919,7 +905,8 @@ namespace InformationTree.Forms
                     gbTask, gbStyleChange, gbStyleChange, gbTimeSpent, gbTaskOperations, btnMoveNode,
                     gbTreeToXML, btnShowFromToUrgencyNumber, btnShowFromToNumberOfTask, gbTaskDetails,
                     nudShowFromUrgencyNumber, nudShowToUrgencyNumber, nudShowFromNumber, nudShowUntilNumber,
-                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentage, btnCalculatePercentage2,
+                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentageFromLeafsToSelectedNode,
+                    btnCalculatePercentageFromSelectedNodeToLeafs,
                 }
             };
             await _mediator.Send(request);
@@ -938,7 +925,8 @@ namespace InformationTree.Forms
                     gbTask, gbStyleChange, gbStyleChange, gbTimeSpent, gbTaskOperations, btnMoveNode,
                     gbTreeToXML, btnShowFromToUrgencyNumber, btnShowFromToNumberOfTask, gbTaskDetails,
                     nudShowFromUrgencyNumber, nudShowToUrgencyNumber, nudShowFromNumber, nudShowUntilNumber,
-                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentage, btnCalculatePercentage2,
+                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentageFromLeafsToSelectedNode,
+                    btnCalculatePercentageFromSelectedNodeToLeafs,
                 }
             };
             await _mediator.Send(request);
@@ -957,7 +945,8 @@ namespace InformationTree.Forms
                     gbTask, gbStyleChange, gbStyleChange, gbTimeSpent, gbTaskOperations, btnMoveNode,
                     gbTreeToXML, btnShowFromToUrgencyNumber, btnShowFromToNumberOfTask, gbTaskDetails,
                     nudShowFromUrgencyNumber, nudShowToUrgencyNumber, nudShowFromNumber, nudShowUntilNumber,
-                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentage, btnCalculatePercentage2,
+                    btnMoveTaskUp, btnMoveTaskDown, btnCalculatePercentageFromLeafsToSelectedNode,
+                    btnCalculatePercentageFromSelectedNodeToLeafs,
                 }
             };
             await _mediator.Send(request);

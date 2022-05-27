@@ -74,8 +74,8 @@ namespace InformationTree.Forms
             this.lblHours = new System.Windows.Forms.Label();
             this.btnExpand = new System.Windows.Forms.Button();
             this.btnCollapse = new System.Windows.Forms.Button();
-            this.btnCalculatePercentage = new System.Windows.Forms.Button();
-            this.btnCalculatePercentage2 = new System.Windows.Forms.Button();
+            this.btnCalculatePercentageFromLeafsToSelectedNode = new System.Windows.Forms.Button();
+            this.btnCalculatePercentageFromSelectedNodeToLeafs = new System.Windows.Forms.Button();
             this.btnToggleCompletedTasks = new System.Windows.Forms.Button();
             this.btnMoveToNextUnfinished = new System.Windows.Forms.Button();
             this.btnMoveTaskUp = new System.Windows.Forms.Button();
@@ -494,29 +494,29 @@ namespace InformationTree.Forms
             this.btnCollapse.UseVisualStyleBackColor = false;
             this.btnCollapse.Click += new System.EventHandler(this.btnCollapse_Click);
             // 
-            // btnCalculatePercentage
+            // btnCalculatePercentageFromLeafsToSelectedNode
             // 
-            this.btnCalculatePercentage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCalculatePercentage.Location = new System.Drawing.Point(4, 74);
-            this.btnCalculatePercentage.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.btnCalculatePercentage.Name = "btnCalculatePercentage";
-            this.btnCalculatePercentage.Size = new System.Drawing.Size(121, 85);
-            this.btnCalculatePercentage.TabIndex = 10;
-            this.btnCalculatePercentage.Text = "Calculate percentage from leafs (to selected node)";
-            this.btnCalculatePercentage.UseVisualStyleBackColor = false;
-            this.btnCalculatePercentage.Click += new System.EventHandler(this.btnCalculatePercentage_Click);
+            this.btnCalculatePercentageFromLeafsToSelectedNode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCalculatePercentageFromLeafsToSelectedNode.Location = new System.Drawing.Point(4, 74);
+            this.btnCalculatePercentageFromLeafsToSelectedNode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnCalculatePercentageFromLeafsToSelectedNode.Name = "btnCalculatePercentage";
+            this.btnCalculatePercentageFromLeafsToSelectedNode.Size = new System.Drawing.Size(121, 85);
+            this.btnCalculatePercentageFromLeafsToSelectedNode.TabIndex = 10;
+            this.btnCalculatePercentageFromLeafsToSelectedNode.Text = "Calculate percentage from leafs (to selected node)";
+            this.btnCalculatePercentageFromLeafsToSelectedNode.UseVisualStyleBackColor = false;
+            this.btnCalculatePercentageFromLeafsToSelectedNode.Click += new System.EventHandler(this.btnCalculatePercentageFromLeafsToSelectedNode_Click);
             // 
-            // btnCalculatePercentage2
+            // btnCalculatePercentageFromSelectedNodeToLeafs
             // 
-            this.btnCalculatePercentage2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCalculatePercentage2.Location = new System.Drawing.Point(128, 74);
-            this.btnCalculatePercentage2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.btnCalculatePercentage2.Name = "btnCalculatePercentage2";
-            this.btnCalculatePercentage2.Size = new System.Drawing.Size(121, 85);
-            this.btnCalculatePercentage2.TabIndex = 11;
-            this.btnCalculatePercentage2.Text = "Calculate percentage from selected node (to leafs)";
-            this.btnCalculatePercentage2.UseVisualStyleBackColor = false;
-            this.btnCalculatePercentage2.Click += new System.EventHandler(this.btnCalculatePercentage2_Click);
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.Location = new System.Drawing.Point(128, 74);
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.Name = "btnCalculatePercentage2";
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.Size = new System.Drawing.Size(121, 85);
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.TabIndex = 11;
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.Text = "Calculate percentage from selected node (to leafs)";
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.UseVisualStyleBackColor = false;
+            this.btnCalculatePercentageFromSelectedNodeToLeafs.Click += new System.EventHandler(this.btnCalculatePercentageFromSelectedNodeToLeafs_Click);
             // 
             // btnToggleCompletedTasks
             // 
@@ -1009,9 +1009,9 @@ namespace InformationTree.Forms
             this.tbTasksChange.Controls.Add(this.btnNoTask);
             this.tbTasksChange.Controls.Add(this.btnCollapse);
             this.tbTasksChange.Controls.Add(this.btnExpand);
-            this.tbTasksChange.Controls.Add(this.btnCalculatePercentage2);
+            this.tbTasksChange.Controls.Add(this.btnCalculatePercentageFromSelectedNodeToLeafs);
             this.tbTasksChange.Controls.Add(this.btnMoveToNextUnfinished);
-            this.tbTasksChange.Controls.Add(this.btnCalculatePercentage);
+            this.tbTasksChange.Controls.Add(this.btnCalculatePercentageFromLeafsToSelectedNode);
             this.tbTasksChange.Controls.Add(this.btnDoNotSave);
             this.tbTasksChange.Controls.Add(this.btnToggleCompletedTasks);
             this.tbTasksChange.Controls.Add(this.btnMoveTaskUp);
@@ -1707,8 +1707,8 @@ namespace InformationTree.Forms
         private System.Windows.Forms.NumericUpDown nudHours;
         private System.Windows.Forms.Button btnExpand;
         private System.Windows.Forms.Button btnCollapse;
-        private System.Windows.Forms.Button btnCalculatePercentage;
-        private System.Windows.Forms.Button btnCalculatePercentage2;
+        private System.Windows.Forms.Button btnCalculatePercentageFromLeafsToSelectedNode;
+        private System.Windows.Forms.Button btnCalculatePercentageFromSelectedNodeToLeafs;
         private System.Windows.Forms.Button btnToggleCompletedTasks;
         private System.Windows.Forms.Button btnMoveToNextUnfinished;
         private System.Windows.Forms.Button btnUpdateText;

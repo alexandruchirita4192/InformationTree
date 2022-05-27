@@ -107,60 +107,6 @@ namespace InformationTree.Tree
 
         #endregion CopyNode, CopyNodes
 
-        #region Node percentage
-
-        public static double GetPercentageFromChildren(TreeNode topNode)
-        {
-            if (topNode == null)
-                throw new ArgumentNullException(nameof(topNode));
-
-            var sum = 0.0;
-            var nr = 0;
-            foreach (TreeNode node in topNode.Nodes)
-            {
-                if (node != null && node.Nodes.Count > 0)
-                {
-                    var procentCompleted = (decimal)GetPercentageFromChildren(node);
-                    node.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(node.Text, ref procentCompleted, true);
-
-                    sum += (double)procentCompleted;
-                }
-                else
-                {
-                    var value = 0.0M;
-                    node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref value, true);
-
-                    sum += (double)value;
-                }
-                nr++;
-            }
-
-            if (nr != 0)
-                return (sum / nr);
-            return 0;
-        }
-
-        public static void SetPercentageToChildren(TreeNode topNode, double percentage)
-        {
-            if (topNode == null)
-                throw new ArgumentNullException(nameof(topNode));
-            if (percentage < 0 || percentage > 100)
-                throw new ArgumentOutOfRangeException(nameof(percentage));
-
-            foreach (TreeNode node in topNode.Nodes)
-            {
-                if (node != null)
-                {
-                    var percentCompleted = (decimal)percentage;
-                    node.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(node.Text, ref percentCompleted, true);
-                    if (node.Nodes.Count > 0)
-                        SetPercentageToChildren(node, percentage);
-                }
-            }
-        }
-
-        #endregion Node percentage
-
         #region Node deletion
 
         public static int ParseToDelete(TreeView tv, TreeNode topNode, string nodeNameToDelete, bool fakeDelete = true)
