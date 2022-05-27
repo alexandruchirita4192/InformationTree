@@ -151,63 +151,6 @@ namespace InformationTree.Tree
 
         #region Nodes completed/unfinished
 
-        public static bool? TasksCompleteAreHidden(TreeView tv)
-        {
-            if (tv == null)
-                throw new ArgumentNullException(nameof(tv));
-
-            if (tv.Nodes.Count > 0)
-            {
-                foreach (TreeNode node in tv.Nodes)
-                {
-                    var completed = 0.0M;
-                    node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref completed, true);
-
-                    if (completed == 100)
-                    {
-                        if (node.ForeColor.Name == Constants.Colors.DefaultBackGroundColor.ToString())
-                            return true;
-                        else
-                            return false;
-                    }
-
-                    if (node.Nodes.Count > 0)
-                    {
-                        var ret = TasksCompleteAreHidden(tv);
-                        if (ret.HasValue)
-                            return ret;
-                        // else continue;
-                    }
-                }
-            }
-            return null;
-        }
-
-        public static void ToggleCompletedTasks(TreeView tv, bool toggleCompletedTasksAreHidden, TreeNodeCollection nodes)
-        {
-            if (tv == null)
-                throw new ArgumentNullException(nameof(tv));
-            if (nodes == null)
-                throw new ArgumentNullException(nameof(nodes));
-
-            var foreColor = toggleCompletedTasksAreHidden ? Constants.Colors.DefaultForeGroundColor : Constants.Colors.DefaultBackGroundColor;
-
-            if (tv.Nodes.Count > 0)
-            {
-                foreach (TreeNode node in nodes)
-                {
-                    var completed = 0.0M;
-                    node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref completed, true);
-
-                    if (completed == 100)
-                        node.ForeColor = foreColor;
-
-                    if (node.Nodes.Count > 0)
-                        ToggleCompletedTasks(tv, toggleCompletedTasksAreHidden, node.Nodes);
-                }
-            }
-        }
-
         public static void MoveToNextUnfinishedNode(TreeView tv, TreeNode currentNode)
         {
             if (tv == null || currentNode == null)
@@ -331,8 +274,6 @@ namespace InformationTree.Tree
 
         #endregion Node search
 
-        
-
         #region Node data size calculation
 
         public static int CalculateDataSizeFromNodeAndChildren(TreeNode node, ITreeNodeDataCachingService treeNodeDataCachingService)
@@ -360,70 +301,5 @@ namespace InformationTree.Tree
         }
 
         #endregion Node data size calculation
-
-        #region Node move
-
-        public static void MoveNode(TreeView tv,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
-            ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
-        {
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
-            if (treeNodeSelectionCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeSelectionCachingService));
-
-            var oldSelectionObj = treeNodeSelectionCachingService.GetOldSelectionFromCache();
-            if (oldSelectionObj == null)
-                return;
-
-            if (oldSelectionObj is TreeNode oldSelection)
-            {
-                bool removedNode = false;
-                var currentSelectionObj = treeNodeSelectionCachingService.GetCurrentSelectionFromCache();
-                if (currentSelectionObj is TreeNode currentSelection)
-                {
-                    var parentSelected = currentSelection.Parent;
-                    if (parentSelected != null)
-                    {
-                        parentSelected.Nodes.Remove(oldSelection);
-                        removedNode = true;
-                    }
-
-                    if (!removedNode)
-                        tv.Nodes.Remove(oldSelection);
-
-                    var currentSelectionTagData = currentSelection.ToTreeNodeData(treeNodeDataCachingService);
-                    if (string.IsNullOrEmpty(currentSelection.Text) &&
-                        currentSelectionTagData != null && string.IsNullOrEmpty(currentSelectionTagData.Data) &&
-                        currentSelection.Parent == null &&
-                        currentSelection.Nodes.Count == 0)
-                        tv.Nodes.Add(oldSelection);
-                    else
-                        currentSelection.Nodes.Add(oldSelection);
-                }
-            }
-        }
-
-        #endregion Node move
-
-        /// <summary>
-        /// Changes the size of a collection of nodes recursively.
-        /// </summary>
-        /// <param name="treeNodeCollection">Collection of nodes.</param>
-        /// <param name="changedSize">Font size changed to all the nodes (added or substracted from nodes size).</param>
-        public static void UpdateSizeOfTreeNodes(TreeNodeCollection treeNodeCollection, float changedSize)
-        {
-            if (treeNodeCollection == null)
-                throw new ArgumentNullException(nameof(treeNodeCollection));
-
-            foreach (TreeNode node in treeNodeCollection)
-            {
-                node.NodeFont = new Font(node.NodeFont.FontFamily, node.NodeFont.Size + changedSize, node.NodeFont.Style);
-
-                // Change size of children recursively too
-                foreach (TreeNode childNode in node.Nodes)
-                    UpdateSizeOfTreeNodes(childNode.Nodes, changedSize);
-            }
-        }
     }
 }

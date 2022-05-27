@@ -20,13 +20,13 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             || request.FontFamilyComboBox == null
             || request.FontSizeNumericUpDown == null)
             {
-                return null;
+                return Task.FromResult<BaseResponse>(null);
             }
 
             if (request.Form is MainForm mainForm)
             {
                 if (mainForm.IsDisposed)
-                    return null;
+                    return Task.FromResult<BaseResponse>(null);
 
                 mainForm.InvokeWrapper(mainForm => mainForm.MouseWheel += mainForm.tvTaskList_MouseClick);
 

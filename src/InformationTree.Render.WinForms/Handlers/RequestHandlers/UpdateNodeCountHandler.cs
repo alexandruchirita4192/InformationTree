@@ -23,7 +23,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             && request.ShowUntilNumberNumericUpDown is NumericUpDown nudShowUntilNumber
             && request.ShowFromNumberNumericUpDown is NumericUpDown nudShowFromNumber)
             {
-                treeView.InvokeWrapper(treeView =>
+                treeView.InvokeWrapper(async treeView =>
                 {
                     var countNodes = treeView.GetNodeCount(true);
 
@@ -38,10 +38,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                     {
                         TreeNodeCounter = countNodes
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(setTreeStateRequest, cancellationToken);
-                    }).Wait();
+                    await _mediator.Send(setTreeStateRequest, cancellationToken);
 
                     nudShowFromNumber.InvokeWrapper(nudShowFromNumber =>
                     {

@@ -315,8 +315,8 @@ namespace InformationTree.Forms
             else
             {
                 btnResetException.Enabled = false;
-                btnResetException.ForeColor = Constants.Colors.DefaultForeGroundColor;
                 btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
+                btnResetException.ForeColor = Constants.Colors.DefaultForeGroundColor;
                 btnResetException.Text = "Reset exception";
             }
         }
@@ -787,12 +787,13 @@ namespace InformationTree.Forms
             }
         }
 
-        private void btnToggleCompletedTasks_Click(object sender, EventArgs e)
+        private async void btnToggleCompletedTasks_Click(object sender, EventArgs e)
         {
-            var completedTasksAreHidden = TreeNodeHelper.TasksCompleteAreHidden(tvTaskList);
-            if (!completedTasksAreHidden.HasValue)
-                completedTasksAreHidden = false;
-            TreeNodeHelper.ToggleCompletedTasks(tvTaskList, !completedTasksAreHidden.Value, tvTaskList.Nodes);
+            var request = new TreeViewToggleCompletedTasksRequest
+            {
+                TreeView = tvTaskList
+            };
+            await _mediator.Send(request);
         }
 
         private void btnMoveToNextUnfinished_Click(object sender, EventArgs e)
@@ -1094,13 +1095,11 @@ namespace InformationTree.Forms
 
         private async void btnMoveNode_Click(object sender, EventArgs e)
         {
-            TreeNodeHelper.MoveNode(tvTaskList, _treeNodeDataCachingService, _treeNodeSelectionCachingService);
-
-            var setTreeStateRequest = new SetTreeStateRequest
+            var request = new MoveNodeRequest
             {
-                TreeUnchanged = false
+                TreeView = tvTaskList
             };
-            await _mediator.Send(setTreeStateRequest);
+            await _mediator.Send(request);
         }
 
         private async void btnGoToDefaultTree_Click(object sender, EventArgs e)
@@ -1358,15 +1357,15 @@ namespace InformationTree.Forms
             }
         }
 
-        public void tvTaskList_MouseClick(object sender, MouseEventArgs e)
+        public async void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (_isControlPressed && tvTaskList != null)
+            var request = new TreeViewMouseClickRequest
             {
-                var deltaFloat = (float)e.Delta;
-                var changedSize = deltaFloat / 120f;
-
-                TreeNodeHelper.UpdateSizeOfTreeNodes(tvTaskList.Nodes, changedSize);
-            }
+                IsControlPressed = _isControlPressed,
+                TreeView = tvTaskList,
+                MouseDelta = e.Delta
+            };
+            await _mediator.Send(request);
         }
 
         private void MainForm_DoubleClick(object sender, EventArgs e)
