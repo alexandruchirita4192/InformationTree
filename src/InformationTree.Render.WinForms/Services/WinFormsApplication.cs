@@ -168,14 +168,12 @@ namespace InformationTree.Render.WinForms.Services
             AutoSaveTimer.Tick += AutoSaveTimer_Tick;
             AutoSaveTimer.Start();
 
-            Application.ApplicationExit += (o, e) =>
+            Application.ApplicationExit += async (o, e) =>
             {
                 if (SplashForm.HasInstance())
                     return;
                 
-                var getTreeStateRequest = new GetTreeStateRequest();
-                if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
-                .Result is not GetTreeStateResponse getTreeStateResponse)
+                if (await _mediator.Send(new GetTreeStateRequest()) is not GetTreeStateResponse getTreeStateResponse)
                     return;
 
                 var isDataChanged = !getTreeStateResponse.TreeUnchanged && getTreeStateResponse.IsSafeToSave;
@@ -196,10 +194,7 @@ namespace InformationTree.Render.WinForms.Services
                             IsSafeToSave = true,
                             TreeUnchanged = false
                         };
-                        Task.Run(async () =>
-                        {
-                            return await _mediator.Send(setTreeStateRequest);
-                        }).Wait();
+                        await _mediator.Send(setTreeStateRequest);
                     }
                     else if (result == PopUpResult.NotConfirm)
                     {
@@ -208,10 +203,7 @@ namespace InformationTree.Render.WinForms.Services
                             IsSafeToSave = false,
                             TreeUnchanged = true
                         };
-                        Task.Run(async () =>
-                        {
-                            return await _mediator.Send(setTreeStateRequest);
-                        }).Wait();
+                        await _mediator.Send(setTreeStateRequest);
                     }
                 }
 

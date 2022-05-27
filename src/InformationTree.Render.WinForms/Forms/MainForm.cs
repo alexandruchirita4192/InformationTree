@@ -464,7 +464,7 @@ namespace InformationTree.Forms
             await _mediator.Send(updateTextClickRequest);
         }
 
-        private void btnAddTask_Click(object sender, EventArgs e)
+        private async void btnAddTask_Click(object sender, EventArgs e)
         {
             var taskPercentCompleted = nudCompleteProgress.Value;
             var taskName = TextProcessingHelper.GetTextAndProcentCompleted(tbTaskName.Text, ref taskPercentCompleted, true);
@@ -488,10 +488,7 @@ namespace InformationTree.Forms
                     {
                         TreeUnchanged = false
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(setTreeStateRequest);
-                    }).Wait();
+                    await _mediator.Send(setTreeStateRequest);
                 }
             }
             else if (selectedNodeLastChildren != null && selectedNodeLastChildren.Text.Equals(taskName /* StartsWith + " [" */))
@@ -509,10 +506,7 @@ namespace InformationTree.Forms
                     {
                         TreeUnchanged = false
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(setTreeStateRequest);
-                    }).Wait();
+                    await _mediator.Send(setTreeStateRequest);
                 }
             }
             else //insert
@@ -553,16 +547,13 @@ namespace InformationTree.Forms
                 ShowUntilNumberNumericUpDown = nudShowUntilNumber,
                 ShowFromNumberNumericUpDown = nudShowFromNumber,
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(updateNodeCountRequest);
-            }).Wait();
+            await _mediator.Send(updateNodeCountRequest);
 
             // TODO: Fix properly
             btnUpdateText_Click(sender, e); // workaround fix for some weirdly added spaces
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private async void btnDelete_Click(object sender, EventArgs e)
         {
             var selectedTask = tvTaskList.SelectedNode;
             var taskName = tbTaskName.Text;
@@ -587,10 +578,7 @@ namespace InformationTree.Forms
                         ShowUntilNumberNumericUpDown = nudShowUntilNumber,
                         ShowFromNumberNumericUpDown = nudShowFromNumber,
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(updateNodeCountRequest);
-                    }).Wait();
+                    await _mediator.Send(updateNodeCountRequest);
                 }
             }
 
@@ -653,7 +641,7 @@ namespace InformationTree.Forms
             tvTaskList.CollapseAll();
         }
 
-        private void btnCalculatePercentage_Click(object sender, EventArgs e)
+        private async void btnCalculatePercentage_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
 
@@ -666,14 +654,11 @@ namespace InformationTree.Forms
                 {
                     TreeUnchanged = false
                 };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateRequest);
-                }).Wait();
+                await _mediator.Send(setTreeStateRequest);
             }
         }
 
-        private void btnCalculatePercentage2_Click(object sender, EventArgs e)
+        private async void btnCalculatePercentage2_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
 
@@ -687,14 +672,11 @@ namespace InformationTree.Forms
                 {
                     TreeUnchanged = false
                 };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateRequest);
-                }).Wait();
+                await _mediator.Send(setTreeStateRequest);
             }
         }
 
-        public void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
+        public async void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null && cbFontFamily.SelectedItem != null)
             {
@@ -708,14 +690,11 @@ namespace InformationTree.Forms
                 {
                     TreeUnchanged = false
                 };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateRequest);
-                }).Wait();
+                await _mediator.Send(setTreeStateRequest);
             }
         }
 
-        public void nudFontSize_ValueChanged(object sender, EventArgs e)
+        public async void nudFontSize_ValueChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
             {
@@ -729,15 +708,12 @@ namespace InformationTree.Forms
                     {
                         TreeUnchanged = false
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(setTreeStateRequest);
-                    }).Wait();
+                    await _mediator.Send(setTreeStateRequest);
                 }
             }
         }
 
-        public void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
+        public async void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (_clbStyle_ItemCheckEntered)
                 return;
@@ -774,10 +750,7 @@ namespace InformationTree.Forms
                     {
                         TreeUnchanged = false
                     };
-                    Task.Run(async () =>
-                    {
-                        return await _mediator.Send(setTreeStateRequest);
-                    }).Wait();
+                    await _mediator.Send(setTreeStateRequest);
                 }
             }
             finally
@@ -798,7 +771,7 @@ namespace InformationTree.Forms
             return currentFontStyle;
         }
 
-        private void tbTextColor_TextChanged(object sender, EventArgs e)
+        private async void tbTextColor_TextChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
             {
@@ -809,14 +782,11 @@ namespace InformationTree.Forms
                 {
                     TreeUnchanged = false
                 };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateRequest);
-                }).Wait();
+                await _mediator.Send(setTreeStateRequest);
             }
         }
 
-        private void tbBackgroundColor_TextChanged(object sender, EventArgs e)
+        private async void tbBackgroundColor_TextChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
             {
@@ -827,10 +797,7 @@ namespace InformationTree.Forms
                 {
                     TreeUnchanged = false
                 };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateRequest);
-                }).Wait();
+                await _mediator.Send(setTreeStateRequest);
             }
         }
 
@@ -854,7 +821,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void btnMoveTaskUp_Click(object sender, EventArgs e)
+        private async void btnMoveTaskUp_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
             if (selectedNode != null && selectedNode.Parent != null && selectedNode.Parent.Nodes != null)
@@ -887,10 +854,7 @@ namespace InformationTree.Forms
             {
                 TreeUnchanged = false
             };
-            Task.Run(async () =>
-            {
-                return await _mediator.Send(setTreeStateRequest);
-            }).Wait();
+            await _mediator.Send(setTreeStateRequest);
         }
 
         private async void btnMoveTaskDown_Click(object sender, EventArgs e)
@@ -1302,7 +1266,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void btnGenerate_Click(object sender, EventArgs e)
+        private async void btnGenerate_Click(object sender, EventArgs e)
         {
             var x = (double)nudX.Value;
             var y = (double)nudY.Value;
@@ -1331,10 +1295,7 @@ namespace InformationTree.Forms
                 {
                     TreeUnchanged = false
                 };
-                Task.Run(async () =>
-                {
-                    return await _mediator.Send(setTreeStateRequest);
-                }).Wait();
+                await _mediator.Send(setTreeStateRequest);
             }
 
             if (cbUseDefaultsChecked)
