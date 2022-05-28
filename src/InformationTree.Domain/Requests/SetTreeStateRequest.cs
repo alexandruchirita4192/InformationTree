@@ -44,6 +44,10 @@ public class SetTreeStateRequest : IRequest<BaseResponse>
     #endregion TreeUnchangedValueChanged
 }
 
+/// <summary>
+/// File information class is created to know when someone wants to set a <see cref="FileName"/> value because you could also set <see cref="FileName"/> null
+/// (and null <see cref="FileInformation"/> means not setting the value)
+/// </summary>
 public class FileInformation
 {
     public string FileName { get; set; }
