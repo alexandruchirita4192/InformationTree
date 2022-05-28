@@ -8,7 +8,7 @@ namespace InformationTree.Domain.Requests
     public class TaskListAfterSelectRequest : BaseRequest
     {
         public Component Form { get; set; }
-        public Component TaskListTreeView { get; set; }
+        public Component TreeView { get; set; }
         public MarshalByRefObject SelectedNode { get; set; }
         public TreeNodeData SelectedNodeData { get; set; }
         public decimal TaskPercentCompleted { get; set; }

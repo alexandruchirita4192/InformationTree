@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
@@ -41,7 +42,7 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             var removeEventsRequest = new MainFormInitializeComponentRemoveEventsRequest
             {
                 Form = request.Form,
-                TaskListTreeView = request.TaskListTreeView,
+                TaskListTreeView = request.TreeView,
                 StyleCheckedListBox = request.StyleCheckedListBox,
                 FontFamilyComboBox = request.FontFamilyComboBox,
                 FontSizeNumericUpDown = request.FontSizeNumericUpDown
@@ -81,7 +82,7 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
                 tbCategory.Text = treeNodeData.Category;
             if (request.DataSizeTextBox is TextBox tbDataSize)
             {
-                var sizeBytes = TreeNodeHelper.CalculateDataSizeFromNodeAndChildren(treeNodeData, _treeNodeDataCachingService);
+                var sizeBytes = CalculateDataSizeFromNodeAndChildren(treeNodeData, _treeNodeDataCachingService);
                 var sizeMb = sizeBytes / 1024 / 1024;
                 tbDataSize.InvokeWrapper(tbDataSize => tbDataSize.Text = $"{sizeBytes}b {sizeMb}M");
             }
@@ -158,7 +159,7 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             var addEventsRequest = new MainFormInitializeComponentAddEventsRequest
             {
                 Form = request.Form,
-                TaskListTreeView = request.TaskListTreeView,
+                TaskListTreeView = request.TreeView,
                 StyleCheckedListBox = request.StyleCheckedListBox,
                 FontFamilyComboBox = request.FontFamilyComboBox,
                 FontSizeNumericUpDown = request.FontSizeNumericUpDown
@@ -177,5 +178,18 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             var checkedState = ((!clb.GetItemChecked(idx)) && itemChecked) || fontStyle == FontStyle.Regular ? CheckState.Checked : CheckState.Unchecked;
             clb.SetItemCheckState(idx, checkedState);
         });
+    }
+
+    private int CalculateDataSizeFromNodeAndChildren(TreeNodeData tagData, ITreeNodeDataCachingService treeNodeDataCachingService)
+    {
+        if (tagData == null)
+            return 0;
+        if (treeNodeDataCachingService == null)
+            throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+
+        var size = tagData.Data.IsEmpty() ? 0 : tagData.Data.Length;
+        foreach (TreeNodeData nd in tagData.Children)
+            size += CalculateDataSizeFromNodeAndChildren(nd, treeNodeDataCachingService);
+        return size;
     }
 }

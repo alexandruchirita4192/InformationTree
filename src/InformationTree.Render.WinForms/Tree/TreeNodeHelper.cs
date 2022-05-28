@@ -8,7 +8,6 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
-using InformationTree.TextProcessing;
 
 namespace InformationTree.Tree
 {
@@ -107,88 +106,6 @@ namespace InformationTree.Tree
 
         #endregion CopyNode, CopyNodes
 
-        #region Node deletion
-
-        public static int ParseToDelete(TreeView tv, TreeNode topNode, string nodeNameToDelete, bool fakeDelete = true)
-        {
-            if (tv == null)
-                throw new ArgumentNullException(nameof(tv));
-            if (topNode == null)
-                throw new ArgumentNullException(nameof(topNode));
-            if (nodeNameToDelete.IsEmpty())
-                throw new ArgumentNullException(nameof(nodeNameToDelete));
-
-            int ret = 0;
-            if (topNode.Text.Equals(nodeNameToDelete /* StartsWith + " [" */))
-            {
-                if (!fakeDelete)
-                {
-                    topNode.Nodes.Clear();
-                    tv.Nodes.Remove(topNode);
-                }
-                ret++;
-            }
-            else
-                foreach (TreeNode node in topNode.Nodes)
-                {
-                    if (node != null && node.Text.Equals(nodeNameToDelete /* StartsWith + " [" */))
-                    {
-                        if (!fakeDelete)
-                        {
-                            node.Nodes.Clear();
-                            tv.Nodes.Remove(node);
-                        }
-
-                        ret++;
-                    }
-                    if (node != null && node.Nodes.Count > 0)
-                        ret += ParseToDelete(tv, node, nodeNameToDelete);
-                }
-            return ret;
-        }
-
-        #endregion Node deletion
-
-        #region Nodes completed/unfinished
-
-        public static void MoveToNextUnfinishedNode(TreeView tv, TreeNode currentNode)
-        {
-            if (tv == null || currentNode == null)
-                return;
-
-            foreach (TreeNode node in currentNode.Nodes)
-            {
-                var completed = 0.0M;
-                node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref completed, true);
-
-                if (completed != 100 && tv.SelectedNode != node)
-                {
-                    tv.SelectedNode = node;
-                    return;
-                }
-            }
-
-            if (currentNode.Parent != null)
-            {
-                var foundCurrentNode = false;
-                foreach (TreeNode node in currentNode.Parent.Nodes)
-                {
-                    if (foundCurrentNode && !object.ReferenceEquals(node, currentNode))
-                    {
-                        MoveToNextUnfinishedNode(tv, node);
-                        return;
-                    }
-
-                    if (ReferenceEquals(node, currentNode))
-                        foundCurrentNode = true;
-                }
-
-                MoveToNextUnfinishedNode(tv, currentNode.Parent);
-            }
-        }
-
-        #endregion Nodes completed/unfinished
-
         #region Node search
 
         public static void ExpandParents(TreeNode node)
@@ -273,33 +190,5 @@ namespace InformationTree.Tree
         }
 
         #endregion Node search
-
-        #region Node data size calculation
-
-        public static int CalculateDataSizeFromNodeAndChildren(TreeNode node, ITreeNodeDataCachingService treeNodeDataCachingService)
-        {
-            if (node == null)
-                return 0;
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
-
-            var tagData = node.ToTreeNodeData(treeNodeDataCachingService);
-            return CalculateDataSizeFromNodeAndChildren(tagData, treeNodeDataCachingService);
-        }
-
-        public static int CalculateDataSizeFromNodeAndChildren(TreeNodeData tagData, ITreeNodeDataCachingService treeNodeDataCachingService)
-        {
-            if (tagData == null)
-                return 0;
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
-
-            var size = tagData.Data == null ? 0 : tagData.Data.Length;
-            foreach (TreeNodeData nd in tagData.Children)
-                size += CalculateDataSizeFromNodeAndChildren(nd, treeNodeDataCachingService);
-            return size;
-        }
-
-        #endregion Node data size calculation
     }
 }

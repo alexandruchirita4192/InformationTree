@@ -323,31 +323,6 @@ namespace InformationTree.Forms
 
         #endregion Public methods
 
-        #region Private methods
-
-        private int ParseToDelete(TreeNode selectedTask, string taskName, bool fakeDelete)
-        {
-            var deletedItemsWithName = 0;
-
-            if (selectedTask != null && selectedTask.Text.Equals(taskName /*StartsWith + " [" */))
-                deletedItemsWithName = TreeNodeHelper.ParseToDelete(tvTaskList, selectedTask, taskName, fakeDelete);
-            else
-                foreach (TreeNode node in tvTaskList.Nodes)
-                {
-                    if (node != null && node.Text.Equals(taskName /*StartsWith + " [" */))
-                    {
-                        node.Nodes.Clear();
-                        tvTaskList.Nodes.Remove(node);
-                    }
-                    if (node.Nodes.Count > 0)
-                        deletedItemsWithName = TreeNodeHelper.ParseToDelete(tvTaskList, node, taskName, fakeDelete);
-                }
-
-            return deletedItemsWithName;
-        }
-
-        #endregion Private methods
-
         #region Handlers
 
         public async void tvTaskList_AfterSelect(object sender, TreeViewEventArgs e)
@@ -357,7 +332,7 @@ namespace InformationTree.Forms
 
             var taskListAfterSelectRequest = new TaskListAfterSelectRequest
             {
-                TaskListTreeView = tvTaskList,
+                TreeView = tvTaskList,
                 Form = this,
                 SelectedNode = e.Node,
                 SelectedNodeData = e.Node
@@ -389,27 +364,47 @@ namespace InformationTree.Forms
             await _mediator.Send(taskListAfterSelectRequest);
         }
 
-        private void btnNoTask_Click(object sender, EventArgs e)
+        private async void btnNoTask_Click(object sender, EventArgs e)
         {
-            tvTaskList.SelectedNode = null;
-            tvTaskList_AfterSelect(
-                sender,
-                new TreeViewEventArgs(
-                    new TreeNode(null)
-                    {
-                        ToolTipText = null,
-                        Tag = new TreeNodeData(null)
-                    })
-            );
-            //gbTimeSpent.Enabled = false;
-            //tbAddedDate.Text = "-";
-            //tbAddedNumber.Text = "-";
-            //tbTaskName.Text = string.Empty;
-            //nudHours.Value = 0;
-            //nudMinutes.Value = 0;
-            //nudSeconds.Value = 0;
-            //nudMilliseconds.Value = 0;
-            //nudUrgency.Value = 0;
+            if (tvTaskList.SelectedNode == null)
+                return;
+            
+            var taskListAfterSelectRequest = new TaskListAfterSelectRequest
+            {
+                TreeView = tvTaskList,
+                Form = this,
+                SelectedNode = tvTaskList.SelectedNode,
+                SelectedNodeData = tvTaskList.SelectedNode
+                    .ToTreeNodeData(_treeNodeDataCachingService),
+                TaskPercentCompleted = nudCompleteProgress.Value,
+                StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                TimeSpentGroupBox = gbTimeSpent,
+                StyleCheckedListBox = clbStyle,
+                FontFamilyComboBox = cbFontFamily,
+                TaskNameTextBox = tbTaskName,
+                AddedDateTextBox = tbAddedDate,
+                LastChangeDateTextBox = tbLastChangeDate,
+                AddedNumberTextBox = tbAddedNumber,
+                UrgencyNumericUpDown = nudUrgency,
+                LinkTextBox = tbLink,
+                IsStartupAlertCheckBox = cbIsStartupAlert,
+                CompleteProgressNumericUpDown = nudCompleteProgress,
+                CategoryTextBox = tbCategory,
+                DataSizeTextBox = tbDataSize,
+                HoursNumericUpDown = nudHours,
+                MinutesNumericUpDown = nudMinutes,
+                SecondsNumericUpDown = nudSeconds,
+                MillisecondsNumericUpDown = nudMilliseconds,
+                FontSizeNumericUpDown = nudFontSize,
+                TextColorTextBox = tbTextColor,
+                BackgroundColorTextBox = tbBackgroundColor,
+            };
+            var request = new TreeViewNoTaskRequest
+            {
+                TreeView = tvTaskList,
+                AfterSelectRequest = taskListAfterSelectRequest,
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnUpdateText_Click(object sender, EventArgs e)
@@ -431,7 +426,7 @@ namespace InformationTree.Forms
                 TaskListTreeView = tvTaskList,
                 AfterSelectRequest = new TaskListAfterSelectRequest
                 {
-                    TaskListTreeView = tvTaskList,
+                    TreeView = tvTaskList,
                     Form = this,
                     SelectedNode = tvTaskList.SelectedNode,
                     SelectedNodeData = tvTaskList.SelectedNode
@@ -555,34 +550,48 @@ namespace InformationTree.Forms
 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
-            var selectedTask = tvTaskList.SelectedNode;
-            var taskName = tbTaskName.Text;
-            var deletedItemsWithName = ParseToDelete(selectedTask, taskName, true);
-
-            if (deletedItemsWithName != 0)
+            if (tvTaskList.SelectedNode == null)
+                return;
+            
+            var taskListAfterSelectRequest = new TaskListAfterSelectRequest
             {
-                var itemOrItems = deletedItemsWithName == 1 ? " item" : " items";
-                var messageBoxText = $"Delete {deletedItemsWithName} {itemOrItems} with name {taskName}?";
-                var messageBoxCaption = $"Delete";
-
-                var result = _popUpService.ShowQuestion(messageBoxText, messageBoxCaption);
-                if (result == PopUpResult.Yes)
-                {
-                    ParseToDelete(selectedTask, taskName, false);
-
-                    btnNoTask_Click(this, EventArgs.Empty);
-
-                    var updateNodeCountRequest = new UpdateNodeCountRequest
-                    {
-                        TreeView = tvTaskList,
-                        ShowUntilNumberNumericUpDown = nudShowUntilNumber,
-                        ShowFromNumberNumericUpDown = nudShowFromNumber,
-                    };
-                    await _mediator.Send(updateNodeCountRequest);
-                }
-            }
-
-            //TreeNodeHelper.TreeUnchanged = false; // on control delete is added too
+                TreeView = tvTaskList,
+                Form = this,
+                SelectedNode = tvTaskList.SelectedNode,
+                SelectedNodeData = tvTaskList.SelectedNode
+                    .ToTreeNodeData(_treeNodeDataCachingService),
+                TaskPercentCompleted = nudCompleteProgress.Value,
+                StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                TimeSpentGroupBox = gbTimeSpent,
+                StyleCheckedListBox = clbStyle,
+                FontFamilyComboBox = cbFontFamily,
+                TaskNameTextBox = tbTaskName,
+                AddedDateTextBox = tbAddedDate,
+                LastChangeDateTextBox = tbLastChangeDate,
+                AddedNumberTextBox = tbAddedNumber,
+                UrgencyNumericUpDown = nudUrgency,
+                LinkTextBox = tbLink,
+                IsStartupAlertCheckBox = cbIsStartupAlert,
+                CompleteProgressNumericUpDown = nudCompleteProgress,
+                CategoryTextBox = tbCategory,
+                DataSizeTextBox = tbDataSize,
+                HoursNumericUpDown = nudHours,
+                MinutesNumericUpDown = nudMinutes,
+                SecondsNumericUpDown = nudSeconds,
+                MillisecondsNumericUpDown = nudMilliseconds,
+                FontSizeNumericUpDown = nudFontSize,
+                TextColorTextBox = tbTextColor,
+                BackgroundColorTextBox = tbBackgroundColor,
+            };
+            var request = new TreeViewDeleteRequest
+            {
+                TreeView = tvTaskList,
+                TaskNameText = tbTaskName.Text,
+                ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                ShowFromNumberNumericUpDown = nudShowFromNumber,
+                AfterSelectRequest = taskListAfterSelectRequest
+            };
+            await _mediator.Send(request);
         }
 
         private void nudCompleteProgress_ValueChanged(object sender, EventArgs e)
@@ -796,16 +805,13 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        private void btnMoveToNextUnfinished_Click(object sender, EventArgs e)
+        private async void btnMoveToNextUnfinished_Click(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-            if (tvTaskList.Nodes.Count > 0)
+            var request = new TreeViewMoveToNextUnfinishedRequest
             {
-                if (selectedNode == null && tvTaskList.Nodes.Count > 0)
-                    selectedNode = tvTaskList.Nodes[0];
-
-                TreeNodeHelper.MoveToNextUnfinishedNode(tvTaskList, selectedNode);
-            }
+                TreeView = tvTaskList
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnMoveTaskUp_Click(object sender, EventArgs e)
