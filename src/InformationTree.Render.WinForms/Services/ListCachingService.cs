@@ -6,7 +6,7 @@ namespace InformationTree.Render.WinForms.Services
 {
     public class ListCachingService : IListCachingService
     {
-        private readonly ConcurrentDictionary<string, IList> _cache = new ConcurrentDictionary<string, IList>();
+        private readonly ConcurrentDictionary<string, IList> _cache = new();
 
         public IList Get(string key)
         {

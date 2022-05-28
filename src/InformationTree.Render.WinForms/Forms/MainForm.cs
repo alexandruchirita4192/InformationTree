@@ -1157,7 +1157,7 @@ namespace InformationTree.Forms
                 if (searchText.Length < 3)
                     return;
 
-                if (!string.IsNullOrEmpty(searchText))
+                if (searchText.IsNotEmpty())
                 {
                     TreeNodeHelper.SetStyleForSearch(tvTaskList.Nodes, searchText, _treeNodeDataCachingService);
                 }
