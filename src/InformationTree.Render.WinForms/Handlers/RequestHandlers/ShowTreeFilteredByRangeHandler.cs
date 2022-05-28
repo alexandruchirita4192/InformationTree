@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
@@ -13,20 +14,18 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class ShowTreeFilteredByRangeHandler : IRequestHandler<ShowTreeFilteredByRangeRequest, BaseResponse>
     {
-        private const string NodesListKey = "Nodes";
-
         private readonly IMediator _mediator;
         private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
-        private readonly IListCachingService _listCachingService;
+        private readonly ICachingService _cachingService;
 
         public ShowTreeFilteredByRangeHandler(
             IMediator mediator,
             ITreeNodeDataCachingService treeNodeDataCachingService,
-            IListCachingService listCachingService)
+            ICachingService cachingService)
         {
             _mediator = mediator;
             _treeNodeDataCachingService = treeNodeDataCachingService;
-            _listCachingService = listCachingService;
+            _cachingService = cachingService;
         }
 
         public async Task<BaseResponse> Handle(ShowTreeFilteredByRangeRequest request, CancellationToken cancellationToken)
@@ -98,10 +97,10 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             CopyNodeFilterType filterType,
             CancellationToken cancellationToken)
         {
-            if (_listCachingService.Get(NodesListKey) is not TreeNodeCollection nodes)
+            if (_cachingService.Get(Constants.CacheKeys.NodesList) is not TreeNodeCollection nodes)
             {
                 nodes = new TreeNode().Nodes;
-                _listCachingService.Set(NodesListKey, nodes);
+                _cachingService.Set(Constants.CacheKeys.NodesList, nodes);
             }
 
             var isFiltered = filterType != CopyNodeFilterType.NoFilter;
@@ -112,7 +111,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                 // Copy tree to cache to save current tree state
                 TreeNodeHelper.CopyNodes(nodes, tvTaskList.Nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
-                _listCachingService.Set(NodesListKey, nodes);
+                _cachingService.Set(Constants.CacheKeys.NodesList, nodes);
 
                 // Update tree view with filtered nodes
                 tvTaskList.Nodes.Clear();

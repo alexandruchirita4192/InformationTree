@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.EventArguments;
 using InformationTree.Domain.Requests;
@@ -12,16 +13,16 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class GetTreeStateHandler : IRequestHandler<GetTreeStateRequest, BaseResponse>
     {
-        private readonly ITreeStateCachingService _treeNodeStateCachingService;
+        private readonly ICachingService _cachingService;
 
-        public GetTreeStateHandler(ITreeStateCachingService treeNodeStateCachingService)
+        public GetTreeStateHandler(ICachingService cachingService)
         {
-            _treeNodeStateCachingService = treeNodeStateCachingService;
+            _cachingService = cachingService;
         }
 
         public Task<BaseResponse> Handle(GetTreeStateRequest request, CancellationToken cancellationToken)
         {
-            var treeNodeState = _treeNodeStateCachingService.GetTreeNodeState()
+            var treeNodeState = _cachingService.Get<TreeState>(Constants.CacheKeys.TreeState)
                 ?? new TreeState();
 
             var getTreeStateResponse =
@@ -38,7 +39,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             var eventHandler = new EventHandler<ValueChangedEventArgs<bool>>(
                 (s, e) => treeNodeState?.InvokeTreeUnchangedValueChangedEventHandler(s, e));
-            
+
             getTreeStateResponse.TreeUnchangedValueChanged += eventHandler;
 
             return Task.FromResult<BaseResponse>(getTreeStateResponse);

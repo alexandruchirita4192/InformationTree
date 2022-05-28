@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
@@ -10,16 +11,16 @@ namespace InformationTree.Render.WinForms.Handlers
 {
     public class SetTreeStateHandler : IRequestHandler<SetTreeStateRequest, BaseResponse>
     {
-        private readonly ITreeStateCachingService _treeNodeStateCachingService;
+        private readonly ICachingService _cachingService;
 
-        public SetTreeStateHandler(ITreeStateCachingService treeNodeStateCachingService)
+        public SetTreeStateHandler(ICachingService cachingService)
         {
-            _treeNodeStateCachingService = treeNodeStateCachingService;
+            _cachingService = cachingService;
         }
 
         public Task<BaseResponse> Handle(SetTreeStateRequest request, CancellationToken cancellationToken)
         {
-            var treeNodeState = _treeNodeStateCachingService.GetTreeNodeState()
+            var treeNodeState = _cachingService.Get<TreeState>(Constants.CacheKeys.TreeState)
                 ?? new TreeState();
 
             if (request.IsSafeToSave.HasValue)
@@ -38,8 +39,8 @@ namespace InformationTree.Render.WinForms.Handlers
                 treeNodeState.FileName = request.FileInformation.FileName;
             if (request.TreeUnchangedValueChangeEventAdded)
                 treeNodeState.TreeUnchangedValueChanged += (s, e) => request.InvokeTreeUnchangedValueChangeEvent(s, e);
-            
-            _treeNodeStateCachingService.CacheTreeNodeState(treeNodeState);
+
+            _cachingService.Set(Constants.CacheKeys.TreeState, treeNodeState);
 
             return Task.FromResult(new BaseResponse());
         }

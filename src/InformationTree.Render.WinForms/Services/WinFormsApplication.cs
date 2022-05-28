@@ -32,7 +32,7 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
-        private readonly IListCachingService _listCachingService;
+        private readonly ICachingService _cachingService;
 
         public WinFormsApplication(
             IConfigurationReader configurationReader,
@@ -49,7 +49,7 @@ namespace InformationTree.Render.WinForms.Services
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
             ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
-            IListCachingService listCachingService)
+            ICachingService cachingService)
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
@@ -65,7 +65,7 @@ namespace InformationTree.Render.WinForms.Services
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
-            _listCachingService = listCachingService;
+            _cachingService = cachingService;
         }
 
         #region extern
@@ -226,7 +226,7 @@ namespace InformationTree.Render.WinForms.Services
                 _importExportTreeXmlService,
                 _mediator,
                 _treeNodeSelectionCachingService,
-                _listCachingService
+                _cachingService
                 ));
         }
 

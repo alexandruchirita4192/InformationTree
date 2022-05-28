@@ -46,8 +46,7 @@ namespace InformationTree.Forms
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
-        private readonly IListCachingService _listCachingService;
-
+        private readonly ICachingService _cachingService;
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -69,7 +68,7 @@ namespace InformationTree.Forms
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
             ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
-            IListCachingService listCachingService)
+            ICachingService cachingService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -85,7 +84,7 @@ namespace InformationTree.Forms
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
-            _listCachingService = listCachingService;
+            _cachingService = cachingService;
 
             InitializeComponent();
 
@@ -171,7 +170,7 @@ namespace InformationTree.Forms
 
             btnShowAll.Enabled = false;
 
-            _isControlPressed = false;
+            _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, false);
             StartPosition = FormStartPosition.CenterScreen;
 
             _configuration = _configurationReader.GetConfiguration();
@@ -254,13 +253,8 @@ namespace InformationTree.Forms
 
         #region Properties
 
-        private bool _clbStyle_ItemCheckEntered { get; set; }
-
-        private ICanvasForm _canvasForm;
-
         private Stopwatch _timer = new();
         private System.Timers.Timer _randomTimer = new();
-        private static int _systemSoundNumber = -1;
 
         public TreeNodeData TaskListRoot
         {
@@ -269,10 +263,6 @@ namespace InformationTree.Forms
                 return tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
             }
         }
-
-        private int _oldX = 0, _oldY = 0;
-
-        private bool _isControlPressed;
 
         #endregion Properties
 
@@ -330,6 +320,8 @@ namespace InformationTree.Forms
             if (e.Node == null)
                 return;
 
+            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
+
             var taskListAfterSelectRequest = new TaskListAfterSelectRequest
             {
                 TreeView = tvTaskList,
@@ -368,7 +360,9 @@ namespace InformationTree.Forms
         {
             if (tvTaskList.SelectedNode == null)
                 return;
-            
+
+            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
+
             var taskListAfterSelectRequest = new TaskListAfterSelectRequest
             {
                 TreeView = tvTaskList,
@@ -412,6 +406,7 @@ namespace InformationTree.Forms
             if (tvTaskList.SelectedNode == null)
                 return;
 
+            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             var taskPercentCompleted = nudCompleteProgress.Value;
             var updateTextClickRequest = new UpdateTextClickRequest
             {
@@ -552,7 +547,8 @@ namespace InformationTree.Forms
         {
             if (tvTaskList.SelectedNode == null)
                 return;
-            
+
+            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             var taskListAfterSelectRequest = new TaskListAfterSelectRequest
             {
                 TreeView = tvTaskList,
@@ -668,7 +664,6 @@ namespace InformationTree.Forms
                 Direction = CalculatePercentageDirection.FromSelectedNodeToLeafs
             };
             await _mediator.Send(request);
-            
         }
 
         public async void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
@@ -710,13 +705,14 @@ namespace InformationTree.Forms
 
         public async void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
         {
+            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             if (_clbStyle_ItemCheckEntered)
                 return;
 
             try
             {
-                _clbStyle_ItemCheckEntered = true;
-
+                _cachingService.Set(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered, true);
+                
                 if (tvTaskList.SelectedNode != null)
                 {
                     var newFontStyle = FontStyle.Regular;
@@ -750,7 +746,7 @@ namespace InformationTree.Forms
             }
             finally
             {
-                _clbStyle_ItemCheckEntered = false;
+                _cachingService.Set(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered, false);
             }
         }
 
@@ -971,28 +967,30 @@ namespace InformationTree.Forms
 
         public void tvTaskList_MouseMove(object sender, MouseEventArgs e)
         {
+            var _oldX = _cachingService.Get<int>(Constants.CacheKeys.TreeViewOldX);
+            var _oldY = _cachingService.Get<int>(Constants.CacheKeys.TreeViewOldY);
             if (e.X == _oldX && e.Y == _oldY)
                 return;
 
             // Get the node at the current mouse pointer location.
-            TreeNode theNode = this.tvTaskList.GetNodeAt(e.X, e.Y);
+            TreeNode theNode = tvTaskList.GetNodeAt(e.X, e.Y);
 
             // Set a ToolTip only if the mouse pointer is actually paused on a node.
             if (theNode != null)
             {
                 // Change the ToolTip only if the pointer moved to a new node.
-                if (theNode.ToolTipText != this.toolTip1.GetToolTip(this.tvTaskList))
+                if (theNode.ToolTipText != toolTip1.GetToolTip(this.tvTaskList))
                 {
-                    toolTip1.SetToolTip(this.tvTaskList, theNode.ToolTipText);
+                    toolTip1.SetToolTip(tvTaskList, theNode.ToolTipText);
                 }
             }
             else // Pointer is not over a node so clear the ToolTip.
             {
-                toolTip1.SetToolTip(this.tvTaskList, "");
+                toolTip1.SetToolTip(tvTaskList, "");
             }
 
-            _oldX = e.X;
-            _oldY = e.Y;
+            _cachingService.Set(Constants.CacheKeys.TreeViewOldX, e.X);
+            _cachingService.Set(Constants.CacheKeys.TreeViewOldY, e.Y);
         }
 
         private void tbTaskName_DoubleClick(object sender, EventArgs e)
@@ -1068,8 +1066,12 @@ namespace InformationTree.Forms
             {
                 var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
 
+                var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
                 if (_canvasForm == null || _canvasForm.IsDisposed)
+                {
                     _canvasForm = _canvasFormFactory.Create(figureLines);
+                    _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
+                }
                 else
                 {
                     _canvasForm.RunTimer.Enabled = false;
@@ -1166,11 +1168,13 @@ namespace InformationTree.Forms
 
         private void btnShowCanvasPopUp_Click(object sender, EventArgs e)
         {
+            var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
             if (_canvasForm == null || _canvasForm.IsDisposed)
             {
                 var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
 
                 _canvasForm = _canvasFormFactory.Create(figureLines);
+                _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
             }
 
             _canvasForm.Show();
@@ -1229,9 +1233,11 @@ namespace InformationTree.Forms
 
             var figureLines = tbCommand.Lines;
 
+            var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
             if (_canvasForm == null || _canvasForm.IsDisposed)
             {
                 _canvasForm = _canvasFormFactory.Create(figureLines);
+                _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
             }
             else
             {
@@ -1252,11 +1258,13 @@ namespace InformationTree.Forms
 
         private void btnDeleteCanvas_Click(object sender, EventArgs e)
         {
+            var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
             if (_canvasForm != null && !_canvasForm.IsDisposed)
             {
                 _canvasForm.Close();
                 _canvasForm.Dispose();
                 _canvasForm = null;
+                _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
             }
         }
 
@@ -1339,15 +1347,12 @@ namespace InformationTree.Forms
 
         public void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            _isControlPressed = false;
+            _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, false);
         }
 
         public void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control)
-                _isControlPressed = true;
-            else
-                _isControlPressed = false;
+            _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, e.Control);
 
             if (e.Control && e.KeyCode == Keys.F)
                 tbSearchBox_DoubleClick(sender, EventArgs.Empty);
@@ -1365,9 +1370,10 @@ namespace InformationTree.Forms
 
         public async void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
+            var isControlKeyPressed = _cachingService.Get<bool>(Constants.CacheKeys.IsControlKeyPressed);
             var request = new TreeViewMouseClickRequest
             {
-                IsControlPressed = _isControlPressed,
+                IsControlPressed = isControlKeyPressed,
                 TreeView = tvTaskList,
                 MouseDelta = e.Delta
             };
@@ -1425,10 +1431,10 @@ namespace InformationTree.Forms
 
             _randomTimer.Interval = interval;
 
-            _systemSoundNumber = -1;
-
-            while (_systemSoundNumber < 1 || _systemSoundNumber > 4)
-                _systemSoundNumber = (new Random(ticksSeedAsInt).Next() % 4) + 1;
+            var soundNumber = -1;
+            while (soundNumber < 1 || soundNumber > 4)
+                soundNumber = (new Random(ticksSeedAsInt).Next() % 4) + 1;
+            _cachingService.Set(Constants.CacheKeys.SoundNumber, soundNumber);
         }
 
         private void RandomTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -1437,8 +1443,9 @@ namespace InformationTree.Forms
                 return;
             if (_configuration.ApplicationFeatures.EnableExtraSound == false)
                 return;
-
-            _soundProvider.PlaySystemSound(_systemSoundNumber);
+            
+            var soundNumber = _cachingService.Get<int>(Constants.CacheKeys.SoundNumber);
+            _soundProvider.PlaySystemSound(soundNumber);
             RandomTimer_ChangeIntervalAndSound();
         }
 

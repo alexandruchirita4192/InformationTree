@@ -7,12 +7,12 @@ namespace InformationTree.Domain
     {
         public static class Colors
         {
-            public static readonly  Color DefaultBackGroundColor = Color.White;
-            public static readonly  Color DefaultForeGroundColor = Color.Black;
-            public static readonly  Color BackGroundColorSearch = Color.SlateGray;
-            public static readonly  Color ForeGroundColorSearch = Color.LightBlue;
-            public static readonly  Color LinkBackGroundColor = Color.DarkCyan;
-            public static readonly  Color DataBackGroundColor = Color.FromArgb(200, 200, 200);
+            public static readonly Color DefaultBackGroundColor = Color.White;
+            public static readonly Color DefaultForeGroundColor = Color.Black;
+            public static readonly Color BackGroundColorSearch = Color.SlateGray;
+            public static readonly Color ForeGroundColorSearch = Color.LightBlue;
+            public static readonly Color LinkBackGroundColor = Color.DarkCyan;
+            public static readonly Color DataBackGroundColor = Color.FromArgb(200, 200, 200);
             public static readonly Color ExceptionColor = Color.Red;
         }
 
@@ -85,5 +85,17 @@ namespace InformationTree.Domain
         }
 
         public const string DefaultFileName = "Data.xml";
+
+        public static class CacheKeys
+        {
+            public const string NodesList = "Nodes";
+            public const string TreeState = "TreeState";
+            public const string IsControlKeyPressed = "IsControlKeyPressed";
+            public const string StyleCheckedListBox_ItemCheckEntered = "StyleCheckedListBox_ItemCheckEntered";
+            public const string CanvasForm = "CanvasForm";
+            public const string SoundNumber = "SoundNumber";
+            public const string TreeViewOldX = "TreeViewOldX";
+            public const string TreeViewOldY = "TreeViewOldY";
+        }
     }
 }
