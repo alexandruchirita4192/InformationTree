@@ -6,7 +6,6 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
-using InformationTree.Tree;
 
 namespace InformationTree.Forms
 {
@@ -50,7 +49,7 @@ namespace InformationTree.Forms
         {
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
-            
+
             DecryptFromFile = fromFile;
 
             if (DecryptFromFile)

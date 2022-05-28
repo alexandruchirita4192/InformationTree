@@ -7,7 +7,7 @@ using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Tree;
+using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -36,9 +36,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 return null;
             if (request.ControlsToEnableForNotFiltered == null || request.ControlsToEnableForNotFiltered.Count == 0)
                 return null;
-            
+
             var controlsToEnableForFiltered = new List<Control>();
-            foreach(var component in request.ControlsToEnableForFiltered)
+            foreach (var component in request.ControlsToEnableForFiltered)
             {
                 if (component is not Control control)
                     return null;
@@ -73,7 +73,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 || (filterType == CopyNodeFilterType.FilterByUrgency && readOnlyState == false);
         }
 
-        private static void SetComponentsByFilterType(CopyNodeFilterType filterType, List<Control>  controlsToEnableForFiltered, List<Control> controlsToEnableForNotFiltered)
+        private static void SetComponentsByFilterType(CopyNodeFilterType filterType, List<Control> controlsToEnableForFiltered, List<Control> controlsToEnableForNotFiltered)
         {
             // Enable controls that restore state of tree only for the filtered state of the tree (expected btnShowAll)
             var isFiltered = filterType != CopyNodeFilterType.NoFilter;
@@ -110,20 +110,20 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 nodes.Clear();
 
                 // Copy tree to cache to save current tree state
-                TreeNodeHelper.CopyNodes(nodes, tvTaskList.Nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
+                nodes.Copy(tvTaskList.Nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
                 _cachingService.Set(Constants.CacheKeys.NodesList, nodes);
 
                 // Update tree view with filtered nodes
                 tvTaskList.Nodes.Clear();
-                TreeNodeHelper.CopyNodes(tvTaskList.Nodes, nodes, _treeNodeDataCachingService, (int)filterHigherThan, (int)filterLowerThan, filterType);
+                tvTaskList.Nodes.Copy(nodes, _treeNodeDataCachingService, (int)filterHigherThan, (int)filterLowerThan, filterType);
             }
             else
             {
                 // Clear tree view nodes
                 tvTaskList.Nodes.Clear();
-                
+
                 // Copy tree back from cache to tree view to restore current tree state
-                TreeNodeHelper.CopyNodes(tvTaskList.Nodes, nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
+                tvTaskList.Nodes.Copy(nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
             }
 
             // Update read only state that keeps track of whether the tree is filtered or not

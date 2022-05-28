@@ -10,7 +10,6 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.TextProcessing;
-using InformationTree.Tree;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Services
@@ -70,7 +69,7 @@ namespace InformationTree.Render.WinForms.Services
         private string GetTabsByIndent(int indent)
         {
             var sb = new StringBuilder();
-            sb.Append('\t',indent);
+            sb.Append('\t', indent);
             return sb.ToString();
         }
 
@@ -144,7 +143,7 @@ namespace InformationTree.Render.WinForms.Services
                     attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
 
                 var tagNodeLineSb = new StringBuilder();
-                
+
                 tagNodeLineSb.Append(GetTabsByIndent(indentTabs));
                 tagNodeLineSb.Append(@"<node ");
                 tagNodeLineSb.Append(GetXmlAttributeText(Constants.XmlAttributes.XmlAttrText, attrText));
@@ -166,7 +165,7 @@ namespace InformationTree.Render.WinForms.Services
                 tagNodeLineSb.Append(GetXmlAttributeText(Constants.XmlAttributes.XmlAttrPercentCompleted, attrPercentCompleted, 0m));
                 tagNodeLineSb.Append(GetXmlAttributeText(Constants.XmlAttributes.XmlAttrCategory, attrCategory));
                 tagNodeLineSb.Append(GetXmlAttributeText(Constants.XmlAttributes.XmlAttrIsStartupAlert, attrIsStartupAlert));
-                
+
                 if (_streamWriter == null)
                     throw new Exception("StreamWriter \"streamWriter\" is null");
 
@@ -177,9 +176,9 @@ namespace InformationTree.Render.WinForms.Services
                     // if data is not empty)
                     tagNodeLineSb.Length -= 1;
                     tagNodeLineSb.Append(">");
-                    
+
                     _streamWriter.WriteLine(tagNodeLineSb.ToString());
-                    
+
                     foreach (var child in node.Children)
                     {
                         SaveNode(_streamWriter, child, indentTabs + 1);

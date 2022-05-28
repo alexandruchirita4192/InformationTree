@@ -7,7 +7,6 @@ using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.TextProcessing;
-using InformationTree.Tree;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -56,13 +55,13 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 if (useSelectedNode)
                 {
                     var parentNode = new TreeNode();
-                    TreeNodeHelper.CopyNode(parentNode, node, _treeNodeDataCachingService);
+                    parentNode.Copy(node, _treeNodeDataCachingService);
                     treeView.Nodes.Add(parentNode);
                     tagData.Data = null;
                 }
                 else
                 {
-                    TreeNodeHelper.CopyNodes(treeView.Nodes, node.Nodes, _treeNodeDataCachingService);
+                    treeView.Nodes.Copy(node.Nodes, _treeNodeDataCachingService);
                 }
 
                 if (await _mediator.Send(new GetTreeStateRequest(), cancellationToken) is not GetTreeStateResponse getTreeStateResponse)

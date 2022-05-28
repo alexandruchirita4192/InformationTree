@@ -20,7 +20,6 @@ using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using InformationTree.TextProcessing;
-using InformationTree.Tree;
 using MediatR;
 using NLog;
 
@@ -213,21 +212,6 @@ namespace InformationTree.Forms
             toolStripItem.Enabled = visibleAndEnabled;
         }
 
-        /// <summary>
-        /// Set background and foreground color for control and it's children
-        /// </summary>
-        private void SetStyleTo(Control ctrl, Color foreground, Color background)
-        {
-            if (ctrl == null)
-                return;
-
-            ctrl.ForeColor = foreground;
-            ctrl.BackColor = background;
-
-            foreach (Control child in ctrl.Controls)
-                SetStyleTo(child, foreground, background);
-        }
-
         private void StartupAlertForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             var form = sender as StartupAlertForm;
@@ -282,7 +266,7 @@ namespace InformationTree.Forms
 
         public void ClearStyleAdded()
         {
-            TreeNodeHelper.ClearStyleAdded(tvTaskList.Nodes);
+            tvTaskList.Nodes.ClearStyleAdded();
         }
 
         public void ChangeResetExceptionButton(string message)
@@ -712,7 +696,7 @@ namespace InformationTree.Forms
             try
             {
                 _cachingService.Set(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered, true);
-                
+
                 if (tvTaskList.SelectedNode != null)
                 {
                     var newFontStyle = FontStyle.Regular;
@@ -1064,7 +1048,7 @@ namespace InformationTree.Forms
             }
             else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
             {
-                var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
+                var figureLines = tvTaskList.GenerateStringGraphicsLinesFromTree();
 
                 var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
                 if (_canvasForm == null || _canvasForm.IsDisposed)
@@ -1154,14 +1138,14 @@ namespace InformationTree.Forms
             {
                 var searchText = tbSearchBox.Text;
 
-                TreeNodeHelper.ClearStyleAdded(tvTaskList.Nodes);
+                ClearStyleAdded();
 
                 if (searchText.Length < 3)
                     return;
 
                 if (searchText.IsNotEmpty())
                 {
-                    TreeNodeHelper.SetStyleForSearch(tvTaskList.Nodes, searchText, _treeNodeDataCachingService);
+                    tvTaskList.Nodes.SetStyleForSearch(searchText, _treeNodeDataCachingService);
                 }
             }
         }
@@ -1171,7 +1155,7 @@ namespace InformationTree.Forms
             var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
             if (_canvasForm == null || _canvasForm.IsDisposed)
             {
-                var figureLines = TreeNodeHelper.GenerateStringGraphicsLinesFromTree(tvTaskList);
+                var figureLines = tvTaskList.GenerateStringGraphicsLinesFromTree();
 
                 _canvasForm = _canvasFormFactory.Create(figureLines);
                 _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
@@ -1443,7 +1427,7 @@ namespace InformationTree.Forms
                 return;
             if (_configuration.ApplicationFeatures.EnableExtraSound == false)
                 return;
-            
+
             var soundNumber = _cachingService.Get<int>(Constants.CacheKeys.SoundNumber);
             _soundProvider.PlaySystemSound(soundNumber);
             RandomTimer_ChangeIntervalAndSound();

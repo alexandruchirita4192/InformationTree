@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
@@ -8,7 +7,6 @@ using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
-using InformationTree.Tree;
 using MediatR;
 using NLog;
 
@@ -172,7 +170,7 @@ namespace InformationTree.Render.WinForms.Services
             {
                 if (SplashForm.HasInstance())
                     return;
-                
+
                 if (await _mediator.Send(new GetTreeStateRequest()) is not GetTreeStateResponse getTreeStateResponse)
                     return;
 

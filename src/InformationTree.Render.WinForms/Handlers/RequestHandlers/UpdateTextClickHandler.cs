@@ -6,7 +6,6 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
-using InformationTree.Tree;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -48,7 +47,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 tvTaskList.InvokeWrapper(tvTaskList =>
                 {
-                    tvTaskList.SelectedNode.Copy(selectedNode.ToTreeNode(_treeNodeDataCachingService));
+                    tvTaskList.SelectedNode.Copy(selectedNode.ToTreeNode(_treeNodeDataCachingService), _treeNodeDataCachingService);
                 });
             }
 
