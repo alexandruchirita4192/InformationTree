@@ -652,20 +652,13 @@ namespace InformationTree.Forms
 
         public async void cbFontFamily_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tvTaskList.SelectedNode != null && cbFontFamily.SelectedItem != null)
+            var request = new FontFamilySelectedIndexChangedRequest
             {
-                var oldFont = tvTaskList.SelectedNode.NodeFont;
-
-                if (cbFontFamily.SelectedItem is string fontFamily)
-                    tvTaskList.SelectedNode.NodeFont = new Font(fontFamily, (float)nudFontSize.Value, oldFont.Style);
-
-                // on font changed is added too??
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest);
-            }
+                TreeView = tvTaskList,
+                FontFamilyComboBox = cbFontFamily,
+                FontSizeNumericUpDown = nudFontSize,
+            };
+            await _mediator.Send(request);
         }
 
         public async void nudFontSize_ValueChanged(object sender, EventArgs e)
@@ -949,79 +942,27 @@ namespace InformationTree.Forms
             btnResetException.Enabled = true;
         }
 
-        public void tvTaskList_MouseMove(object sender, MouseEventArgs e)
+        public async void tvTaskList_MouseMove(object sender, MouseEventArgs e)
         {
-            var _oldX = _cachingService.Get<int>(Constants.CacheKeys.TreeViewOldX);
-            var _oldY = _cachingService.Get<int>(Constants.CacheKeys.TreeViewOldY);
-            if (e.X == _oldX && e.Y == _oldY)
-                return;
-
-            // Get the node at the current mouse pointer location.
-            TreeNode theNode = tvTaskList.GetNodeAt(e.X, e.Y);
-
-            // Set a ToolTip only if the mouse pointer is actually paused on a node.
-            if (theNode != null)
+            var request = new TreeViewMouseMoveRequest
             {
-                // Change the ToolTip only if the pointer moved to a new node.
-                if (theNode.ToolTipText != toolTip1.GetToolTip(this.tvTaskList))
-                {
-                    toolTip1.SetToolTip(tvTaskList, theNode.ToolTipText);
-                }
-            }
-            else // Pointer is not over a node so clear the ToolTip.
-            {
-                toolTip1.SetToolTip(tvTaskList, "");
-            }
-
-            _cachingService.Set(Constants.CacheKeys.TreeViewOldX, e.X);
-            _cachingService.Set(Constants.CacheKeys.TreeViewOldY, e.Y);
+                TreeView = tvTaskList,
+                X = e.X,
+                Y = e.Y,
+                Tooltip = ttTaskList
+            };
+            await _mediator.Send(request);
         }
 
-        private void tbTaskName_DoubleClick(object sender, EventArgs e)
+        private async void tbTaskName_DoubleClick(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-            if (selectedNode != null)
+            var request = new TreeViewDoubleClickRequest
             {
-                var tagData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
-                var data = tagData.Data ?? string.Empty;
-
-                var form = new PopUpEditForm(
-                    _canvasFormFactory,
-                    _popUpService,
-                    _configurationReader,
-                    _mediator,
-                    _cachingService,
-                    selectedNode.Text,
-                    data);
-
-                WinFormsApplication.CenterForm(form, this);
-
-                form.FormClosing += async (s, ev) =>
-                {
-                    var popUpReturnedData = form.Data;
-
-                    if (selectedNode != null)
-                    {
-                        var td = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
-                        td.Data = popUpReturnedData;
-
-                        var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(popUpReturnedData);
-                        selectedNode.ToolTipText = TextProcessingHelper.GetToolTipText(selectedNode.Text +
-                            (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
-                            (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""));
-
-                        tbTaskName.BackColor = tagData.GetTaskNameColor();
-
-                        var setTreeStateRequest = new SetTreeStateRequest
-                        {
-                            TreeUnchanged = false
-                        };
-                        await _mediator.Send(setTreeStateRequest);
-                    }
-                };
-
-                form.ShowDialog();
-            }
+                Form = this,
+                TreeView = tvTaskList,
+                TaskNameTextBox = tbTaskName,
+            };
+            await _mediator.Send(request);
         }
 
         public async void tvTaskList_DoubleClick(object sender, EventArgs e)

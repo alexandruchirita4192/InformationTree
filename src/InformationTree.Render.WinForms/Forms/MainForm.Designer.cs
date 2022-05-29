@@ -82,7 +82,7 @@ namespace InformationTree.Forms
             this.btnMoveTaskDown = new System.Windows.Forms.Button();
             this.btnResetException = new System.Windows.Forms.Button();
             this.btnDoNotSave = new System.Windows.Forms.Button();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.ttTaskList = new System.Windows.Forms.ToolTip(this.components);
             this.tbTreeChange = new System.Windows.Forms.TabControl();
             this.tbTaskEdit = new System.Windows.Forms.TabPage();
             this.gbCompletedPercent = new System.Windows.Forms.GroupBox();
@@ -115,7 +115,7 @@ namespace InformationTree.Forms
             this.btnUpdateLink = new System.Windows.Forms.Button();
             this.nudUrgency = new System.Windows.Forms.NumericUpDown();
             this.tbAddedNumber = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblLink = new System.Windows.Forms.Label();
             this.tbLink = new System.Windows.Forms.TextBox();
             this.lblAddedNumber = new System.Windows.Forms.Label();
             this.tbTasksChange = new System.Windows.Forms.TabPage();
@@ -816,7 +816,7 @@ namespace InformationTree.Forms
             this.gbTaskDetails.Controls.Add(this.btnUpdateLink);
             this.gbTaskDetails.Controls.Add(this.nudUrgency);
             this.gbTaskDetails.Controls.Add(this.tbAddedNumber);
-            this.gbTaskDetails.Controls.Add(this.label1);
+            this.gbTaskDetails.Controls.Add(this.lblLink);
             this.gbTaskDetails.Controls.Add(this.tbLink);
             this.gbTaskDetails.Controls.Add(this.lblAddedNumber);
             this.gbTaskDetails.Location = new System.Drawing.Point(5, 7);
@@ -967,15 +967,15 @@ namespace InformationTree.Forms
             this.tbAddedNumber.Size = new System.Drawing.Size(129, 23);
             this.tbAddedNumber.TabIndex = 21;
             // 
-            // label1
+            // lblLink
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 25);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 15);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Link";
+            this.lblLink.AutoSize = true;
+            this.lblLink.Location = new System.Drawing.Point(16, 25);
+            this.lblLink.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblLink.Name = "lblLink";
+            this.lblLink.Size = new System.Drawing.Size(29, 15);
+            this.lblLink.TabIndex = 1;
+            this.lblLink.Text = "Link";
             // 
             // tbLink
             // 
@@ -1717,7 +1717,7 @@ namespace InformationTree.Forms
         private System.Windows.Forms.TextBox tbSearchBox;
         private System.Windows.Forms.Button btnResetException;
         private System.Windows.Forms.Button btnDoNotSave;
-        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ToolTip ttTaskList;
         private System.Windows.Forms.TabPage tbTaskEdit;
         private System.Windows.Forms.TabPage tbTaskDetails;
         private System.Windows.Forms.TabPage tbTasksChange;
@@ -1738,7 +1738,7 @@ namespace InformationTree.Forms
         private System.Windows.Forms.NumericUpDown nudShowToUrgencyNumber;
         private System.Windows.Forms.Label lblUrgencyNumber;
         private System.Windows.Forms.GroupBox gbTaskDetails;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblLink;
         private System.Windows.Forms.TextBox tbLink;
         private System.Windows.Forms.Button btnUpdateLink;
         private System.Windows.Forms.NumericUpDown nudUrgency;
