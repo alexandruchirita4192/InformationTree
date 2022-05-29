@@ -83,7 +83,7 @@ namespace InformationTree.Render.WinForms.Extensions
                 : Constants.Colors.DataBackGroundColor;
         }
 
-        public static TreeNodeData GetFirstNode(this TreeNodeData rootNode, string text)
+        public static TreeNodeData GetFirstNodeWith(this TreeNodeData rootNode, string text)
         {
             TreeNodeData ret = null;
             text = text.ToLower();
@@ -92,17 +92,14 @@ namespace InformationTree.Render.WinForms.Extensions
             {
                 foreach (TreeNodeData child in rootNode.Children)
                 {
-                    var nodeData = child.Data.IsNotEmpty() ? child.Data : null;
                     var foundInText = child.Text.IsNotEmpty()
                         && child.Text.ToLower().Split('[')[0].Contains(text);
-                    var foundInData = nodeData != null && nodeData.ToLower().Contains(text);
-                    var foundCondition = foundInText || foundInData;
-                    if (foundCondition)
+                    if (foundInText)
                         return child;
 
                     if (child.Children.Count > 0)
                     {
-                        ret = GetFirstNode(child, text);
+                        ret = GetFirstNodeWith(child, text);
                         if (ret != null)
                             return ret;
                     }

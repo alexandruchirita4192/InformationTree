@@ -988,8 +988,9 @@ namespace InformationTree.Forms
                 var form = new PopUpEditForm(
                     _canvasFormFactory,
                     _popUpService,
-                    _encryptionAndSigningProvider,
                     _configurationReader,
+                    _mediator,
+                    _cachingService,
                     selectedNode.Text,
                     data);
 
@@ -997,14 +998,14 @@ namespace InformationTree.Forms
 
                 form.FormClosing += async (s, ev) =>
                 {
-                    var d = form.Data;
+                    var popUpReturnedData = form.Data;
 
                     if (selectedNode != null)
                     {
                         var td = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
-                        td.Data = d;
+                        td.Data = popUpReturnedData;
 
-                        var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(d);
+                        var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(popUpReturnedData);
                         selectedNode.ToolTipText = TextProcessingHelper.GetToolTipText(selectedNode.Text +
                             (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
                             (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""));

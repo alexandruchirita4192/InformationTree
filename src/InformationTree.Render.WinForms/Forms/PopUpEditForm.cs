@@ -1,14 +1,14 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Requests;
+using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
-using InformationTree.Render.WinForms.Extensions;
-using InformationTree.Render.WinForms.Services;
+using MediatR;
 using NLog;
 using RicherTextBox.Controls;
 
@@ -22,11 +22,11 @@ namespace InformationTree.Forms
 
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
-        private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly IConfigurationReader _configurationReader;
+        private readonly IMediator _mediator;
+        private readonly ICachingService _cachingService;
         private readonly Configuration _configuration;
 
-        private ICanvasForm _canvasForm;
         private Button tbExitPopUpAndSave;
         private RicherTextBox.Controls.RicherTextBox tbData;
 
@@ -34,13 +34,21 @@ namespace InformationTree.Forms
 
         #region Properties
 
+        #region Data
+
+        /// <summary>
+        /// Data field to override what is returned from the pop up in case it is not empty.
+        /// </summary>
         private string data;
 
+        /// <summary>
+        /// Returns the data from the RicherTextBox editor of the pop up.
+        /// </summary>
         public string Data
         {
             get
             {
-                if (data != null)
+                if (data.IsNotEmpty())
                     return data;
                 if (tbData.TextLength == 0)
                     return string.Empty;
@@ -52,18 +60,15 @@ namespace InformationTree.Forms
         {
             get
             {
-                var text = tbData.Text ?? string.Empty;
-                return text.Trim().StartsWith("-----BEGIN PGP");
+                return tbData.Text.IsNotEmpty()
+                    ? tbData.Text.Trim().StartsWith("-----BEGIN PGP")
+                    : false;
             }
         }
 
-        public bool FromFile { get { return cbFromFile.Checked; } }
+        #endregion Data
 
-        private string _pgpPassword;
-        private string _pgpPublicKeyFile;
-        private string _pgpPrivateKeyFile;
-        private string _pgpPublicKeyText;
-        private string _pgpPrivateKeyText;
+        private bool FromFile { get { return cbFromFile.Checked; } }
 
         #endregion Properties
 
@@ -79,13 +84,15 @@ namespace InformationTree.Forms
         private PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            IConfigurationReader configurationReader)
+            IConfigurationReader configurationReader,
+            IMediator mediator,
+            ICachingService cachingService)
         {
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
-            _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _configurationReader = configurationReader;
+            _mediator = mediator;
+            _cachingService = cachingService;
 
             _configuration = _configurationReader.GetConfiguration();
 
@@ -125,11 +132,12 @@ namespace InformationTree.Forms
         public PopUpEditForm(
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
             IConfigurationReader configurationReader,
+            IMediator mediator,
+            ICachingService cachingService,
             string title,
             string data)
-            : this(canvasFormFactory, popUpService, encryptionAndSigningProvider, configurationReader)
+            : this(canvasFormFactory, popUpService, configurationReader, mediator, cachingService)
         {
             Text += $": {title}";
 
@@ -158,7 +166,7 @@ namespace InformationTree.Forms
         {
             if (tbData?.TextBox == null)
                 return;
-            
+
             if (tbData.TextBox.SelectionColor != Constants.Colors.DefaultForeGroundColor)
                 tbData.TextBox.SelectionColor = Constants.Colors.DefaultForeGroundColor;
 
@@ -359,169 +367,40 @@ namespace InformationTree.Forms
                 tbData.InsertPicture();
         }
 
-        private void btnPgpDecryptData_Click(object sender, EventArgs e)
+        private async void btnPgpDecryptData_Click(object sender, EventArgs e)
         {
             data = cbKeepCrypt.Checked ? Data : null;
 
-            if (string.IsNullOrWhiteSpace(tbData.Text))
+            var request = new PgpEncryptDecryptDataRequest
             {
-                _popUpService.ShowError("No data to decrypt.");
+                DataRicherTextBox = tbData,
+                EncryptionLabel = lblEncryption,
+                ActionType = PgpActionType.Decrypt,
+                FromFile = FromFile,
+                DataIsPgpEncrypted = DataIsPgpEncrypted,
+                PopUpEditForm = this
+            };
+            
+            if (await _mediator.Send(request) is not PgpEncryptDecryptDataResponse response)
                 return;
-            }
-
-            if (DataIsPgpEncrypted ||
-                _popUpService.ShowQuestion("Data seems to be decrypted. Try to decrypt anyway?") == PopUpResult.Yes)
-            {
-                GetPrivateKeyWithPassword();
-            }
+            data = response.Data;
         }
 
-        private void GetPrivateKeyWithPassword(string titleOverride = null)
+        private async void btnPgpEncryptData_Click(object sender, EventArgs e)
         {
-            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, FromFile);
-
-            if (titleOverride.IsNotEmpty())
-                form.Text = titleOverride;
-
-            WinFormsApplication.CenterForm(form, this);
-
-            form.FormClosed += PgpDecryptForm_FormClosed;
-            form.ShowDialog();
-        }
-
-        private void PgpDecryptForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            var form = sender as PgpDecrypt;
-            if (form != null)
+            var request = new PgpEncryptDecryptDataRequest
             {
-                _pgpPassword = form.PgpPassword;
-                _pgpPrivateKeyFile = form.PgpPrivateKeyFile;
-                _pgpPrivateKeyText = form.PgpPrivateKeyText;
-
-                string result;
-                if (FromFile)
-                {
-                    result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(tbData.Text, _pgpPrivateKeyFile, _pgpPassword);
-                    lblEncryption.Text = $"Decrypted with key: {_pgpPrivateKeyFile}";
-                }
-                else
-                {
-                    result = _encryptionAndSigningProvider.GetDecryptedStringFromString(tbData.Text, _pgpPrivateKeyText, _pgpPassword);
-                    lblEncryption.Text = "Decrypted with node key";
-                }
-
-                tbData.Rtf = result;
-            }
-        }
-
-        // TODO: Handle this function in a MediatR handler and give access to the form or controls which require update (and this has to work without them too, for right click in the main form)
-        private void btnPgpEncryptData_Click(object sender, EventArgs e)
-        {
-            var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
-            var decryptedData = result == PopUpResult.Yes ? tbData.Rtf : tbData.Text;
-
-            if (decryptedData.IsEmpty())
-            {
-                _popUpService.ShowError("No data to encrypt.");
+                DataRicherTextBox = tbData,
+                EncryptionLabel = lblEncryption,
+                ActionType = PgpActionType.Encrypt,
+                FromFile = FromFile,
+                DataIsPgpEncrypted = DataIsPgpEncrypted,
+                PopUpEditForm = this
+            };
+            
+            if (await _mediator.Send(request) is not PgpEncryptDecryptDataResponse response)
                 return;
-            }
-
-            if (FromFile)
-            {
-                _pgpPublicKeyFile = _popUpService.GetPublicKeyFile();
-
-                if (_configuration.TreeFeatures.EnableEncryptionSigning)
-                {
-                    _pgpPublicKeyText = File.ReadAllText(_pgpPublicKeyFile);
-
-                    GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
-
-                    var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
-                    resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
-
-                    if (tbData.Text != resultedText)
-                    {
-                        data = null;
-                        tbData.Text = resultedText;
-                        lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
-                    }
-                }
-                else
-                {
-                    using var decryptedStream = decryptedData.ToStream();
-                    using var outputStream = new MemoryStream();
-                    
-                    _encryptionAndSigningProvider.EncryptFromFile(decryptedStream, outputStream, _pgpPublicKeyFile, true, true);
-
-                    using (var reader = new StreamReader(outputStream))
-                    {
-                        var resultedText = reader.ReadToEnd();
-                        if (tbData.Text != resultedText)
-                        {
-                            data = null;
-                            tbData.Text = resultedText;
-                            lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
-                        }
-                    }
-                }
-            }
-            else
-            {
-                FindNodeWithPublicKey();
-
-                string resultedText;
-                if (_configuration.TreeFeatures.EnableEncryptionSigning)
-                {
-                    GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
-
-                    resultedText = _encryptionAndSigningProvider.EncryptAndSignString(tbData.Rtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
-                }
-                else
-                {
-                    resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(tbData.Rtf, _pgpPublicKeyText, true, true);
-                }
-                resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
-
-                if (tbData.Text != resultedText)
-                {
-                    data = null;
-                    tbData.Text = resultedText;
-                    lblEncryption.Text = "Encrypted with node key";
-                }
-            }
-        }
-
-        private void FindNodeWithPublicKey()
-        {
-            var form = new SearchForm(_popUpService);
-
-            WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
-
-            form.FormClosed += SearchForm_FormClosed;
-            form.ShowDialog();
-        }
-
-        private void SearchForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            var form = sender as SearchForm;
-            if (form != null)
-            {
-                var textToFind = form.TextToFind;
-
-                if (WinFormsApplication.MainForm?.TaskListRoot == null)
-                    return;
-
-                var nodeData = WinFormsApplication.MainForm.TaskListRoot.GetFirstNode(textToFind);
-                if (nodeData != null)
-                {
-                    _pgpPublicKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
-
-                    _popUpService.ShowMessage($"Public key taken from data of node {nodeData.Text}", $"Node {nodeData.Text} used");
-                }
-
-                if (string.IsNullOrEmpty(_pgpPublicKeyText) && _popUpService.ShowQuestion("You did not select a valid public key node. Try to select again?") == PopUpResult.Yes)
-                    FindNodeWithPublicKey();
-            }
+            data = response.Data;
         }
 
         private void PopUpEditForm_DoubleClick(object sender, EventArgs e)
@@ -547,18 +426,21 @@ namespace InformationTree.Forms
             var text = tbData.TextBox.SelectedText.Length > 0 ? tbData.TextBox.SelectedText : tbData.TextBox.Text;
             if (text.Length <= 0)
                 return;
-
-            if (_canvasForm == null || _canvasForm.IsDisposed)
-                _canvasForm = _canvasFormFactory.Create(new[] { text });
+            var canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
+            if (canvasForm == null || canvasForm.IsDisposed)
+            {
+                canvasForm = _canvasFormFactory.Create(new[] { text });
+                _cachingService.Set(Constants.CacheKeys.CanvasForm, canvasForm);
+            }
             else
             {
-                _canvasForm.RunTimer.Stop();
-                _canvasForm.GraphicsFile.Clean();
-                _canvasForm.GraphicsFile.ParseLines(new[] { text });
-                _canvasForm.RunTimer.Start();
+                canvasForm.RunTimer.Stop();
+                canvasForm.GraphicsFile.Clean();
+                canvasForm.GraphicsFile.ParseLines(new[] { text });
+                canvasForm.RunTimer.Start();
             }
 
-            _canvasForm.Show();
+            canvasForm.Show();
         }
     }
 }

@@ -368,7 +368,7 @@ namespace InformationTree.PgpEncryption
 
         public string GetEncryptedStringFromString(string decryptedText, string publicKeyText, bool armor, bool withIntegrityCheck)
         {
-            if (string.IsNullOrEmpty(publicKeyText))
+            if (publicKeyText.IsEmpty())
                 return decryptedText;
             
             try
@@ -386,14 +386,14 @@ namespace InformationTree.PgpEncryption
             }
         }
 
-        private string GetEncryptedStringFromStream(string inputFile, Stream publicKeyStream, bool armor, bool withIntegrityCheck)
+        private string GetEncryptedStringFromStream(string inputText, Stream publicKeyStream, bool armor, bool withIntegrityCheck)
         {
-            if (string.IsNullOrWhiteSpace(inputFile))
+            if (inputText.IsEmpty())
                 return string.Empty;
 
             try
             {
-                using (var inputStream = inputFile.ToStream())
+                using (var inputStream = inputText.ToStream())
                 {
                     using (var outputStream = new MemoryStream())
                     {
@@ -417,7 +417,7 @@ namespace InformationTree.PgpEncryption
             {
                 _logger.Error(ex);
                 _popUpService.ShowWarning(ex.Message, "Message not decrypted because of error");
-                return File.ReadAllText(inputFile);
+                throw;
             }
         }
 
