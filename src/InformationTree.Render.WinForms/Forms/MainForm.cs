@@ -35,8 +35,6 @@ namespace InformationTree.Forms
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IPopUpService _popUpService;
-        private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
-        private readonly ICompressionProvider _compressionProvider;
         private readonly IConfigurationReader _configurationReader;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
         private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
@@ -44,7 +42,6 @@ namespace InformationTree.Forms
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
-        private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
         private readonly ICachingService _cachingService;
         private readonly Configuration _configuration;
 
@@ -57,8 +54,6 @@ namespace InformationTree.Forms
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
             IPopUpService popUpService,
-            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            ICompressionProvider compressionProvider,
             IConfigurationReader configurationReader,
             IExportNodeToRtfService exportNodeToRtfService,
             ITreeNodeDataCachingService treeNodeDataCachingService,
@@ -66,15 +61,12 @@ namespace InformationTree.Forms
             IExportTreeToXmlService exportTreeToXmlService,
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
-            ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
             ICachingService cachingService)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
             _popUpService = popUpService;
-            _encryptionAndSigningProvider = encryptionAndSigningProvider;
-            _compressionProvider = compressionProvider;
             _configurationReader = configurationReader;
             _exportNodeToRtfService = exportNodeToRtfService;
             _treeNodeDataCachingService = treeNodeDataCachingService;
@@ -82,7 +74,6 @@ namespace InformationTree.Forms
             _exportTreeToXmlService = exportTreeToXmlService;
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
-            _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
             _cachingService = cachingService;
 
             InitializeComponent();
@@ -159,12 +150,17 @@ namespace InformationTree.Forms
                     ShowUntilNumberNumericUpDown = nudShowUntilNumber,
                     ShowFromNumberNumericUpDown = nudShowFromNumber,
                 };
+                var showStartupAlertFormRequest = new ShowStartupAlertFormRequest
+                {
+                    TreeView = tvTaskList,
+                    SearchBoxTextBox = tbSearchBox,
+                };
                 Task.Run(async () =>
                 {
                     await _mediator.Send(treeViewCollapseAndRefreshRequest);
-                    return await _mediator.Send(updateNodeCountRequest);
+                    await _mediator.Send(updateNodeCountRequest);
+                    await _mediator.Send(showStartupAlertFormRequest);
                 }).Wait();
-                ShowStartupAlertForm();
             }
 
             btnShowAll.Enabled = false;
@@ -210,27 +206,6 @@ namespace InformationTree.Forms
                 return;
             toolStripItem.Visible = visibleAndEnabled;
             toolStripItem.Enabled = visibleAndEnabled;
-        }
-
-        private void StartupAlertForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            var form = sender as StartupAlertForm;
-            if (form != null)
-            {
-                var selectedNode = form.SelectedItemOrCategory;
-                var textToFind = selectedNode.Text;
-                if (textToFind == "None")
-                    return;
-
-                var percent = 0m;
-                tbSearchBox.Text = TextProcessingHelper.GetTextAndProcentCompleted(textToFind, ref percent, true);
-                tbSearchBox_KeyUp(this, new KeyEventArgs(Keys.Enter));
-
-                ////if (tvTaskList.Nodes.Contains(selectedNode))
-                ////    tvTaskList.SelectedNode = selectedNode;
-                ////else
-                ////    ;// search whole category (do nothing for now)
-            }
         }
 
         #endregion ctor
@@ -1053,43 +1028,26 @@ namespace InformationTree.Forms
             await _mediator.Send(setTreeStateRequest);
         }
 
-        private void tbSearchBox_DoubleClick(object sender, EventArgs e)
+        private async void tbSearchBox_DoubleClick(object sender, EventArgs e)
         {
-            var form = new SearchForm(_popUpService, tbSearchBox.Text);
-
-            WinFormsApplication.CenterForm(form, this);
-
-            form.FormClosed += SearchForm_FormClosed;
-            form.ShowDialog();
+            var request = new SearchBoxDoubleClickRequest
+            {
+                Form = this,
+                SearchBoxTextBox = tbSearchBox,
+                TreeView = tvTaskList,
+            };
+            await _mediator.Send(request);
         }
 
-        private void SearchForm_FormClosed(object sender, FormClosedEventArgs e)
+        private async void tbSearchBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (sender is SearchForm form)
+            var request = new SearchBoxKeyUpRequest
             {
-                var textToFind = form.TextToFind;
-                tbSearchBox.Text = textToFind;
-                tbSearchBox_KeyUp(this, new KeyEventArgs(Keys.Enter));
-            }
-        }
-
-        private void tbSearchBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            MainForm_KeyUp(sender, e);
-            if (e.KeyData == Keys.Enter)
-            {
-                var searchText = tbSearchBox.Text;
-
-                ClearStyleAdded();
-
-                if (searchText.Length < 3)
-                    return;
-
-                if (searchText.IsNotEmpty())
-                {
-                    tvTaskList.Nodes.SetStyleForSearch(searchText, _treeNodeDataCachingService);
-                }
-            }
+                TreeView = tvTaskList,
+                SearchBoxTextBox = tbSearchBox,
+                KeyData = (int)e.KeyData,
+            };
+            await _mediator.Send(request);
         }
 
         private void btnShowCanvasPopUp_Click(object sender, EventArgs e)
@@ -1133,23 +1091,14 @@ namespace InformationTree.Forms
             await _mediator.Send(setTreeStateRequest);
         }
 
-        private void ShowStartupAlertForm()
+        private async void btnShowStartupAlertForm_Click(object sender, EventArgs e)
         {
-            var alertNodesRoot = new TreeNodeData();
-            var haveAlerts = _importTreeFromXmlService.LoadTreeNodesByCategory(TaskListRoot, alertNodesRoot, true);
-
-            if (haveAlerts)
+            var request = new ShowStartupAlertFormRequest
             {
-                var form = new StartupAlertForm(_treeNodeDataCachingService, alertNodesRoot);
-                form.FormClosing += StartupAlertForm_FormClosing;
-                form.ShowDialog();
-                tvTaskList.Refresh();
-            }
-        }
-
-        private void btnShowStartupAlertForm_Click(object sender, EventArgs e)
-        {
-            ShowStartupAlertForm();
+                TreeView = tvTaskList,
+                SearchBoxTextBox = tbSearchBox,
+            };
+            await _mediator.Send(request);
         }
 
         private void btnExecCommand_Click(object sender, EventArgs e)
@@ -1276,21 +1225,87 @@ namespace InformationTree.Forms
             _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, false);
         }
 
-        public void tvTaskList_KeyDown(object sender, KeyEventArgs e)
+        public async void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         {
             _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, e.Control);
 
             if (e.Control && e.KeyCode == Keys.F)
-                tbSearchBox_DoubleClick(sender, EventArgs.Empty);
+            {
+                var request = new SearchBoxDoubleClickRequest
+                {
+                    Form = this,
+                    SearchBoxTextBox = tbSearchBox,
+                    TreeView = tvTaskList,
+                };
+                await _mediator.Send(request);
+            }
 
             if (ReferenceEquals(sender, tvTaskList))
             {
                 if (e.KeyCode == Keys.Delete)
-                    btnDelete_Click(sender, EventArgs.Empty);
+                {
+                    if (tvTaskList.SelectedNode == null)
+                        return;
+
+                    var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
+                    var taskListAfterSelectRequest = new TaskListAfterSelectRequest
+                    {
+                        TreeView = tvTaskList,
+                        Form = this,
+                        SelectedNode = tvTaskList.SelectedNode,
+                        SelectedNodeData = tvTaskList.SelectedNode
+                            .ToTreeNodeData(_treeNodeDataCachingService),
+                        TaskPercentCompleted = nudCompleteProgress.Value,
+                        StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                        TimeSpentGroupBox = gbTimeSpent,
+                        StyleCheckedListBox = clbStyle,
+                        FontFamilyComboBox = cbFontFamily,
+                        TaskNameTextBox = tbTaskName,
+                        AddedDateTextBox = tbAddedDate,
+                        LastChangeDateTextBox = tbLastChangeDate,
+                        AddedNumberTextBox = tbAddedNumber,
+                        UrgencyNumericUpDown = nudUrgency,
+                        LinkTextBox = tbLink,
+                        IsStartupAlertCheckBox = cbIsStartupAlert,
+                        CompleteProgressNumericUpDown = nudCompleteProgress,
+                        CategoryTextBox = tbCategory,
+                        DataSizeTextBox = tbDataSize,
+                        HoursNumericUpDown = nudHours,
+                        MinutesNumericUpDown = nudMinutes,
+                        SecondsNumericUpDown = nudSeconds,
+                        MillisecondsNumericUpDown = nudMilliseconds,
+                        FontSizeNumericUpDown = nudFontSize,
+                        TextColorTextBox = tbTextColor,
+                        BackgroundColorTextBox = tbBackgroundColor,
+                    };
+                    var request = new TreeViewDeleteRequest
+                    {
+                        TreeView = tvTaskList,
+                        TaskNameText = tbTaskName.Text,
+                        ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                        ShowFromNumberNumericUpDown = nudShowFromNumber,
+                        AfterSelectRequest = taskListAfterSelectRequest
+                    };
+                    await _mediator.Send(request);
+                }
                 else if (e.KeyCode == Keys.Enter)
-                    tbTaskName_DoubleClick(sender, EventArgs.Empty);
+                {
+                    var request = new TreeViewDoubleClickRequest
+                    {
+                        Form = this,
+                        TreeView = tvTaskList,
+                        TaskNameTextBox = tbTaskName,
+                    };
+                    await _mediator.Send(request);
+                }
                 else if (e.KeyCode == Keys.M)
-                    btnMoveNode_Click(sender, EventArgs.Empty);
+                {
+                    var request = new MoveNodeRequest
+                    {
+                        TreeView = tvTaskList
+                    };
+                    await _mediator.Send(request);
+                }
             }
         }
 
@@ -1375,9 +1390,15 @@ namespace InformationTree.Forms
             RandomTimer_ChangeIntervalAndSound();
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tbTaskName_DoubleClick(sender, e);
+            var request = new TreeViewDoubleClickRequest
+            {
+                Form = this,
+                TreeView = tvTaskList,
+                TaskNameTextBox = tbTaskName,
+            };
+            await _mediator.Send(request);
         }
 
         private void showChildrenAsListToolStripMenuItem_Click(object sender, EventArgs e)

@@ -21,15 +21,12 @@ namespace InformationTree.Render.WinForms.Services
         private readonly ISoundProvider _soundProvider;
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
-        private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
-        private readonly ICompressionProvider _compressionProvider;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
         private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
-        private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
         private readonly ICachingService _cachingService;
 
         public WinFormsApplication(
@@ -38,15 +35,12 @@ namespace InformationTree.Render.WinForms.Services
             ISoundProvider soundProvider,
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
-            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            ICompressionProvider compressionProvider,
             IExportNodeToRtfService exportNodeToRtfService,
             ITreeNodeDataCachingService treeNodeDataCachingService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
-            ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
             ICachingService cachingService)
         {
             _configurationReader = configurationReader;
@@ -54,15 +48,12 @@ namespace InformationTree.Render.WinForms.Services
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
-            _encryptionAndSigningProvider = encryptionAndSigningProvider;
-            _compressionProvider = compressionProvider;
             _exportNodeToRtfService = exportNodeToRtfService;
             _treeNodeDataCachingService = treeNodeDataCachingService;
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
-            _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
             _cachingService = cachingService;
         }
 
@@ -214,8 +205,6 @@ namespace InformationTree.Render.WinForms.Services
                 _graphicsFileRecursiveGenerator,
                 _canvasFormFactory,
                 _popUpService,
-                _encryptionAndSigningProvider,
-                _compressionProvider,
                 _configurationReader,
                 _exportNodeToRtfService,
                 _treeNodeDataCachingService,
@@ -223,7 +212,6 @@ namespace InformationTree.Render.WinForms.Services
                 _exportTreeToXmlService,
                 _importExportTreeXmlService,
                 _mediator,
-                _treeNodeSelectionCachingService,
                 _cachingService
                 ));
         }
