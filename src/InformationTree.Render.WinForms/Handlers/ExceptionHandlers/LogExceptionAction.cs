@@ -11,8 +11,9 @@ namespace InformationTree.Render.WinForms.Handlers.ExceptionHandlers
 
         protected override void Execute(BaseRequest request, Exception exception)
         {
-            _logger.Error("Error while processing MediatR request {0}", request.GetType().Name);
-            _logger.Error(exception);
+            _logger.Error("Error occured while processing MediatR request '{0}':\n'{1}'",
+                request.GetType().Name,
+                exception.ToString());
         }
     }
 }

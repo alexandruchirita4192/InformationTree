@@ -28,7 +28,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             var _oldX = _cachingService.Get<int>(Constants.CacheKeys.TreeViewOldX);
             var _oldY = _cachingService.Get<int>(Constants.CacheKeys.TreeViewOldY);
             if (request.X == _oldX && request.Y == _oldY)
-                return null;
+                return Task.FromResult<BaseResponse>(null);
 
             // Get the node at the current mouse pointer location.
             TreeNode theNode = tvTaskList.GetNodeAt(request.X, request.Y);

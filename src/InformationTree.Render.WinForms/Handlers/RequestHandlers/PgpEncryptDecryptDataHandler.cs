@@ -65,11 +65,11 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         public Task<BaseResponse> Handle(PgpEncryptDecryptDataRequest request, CancellationToken cancellationToken)
         {
             if (request.DataRicherTextBox is not RicherTextBox.Controls.RicherTextBox tbData)
-                return null;
+                return Task.FromResult<BaseResponse>(null);
             if (request.EncryptionLabel is not Label lblEncryption)
-                return null;
+                return Task.FromResult<BaseResponse>(null);
             if (request.PopUpEditForm is not PopUpEditForm popUpEditForm)
-                return null;
+                return Task.FromResult<BaseResponse>(null);
 
             SetFields(request, tbData, lblEncryption, popUpEditForm);
             var result = InternalHandle();

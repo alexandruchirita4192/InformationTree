@@ -13,7 +13,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         public Task<BaseResponse> Handle(TreeViewCollapseAndRefreshRequest request, CancellationToken cancellationToken)
         {
             if (request.TreeView is not TreeView tvTaskList)
-                return null;
+                return Task.FromResult<BaseResponse>(null);
 
             var selectedNode = tvTaskList.SelectedNode;
             if (tvTaskList.Nodes.Count > 0)
