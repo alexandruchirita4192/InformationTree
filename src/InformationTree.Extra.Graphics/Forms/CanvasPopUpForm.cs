@@ -10,7 +10,7 @@ namespace InformationTree.Forms
         private int op, nr, x, y, r;
         public System.Timers.Timer RunTimer { get; private set; }
         public IGraphicsFile GraphicsFile { get; private set; }
-        private D.BufferedGraphicsContext context;
+        private D.BufferedGraphicsContext context = D.BufferedGraphicsManager.Current;
         private D.BufferedGraphics grafx;
 
         public CanvasPopUpForm(IGraphicsFile graphicsFile)
@@ -21,7 +21,6 @@ namespace InformationTree.Forms
             
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
-            context = D.BufferedGraphicsManager.Current;
             context.MaximumBuffer = new D.Size(this.Width + 1, this.Height + 1);
             grafx = context.Allocate(this.CreateGraphics(),
                  new D.Rectangle(0, 0, this.Width, this.Height));
@@ -96,10 +95,10 @@ namespace InformationTree.Forms
 
         private void CanvasPopUpForm_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (FormBorderStyle == System.Windows.Forms.FormBorderStyle.Sizable)
-                FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            if (FormBorderStyle == FormBorderStyle.Sizable)
+                FormBorderStyle = FormBorderStyle.None;
             else
-                FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+                FormBorderStyle = FormBorderStyle.Sizable;
         }
 
         private void CanvasPopUpForm_Paint(object sender, PaintEventArgs e)
