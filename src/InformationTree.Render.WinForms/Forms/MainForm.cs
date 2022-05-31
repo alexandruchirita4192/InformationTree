@@ -130,7 +130,7 @@ namespace InformationTree.Forms
             {
                 File.AppendAllText("TreeUnchangedIssue.txt", $"Tree unchanged set as {e.NewValue} was called by {new StackTrace()} at {DateTime.Now}");
 
-                lblUnchanged.Text = (e.NewValue ? "Tree unchanged (do not save)" : "Tree changed (save)");
+                lblUnchanged.InvokeWrapper(lblUnchanged => lblUnchanged.Text = (e.NewValue ? "Tree unchanged (do not save)" : "Tree changed (save)"));
             };
             Task.Run(async () =>
             {
