@@ -10,7 +10,6 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
-using InformationTree.TextProcessing;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -77,9 +76,10 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                         treeNodeData.Data = popUpReturnedData;
 
                         var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(popUpReturnedData);
-                        selectedNode.ToolTipText = TextProcessingHelper.GetToolTipText(selectedNode.Text +
+                        selectedNode.ToolTipText = (selectedNode.Text +
                             (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
-                            (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""));
+                            (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""))
+                            .GetToolTipText();
 
                         tbTaskName.BackColor = tagData.GetTaskNameColor();
 

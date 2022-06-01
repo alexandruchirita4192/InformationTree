@@ -3,9 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
-using InformationTree.TextProcessing;
+using InformationTree.Domain.Services;
+using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -13,10 +15,15 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     public class CalculatePercentageHandler : IRequestHandler<CalculatePercentageRequest, BaseResponse>
     {
         private readonly IMediator _mediator;
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
 
-        public CalculatePercentageHandler(IMediator mediator)
+        public CalculatePercentageHandler(
+            IMediator mediator,
+            ITreeNodeDataCachingService treeNodeDataCachingService
+            )
         {
             _mediator = mediator;
+            _treeNodeDataCachingService = treeNodeDataCachingService;
         }
 
         public async Task<BaseResponse> Handle(CalculatePercentageRequest request, CancellationToken cancellationToken)
@@ -26,8 +33,10 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             if (request.Direction == CalculatePercentageDirection.FromLeafsToSelectedNode)
             {
-                var percentage = (decimal)GetPercentageFromChildren(selectedNode);
-                selectedNode.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(selectedNode.Text, ref percentage, true);
+                var percentage = GetPercentageFromChildren(selectedNode)
+                    .ValidatePercentage();
+                selectedNode.ToTreeNodeData(_treeNodeDataCachingService)
+                    .PercentCompleted = percentage;
 
                 var setTreeStateRequest = new SetTreeStateRequest
                 {
@@ -37,9 +46,11 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             }
             else if (request.Direction == CalculatePercentageDirection.FromSelectedNodeToLeafs)
             {
-                var percentage = 0.0M;
-                TextProcessingHelper.GetTextAndProcentCompleted(selectedNode.Text, ref percentage, true);
-                SetPercentageToChildren(selectedNode, (double)percentage);
+                var percentage = selectedNode.ToTreeNodeData(_treeNodeDataCachingService)
+                    .PercentCompleted
+                    .ValidatePercentage();
+                
+                SetPercentageToChildren(selectedNode, percentage);
 
                 var setTreeStateRequest = new SetTreeStateRequest
                 {
@@ -50,28 +61,31 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             return new BaseResponse();
         }
 
-        private double GetPercentageFromChildren(TreeNode topNode)
+        private decimal GetPercentageFromChildren(TreeNode topNode)
         {
             if (topNode == null)
                 throw new ArgumentNullException(nameof(topNode));
 
-            var sum = 0.0;
+            var sum = 0m;
             var nr = 0;
             foreach (TreeNode node in topNode.Nodes)
             {
                 if (node != null && node.Nodes.Count > 0)
                 {
-                    var procentCompleted = (decimal)GetPercentageFromChildren(node);
-                    node.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(node.Text, ref procentCompleted, true);
+                    var procentCompleted = GetPercentageFromChildren(node);
+                    var procentCompletedForCurrentNode = node.ToTreeNodeData(_treeNodeDataCachingService)
+                        .PercentCompleted
+                        .ValidatePercentage();
+                    procentCompleted += procentCompletedForCurrentNode;
 
-                    sum += (double)procentCompleted;
+                    sum += procentCompleted;
                 }
                 else
                 {
-                    var value = 0.0M;
-                    node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref value, true);
-
-                    sum += (double)value;
+                    var procentCompleted = node.ToTreeNodeData(_treeNodeDataCachingService)
+                        .PercentCompleted
+                        .ValidatePercentage();
+                    sum += procentCompleted;
                 }
                 nr++;
             }
@@ -79,7 +93,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             return nr != 0 ? sum / nr : 0;
         }
 
-        private void SetPercentageToChildren(TreeNode topNode, double percentage)
+        private void SetPercentageToChildren(TreeNode topNode, decimal percentage)
         {
             if (topNode == null)
                 throw new ArgumentNullException(nameof(topNode));
@@ -90,8 +104,8 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 if (node != null)
                 {
-                    var percentCompleted = (decimal)percentage;
-                    node.Text = TextProcessingHelper.UpdateTextAndProcentCompleted(node.Text, ref percentCompleted, true);
+                    node.ToTreeNodeData(_treeNodeDataCachingService)
+                        .PercentCompleted = percentage;
                     if (node.Nodes.Count > 0)
                         SetPercentageToChildren(node, percentage);
                 }

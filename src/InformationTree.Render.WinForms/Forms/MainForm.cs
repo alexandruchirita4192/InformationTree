@@ -18,8 +18,6 @@ using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Render.WinForms;
 using InformationTree.Render.WinForms.Extensions;
-using InformationTree.Render.WinForms.Services;
-using InformationTree.TextProcessing;
 using MediatR;
 using NLog;
 
@@ -366,13 +364,12 @@ namespace InformationTree.Forms
                 return;
 
             var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
-            var taskPercentCompleted = nudCompleteProgress.Value;
             var updateTextClickRequest = new UpdateTextClickRequest
             {
                 SelectedNode = tvTaskList.SelectedNode
                     .ToTreeNodeData(_treeNodeDataCachingService),
-                TaskPercentCompleted = taskPercentCompleted,
-                TaskName = TextProcessingHelper.GetTextAndProcentCompleted(tbTaskName.Text, ref taskPercentCompleted, true),
+                TaskPercentCompleted = nudCompleteProgress.Value,
+                TaskName = tbTaskName.Text,
                 Link = tbLink.Text,
                 Urgency = (int)nudUrgency.Value,
                 Category = tbCategory.Text,
@@ -416,7 +413,7 @@ namespace InformationTree.Forms
         private async void btnAddTask_Click(object sender, EventArgs e)
         {
             var taskPercentCompleted = nudCompleteProgress.Value;
-            var taskName = TextProcessingHelper.GetTextAndProcentCompleted(tbTaskName.Text, ref taskPercentCompleted, true);
+            var taskName = tbTaskName.Text;
             var urgency = (int)nudUrgency.Value;
             var link = tbLink.Text;
 
@@ -466,7 +463,7 @@ namespace InformationTree.Forms
                     ForeColor = Constants.Colors.DefaultForeGroundColor,
                     BackColor = Constants.Colors.DefaultBackGroundColor,
                     NodeFont = WinFormsConstants.FontDefaults.DefaultFont.Clone() as Font,
-                    ToolTipText = TextProcessingHelper.GetToolTipText(taskName)
+                    ToolTipText = taskName.GetToolTipText()
                 };
                 var treeNodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 treeNodeData.AddedNumber = tvTaskList.GetNodeCount(true) + 1;
@@ -549,10 +546,29 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        private void nudCompleteProgress_ValueChanged(object sender, EventArgs e)
+        private async void nudCompleteProgress_ValueChanged(object sender, EventArgs e)
         {
             pbPercentComplete.Maximum = 100;
             pbPercentComplete.Value = (int)nudCompleteProgress.Value;
+            
+            if (tvTaskList.SelectedNode != null)
+            {
+                tvTaskList.SelectedNode
+                    .ToTreeNodeData(_treeNodeDataCachingService)
+                    .PercentCompleted = nudCompleteProgress.Value
+                    .ValidatePercentage();
+
+                // TODO: Find a proper way to check if progress value has changed and not because of selection change
+                var valueHasChanged = false;
+                if (valueHasChanged)
+                {
+                    var setTreeStateRequest = new SetTreeStateRequest
+                    {
+                        TreeUnchanged = false
+                    };
+                    await _mediator.Send(setTreeStateRequest);
+                }
+            }
         }
 
         private void btnStartCounting_Click(object sender, EventArgs e)

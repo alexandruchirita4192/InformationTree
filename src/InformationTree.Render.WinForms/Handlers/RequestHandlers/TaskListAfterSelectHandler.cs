@@ -9,7 +9,6 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
-using InformationTree.TextProcessing;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
@@ -47,8 +46,7 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
                 FontSizeNumericUpDown = request.FontSizeNumericUpDown
             };
             await _mediator.Send(removeEventsRequest, cancellationToken);
-
-            var percentCompleted = request.TaskPercentCompleted;
+            
             var timeSpanTotal = treeNodeData.Name.IsNotEmpty() && long.TryParse(treeNodeData.Name, out long timeSpanMilliseconds)
                 ? TimeSpan.FromMilliseconds(timeSpanMilliseconds)
                 : new TimeSpan(0);
@@ -57,9 +55,8 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             {
                 tbTaskName.InvokeWrapper(tbTaskName =>
                 {
-                    tbTaskName.Text = TextProcessingHelper.GetTextAndProcentCompleted(treeNodeData.Text, ref percentCompleted, true);
+                    tbTaskName.Text = treeNodeData.Text;
                     tbTaskName.BackColor = treeNodeData.GetTaskNameColor();
-                    treeNodeData.PercentCompleted = percentCompleted;
                 });
             }
             if (request.AddedDateTextBox is TextBox tbAddedDate)
@@ -75,7 +72,8 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             if (request.IsStartupAlertCheckBox is CheckBox cbIsStartupAlert)
                 cbIsStartupAlert.InvokeWrapper(cbIsStartupAlert => cbIsStartupAlert.Checked = treeNodeData.IsStartupAlert);
             if (request.CompleteProgressNumericUpDown is NumericUpDown nudCompleteProgress)
-                nudCompleteProgress.InvokeWrapper(nudCompleteProgress => nudCompleteProgress.Value = percentCompleted);
+                nudCompleteProgress.InvokeWrapper(nudCompleteProgress => nudCompleteProgress.Value = treeNodeData.PercentCompleted
+                    .ValidatePercentage());
 
             if (request.CategoryTextBox is TextBox tbCategory)
                 tbCategory.Text = treeNodeData.Category;

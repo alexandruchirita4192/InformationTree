@@ -7,7 +7,6 @@ using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Forms;
 using InformationTree.Render.WinForms.Extensions;
-using InformationTree.TextProcessing;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -65,8 +64,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 if (textToFind == "None")
                     return;
 
-                var percent = 0m;
-                _tbSearchBox.Text = TextProcessingHelper.GetTextAndProcentCompleted(textToFind, ref percent, true);
+                _tbSearchBox.Text = textToFind;
 
                 var request = new SearchBoxKeyUpRequest
                 {

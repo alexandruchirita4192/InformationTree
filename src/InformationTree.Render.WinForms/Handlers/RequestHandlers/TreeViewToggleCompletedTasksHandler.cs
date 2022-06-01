@@ -2,15 +2,24 @@
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
-using InformationTree.TextProcessing;
+using InformationTree.Domain.Services;
+using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class TreeViewToggleCompletedTasksHandler : IRequestHandler<TreeViewToggleCompletedTasksRequest, BaseResponse>
     {
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+
+        public TreeViewToggleCompletedTasksHandler(ITreeNodeDataCachingService treeNodeDataCachingService)
+        {
+            _treeNodeDataCachingService = treeNodeDataCachingService;
+        }
+
         public Task<BaseResponse> Handle(TreeViewToggleCompletedTasksRequest request, CancellationToken cancellationToken)
         {
             if (request.TreeView is not TreeView tvTaskList)
@@ -28,8 +37,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 foreach (TreeNode node in tv.Nodes)
                 {
-                    var completed = 0.0M;
-                    node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref completed, true);
+                    var completed = node.ToTreeNodeData(_treeNodeDataCachingService)
+                        .PercentCompleted
+                        .ValidatePercentage();
 
                     if (completed == 100)
                     {
@@ -59,8 +69,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                 foreach (TreeNode node in nodes)
                 {
-                    var completed = 0.0M;
-                    node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref completed, true);
+                    var completed = node.ToTreeNodeData(_treeNodeDataCachingService)
+                        .PercentCompleted
+                        .ValidatePercentage();
 
                     if (completed == 100)
                         node.ForeColor = foreColor;

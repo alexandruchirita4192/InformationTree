@@ -15,7 +15,6 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
-using InformationTree.TextProcessing;
 using MediatR;
 using NLog;
 
@@ -284,14 +283,14 @@ namespace InformationTree.Render.WinForms.Services
             }
 
             var newStyle = GetStyleFrom(attrBold, attrItalic, attrUnderline, attrStrikeout);
-
-            if (attrText != null)
-                attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
+            
+            attrPercentCompleted = attrPercentCompleted.ValidatePercentage();
 
             var attrDataStripped = RicherTextBox.Controls.RicherTextBox.StripRTF(attrData);
-            var tooltipText = TextProcessingHelper.GetToolTipText(attrText +
+            var tooltipText = (attrText +
                 (attrName.IsNotEmpty() && attrName != "0" ? $"{Environment.NewLine} TimeSpent: {attrName}" : "") +
-                (attrDataStripped.IsNotEmpty() ? $"{Environment.NewLine} Data: {attrDataStripped}" : ""));
+                (attrDataStripped.IsNotEmpty() ? $"{Environment.NewLine} Data: {attrDataStripped}" : ""))
+                .GetToolTipText();
 
             var treeNodeData = new TreeNodeData
             {
@@ -316,7 +315,8 @@ namespace InformationTree.Render.WinForms.Services
                 Link = attrLink,
                 Category = attrCategory,
                 IsStartupAlert = attrIsStartupAlert,
-                ToolTipText = tooltipText
+                ToolTipText = tooltipText,
+                PercentCompleted = attrPercentCompleted
             };
 
             return treeNodeData;

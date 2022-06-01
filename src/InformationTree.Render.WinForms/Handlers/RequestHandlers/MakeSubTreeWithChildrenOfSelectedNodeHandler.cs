@@ -6,7 +6,6 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
-using InformationTree.TextProcessing;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -45,9 +44,8 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
                 tagData.Link = tbLink.Text;
 
-                var percentCompleted = 0M;
                 if (tagData.Link.IsEmpty() || !tagData.Link.EndsWith(".xml") || tagData.Link.Contains(" "))
-                    tagData.Link = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref percentCompleted, true).Replace(" ", "_") + ".xml";
+                    tagData.Link = node.Text.Replace(" ", "_") + ".xml";
 
                 tbLink.Text = tagData.Link;
 

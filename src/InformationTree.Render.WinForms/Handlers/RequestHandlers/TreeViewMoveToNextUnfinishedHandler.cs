@@ -1,15 +1,24 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
-using InformationTree.TextProcessing;
+using InformationTree.Domain.Services;
+using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class TreeViewMoveToNextUnfinishedHandler : IRequestHandler<TreeViewCollapseAndRefreshRequest, BaseResponse>
     {
+        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+
+        public TreeViewMoveToNextUnfinishedHandler(ITreeNodeDataCachingService treeNodeDataCachingService)
+        {
+            _treeNodeDataCachingService = treeNodeDataCachingService;
+        }
+
         public Task<BaseResponse> Handle(TreeViewCollapseAndRefreshRequest request, CancellationToken cancellationToken)
         {
             if (request.TreeView is not TreeView tvTaskList)
@@ -34,9 +43,10 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             foreach (TreeNode node in currentNode.Nodes)
             {
-                var completed = 0.0M;
-                node.Text = TextProcessingHelper.GetTextAndProcentCompleted(node.Text, ref completed, true);
-
+                var completed = currentNode.ToTreeNodeData(_treeNodeDataCachingService)
+                    .PercentCompleted
+                    .ValidatePercentage();
+                
                 if (completed != 100 && tv.SelectedNode != node)
                 {
                     tv.SelectedNode = node;

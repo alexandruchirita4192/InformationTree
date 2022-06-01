@@ -9,7 +9,6 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.TextProcessing;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Services
@@ -139,8 +138,7 @@ namespace InformationTree.Render.WinForms.Services
                 var attrCategory = node.Category;
                 var attrIsStartupAlert = node.IsStartupAlert;
 
-                if (attrText != null)
-                    attrText = TextProcessingHelper.GetTextAndProcentCompleted(attrText, ref attrPercentCompleted, true);
+                attrPercentCompleted = attrPercentCompleted.ValidatePercentage();
 
                 var tagNodeLineSb = new StringBuilder();
 
