@@ -29,6 +29,7 @@ namespace InformationTree.Render.WinForms.Extensions
             this TreeNode destination,
             TreeNode source,
             ITreeNodeDataCachingService treeNodeDataCachingService,
+            bool includeChildren = true,
             int? filterHigherThan = null,
             int? filterLowerThan = null,
             CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
@@ -64,8 +65,12 @@ namespace InformationTree.Render.WinForms.Extensions
             destination.ForeColor = source.ForeColor.IsEmpty ? Constants.Colors.DefaultForeGroundColor : source.ForeColor;
             destination.BackColor = source.BackColor.IsEmpty ? Constants.Colors.DefaultBackGroundColor : source.BackColor;
 
-            foreach (TreeNode node in source.Nodes)
-                destination.Nodes.Copy(node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
+            if (includeChildren)
+            {
+                foreach (TreeNode node in source.Nodes)
+                    destination.Nodes.Copy(node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
+
+            }
         }
 
         // TODO: Create an adapter with that, to change from TreeNode to TreeNodeData and vice versa and remove the dependency requirement in extension parameters

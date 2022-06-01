@@ -15,7 +15,7 @@ namespace InformationTree.Render.WinForms.Services
             lock (_lock)
             {
                 if (treeNode is TreeNode node
-                && !ReferenceEquals(currentSelection, oldSelection))
+                && !ReferenceEquals(currentSelection, node))
                 {
                     oldSelection = currentSelection;
                     currentSelection = node;

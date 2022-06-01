@@ -47,7 +47,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 tvTaskList.InvokeWrapper(tvTaskList =>
                 {
-                    tvTaskList.SelectedNode.Copy(selectedNode.ToTreeNode(_treeNodeDataCachingService), _treeNodeDataCachingService);
+                    tvTaskList.SelectedNode.Copy(selectedNode.ToTreeNode(_treeNodeDataCachingService), _treeNodeDataCachingService, false);
                 });
             }
 

@@ -44,7 +44,7 @@ namespace InformationTree.Render.WinForms.Extensions
                 throw new ArgumentNullException(nameof(treeNodeDataCachingService));
 
             var node = new TreeNode();
-            node.Copy(source, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
+            node.Copy(source, treeNodeDataCachingService, true, filterHigherThan, filterLowerThan, filterType);
 
             if ((filterLowerThan == null && filterHigherThan == null) || (filterLowerThan != null && filterHigherThan != null))
                 destination.Add(node);
