@@ -187,8 +187,9 @@ namespace InformationTree.Render.WinForms.Services
 
             foreach (XmlAttribute attr in attributes)
             {
-                var decodedAttrValue = attr.Value.IsNotEmpty()
-                    ? HttpUtility.HtmlDecode(attr.Value)
+                var attrValue = attr.Value.IsNotEmpty() ? attr.Value : string.Empty;
+                var decodedAttrValue = attrValue.IsNotEmpty()
+                    ? HttpUtility.HtmlDecode(attrValue)
                     : string.Empty;
 
                 switch (attr.Name)
@@ -218,12 +219,30 @@ namespace InformationTree.Render.WinForms.Services
                         break;
 
                     case Constants.XmlAttributes.XmlAttrFontFamily:
-                        attrFontFamily = FontFamily.Families.FirstOrDefault(f => f.Name == decodedAttrValue)
+                        attrFontFamily = FontFamily.Families.FirstOrDefault(f => 
+                            string.Compare(f.Name, decodedAttrValue, StringComparison.InvariantCultureIgnoreCase) == 0)
                             ?? WinFormsConstants.FontDefaults.DefaultFontFamily;
                         break;
 
                     case Constants.XmlAttributes.XmlAttrData:
                         attrData = _compressionProvider.Decompress(decodedAttrValue);
+                        
+                        if (string.Compare(attrData, decodedAttrValue, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        {
+                            _logger.Debug("Decompressed data '{data}' is the same as compressed data, " +
+                                "decompressing again using the fallback mechanism without using the HtmlDecode returned data," +
+                                " but using the data before decoding with HtmlDecode instead: '{attrValue}'.",
+                                attrData,
+                                attrValue);
+                            
+                            // Fallback mechanism in case of issues because of HtmlDecode
+                            // (hopefully that's not because of older version of CompressionProvider using UrlTokenDecode)
+                            attrData = _compressionProvider.Decompress(attrValue);
+
+                            // If even this got the same value, then assume it's not compressed and get something after decoding part (as usually should happen)
+                            if (string.Compare(attrData, attrValue, StringComparison.InvariantCultureIgnoreCase) == 0)
+                                attrData = decodedAttrValue;
+                        }
                         break;
 
                     case Constants.XmlAttributes.XmlAttrAddedDate:
