@@ -35,12 +35,13 @@ namespace InformationTree.Forms
         private readonly IPopUpService _popUpService;
         private readonly IConfigurationReader _configurationReader;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ICachingService _cachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        private readonly ITreeNodeDataToTreeNodeAdapter _treeNodeDataToTreeNodeAdapter;
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -54,12 +55,13 @@ namespace InformationTree.Forms
             IPopUpService popUpService,
             IConfigurationReader configurationReader,
             IExportNodeToRtfService exportNodeToRtfService,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
-            ICachingService cachingService)
+            ICachingService cachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
+            ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter)
         {
             _soundProvider = soundProvider;
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
@@ -67,13 +69,14 @@ namespace InformationTree.Forms
             _popUpService = popUpService;
             _configurationReader = configurationReader;
             _exportNodeToRtfService = exportNodeToRtfService;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _cachingService = cachingService;
-
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+            _treeNodeDataToTreeNodeAdapter = treeNodeDataToTreeNodeAdapter;
+            
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -116,7 +119,7 @@ namespace InformationTree.Forms
                 return;
 
             (var root, var fileName) = _importTreeFromXmlService.LoadTree(getTreeStateResponse.FileName, this);
-            root.CopyToTreeView(tvTaskList, _treeNodeDataCachingService, true);
+            _treeNodeDataToTreeNodeAdapter.AdaptToTreeView(root, tvTaskList, true);
 
             var setTreeStateRequest = new SetTreeStateRequest
             {
@@ -217,7 +220,7 @@ namespace InformationTree.Forms
         {
             get
             {
-                return tvTaskList.ToTreeNodeData(_treeNodeDataCachingService);
+                return _treeNodeToTreeNodeDataAdapter.AdaptTreeView(tvTaskList);
             }
         }
 
@@ -284,8 +287,7 @@ namespace InformationTree.Forms
                 TreeView = tvTaskList,
                 Form = this,
                 SelectedNode = e.Node,
-                SelectedNodeData = e.Node
-                    .ToTreeNodeData(_treeNodeDataCachingService),
+                SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(e.Node),
                 TaskPercentCompleted = nudCompleteProgress.Value,
                 StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
                 TimeSpentGroupBox = gbTimeSpent,
@@ -325,8 +327,7 @@ namespace InformationTree.Forms
                 TreeView = tvTaskList,
                 Form = this,
                 SelectedNode = tvTaskList.SelectedNode,
-                SelectedNodeData = tvTaskList.SelectedNode
-                    .ToTreeNodeData(_treeNodeDataCachingService),
+                SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                 TaskPercentCompleted = nudCompleteProgress.Value,
                 StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
                 TimeSpentGroupBox = gbTimeSpent,
@@ -366,8 +367,7 @@ namespace InformationTree.Forms
             var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             var updateTextClickRequest = new UpdateTextClickRequest
             {
-                SelectedNode = tvTaskList.SelectedNode
-                    .ToTreeNodeData(_treeNodeDataCachingService),
+                SelectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                 TaskPercentCompleted = nudCompleteProgress.Value,
                 TaskName = tbTaskName.Text,
                 Link = tbLink.Text,
@@ -380,8 +380,7 @@ namespace InformationTree.Forms
                     TreeView = tvTaskList,
                     Form = this,
                     SelectedNode = tvTaskList.SelectedNode,
-                    SelectedNodeData = tvTaskList.SelectedNode
-                        .ToTreeNodeData(_treeNodeDataCachingService),
+                    SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                     TaskPercentCompleted = nudCompleteProgress.Value,
                     StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
                     TimeSpentGroupBox = gbTimeSpent,
@@ -425,7 +424,7 @@ namespace InformationTree.Forms
                 if (selectedNode.Text != taskName)
                 {
                     selectedNode.Text = taskName;
-                    var tagData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
+                    var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
                     tagData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
@@ -443,7 +442,7 @@ namespace InformationTree.Forms
                 {
                     selectedNodeLastChildren.Text = taskName;
 
-                    var tagData = selectedNodeLastChildren.ToTreeNodeData(_treeNodeDataCachingService);
+                    var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNodeLastChildren);
                     tagData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
@@ -465,7 +464,7 @@ namespace InformationTree.Forms
                     NodeFont = WinFormsConstants.FontDefaults.DefaultFont.Clone() as Font,
                     ToolTipText = taskName.GetToolTipText()
                 };
-                var treeNodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
+                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
                 treeNodeData.AddedNumber = tvTaskList.GetNodeCount(true) + 1;
                 treeNodeData.Urgency = urgency;
                 treeNodeData.Link = link;
@@ -510,8 +509,7 @@ namespace InformationTree.Forms
                 TreeView = tvTaskList,
                 Form = this,
                 SelectedNode = tvTaskList.SelectedNode,
-                SelectedNodeData = tvTaskList.SelectedNode
-                    .ToTreeNodeData(_treeNodeDataCachingService),
+                SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                 TaskPercentCompleted = nudCompleteProgress.Value,
                 StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
                 TimeSpentGroupBox = gbTimeSpent,
@@ -553,8 +551,7 @@ namespace InformationTree.Forms
             
             if (tvTaskList.SelectedNode != null)
             {
-                tvTaskList.SelectedNode
-                    .ToTreeNodeData(_treeNodeDataCachingService)
+                _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode)
                     .PercentCompleted = nudCompleteProgress.Value
                     .ValidatePercentage();
 
@@ -699,7 +696,7 @@ namespace InformationTree.Forms
                     var foreColor = tvTaskList.SelectedNode.ForeColor;
                     tvTaskList.SelectedNode.ForeColor = foreColor != null && !foreColor.IsEmpty ? foreColor : Constants.Colors.DefaultForeGroundColor;
 
-                    var nodeData = tvTaskList.SelectedNode.ToTreeNodeData(_treeNodeDataCachingService);
+                    var nodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode);
                     nodeData.LastChangeDate = DateTime.Now;
 
                     tvTaskList_AfterSelect(sender, new TreeViewEventArgs(tvTaskList.SelectedNode));
@@ -961,8 +958,8 @@ namespace InformationTree.Forms
             var node = tvTaskList.SelectedNode;
             if (node != null)
             {
-                var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                if (tagData != null && tagData.Link.IsNotEmpty())
+                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
+                if (treeNodeData != null && treeNodeData.Link.IsNotEmpty())
                 {
                     (_, var fileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
                         TaskListRoot,
@@ -970,7 +967,7 @@ namespace InformationTree.Forms
                         tvTaskList,
                         nudShowUntilNumber,
                         nudShowFromNumber,
-                        tagData.Link);
+                        treeNodeData.Link);
 
                     var setTreeStateRequest = new SetTreeStateRequest
                     {
@@ -1181,8 +1178,8 @@ namespace InformationTree.Forms
 
             if (cbLogChecked && node != null)
             {
-                var nodeData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                nodeData.Data += commandData + Environment.NewLine;
+                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
+                treeNodeData.Data += commandData + Environment.NewLine;
 
                 var setTreeStateRequest = new SetTreeStateRequest
                 {
@@ -1269,8 +1266,7 @@ namespace InformationTree.Forms
                         TreeView = tvTaskList,
                         Form = this,
                         SelectedNode = tvTaskList.SelectedNode,
-                        SelectedNodeData = tvTaskList.SelectedNode
-                            .ToTreeNodeData(_treeNodeDataCachingService),
+                        SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                         TaskPercentCompleted = nudCompleteProgress.Value,
                         StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
                         TimeSpentGroupBox = gbTimeSpent,
@@ -1424,16 +1420,36 @@ namespace InformationTree.Forms
             form.ShowDialog();
         }
 
-        private void encryptToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void encryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _popUpService.ShowWarning("Not implemented.");
             // TODO: Call handler from btnPgpEncryptData_Click after it is a MediatR handler
+            //var request = new PgpEncryptDecryptDataRequest
+            //{
+            //    DataRicherTextBox = null, // TODO: Make another request and handler that doesn't use the RicherTextBox and call it here (move all logic to it)
+            //    EncryptionLabel = null,
+            //    FormToCenterTo = this,
+            //    ActionType = PgpActionType.Encrypt,
+            //    FromFile = false,
+            //    DataIsPgpEncrypted = false,
+            //};
+            //await _mediator.Send(request);
         }
 
-        private void decryptToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _popUpService.ShowWarning("Not implemented.");
             // TODO: Call handler from btnPgpEncryptData_Click after it is a MediatR handler
+            //var request = new PgpEncryptDecryptDataRequest
+            //{
+            //    DataRicherTextBox = null, // TODO: Make another request and handler that doesn't use the RicherTextBox and call it here (move all logic to it)
+            //    EncryptionLabel = null,
+            //    FormToCenterTo = this,
+            //    ActionType = PgpActionType.Decrypt,
+            //    FromFile = false,
+            //    DataIsPgpEncrypted = false,
+            //};
+            //await _mediator.Send(request);
         }
 
         private void btnExportToRtf_Click(object sender, EventArgs e)

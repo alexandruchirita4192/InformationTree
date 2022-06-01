@@ -21,7 +21,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         private readonly IConfigurationReader _configurationReader;
         private readonly IMediator _mediator;
         private readonly ICachingService _cachingService;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
 
         public TreeViewDoubleClickHandler(
             ICanvasFormFactory canvasFormFactory,
@@ -29,7 +29,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             IConfigurationReader configurationReader,
             IMediator mediator,
             ICachingService cachingService,
-            ITreeNodeDataCachingService treeNodeDataCachingService
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter
             )
         {
             _canvasFormFactory = canvasFormFactory;
@@ -37,7 +37,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             _configurationReader = configurationReader;
             _mediator = mediator;
             _cachingService = cachingService;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public Task<BaseResponse> Handle(TreeViewDoubleClickRequest request, CancellationToken cancellationToken)
@@ -52,7 +52,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             var selectedNode = tvTaskList.SelectedNode;
             if (selectedNode != null)
             {
-                var tagData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
+                var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
                 var data = tagData.Data ?? string.Empty;
 
                 var form = new PopUpEditForm(
@@ -72,7 +72,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                     if (selectedNode != null)
                     {
-                        var treeNodeData = selectedNode.ToTreeNodeData(_treeNodeDataCachingService);
+                        var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
                         treeNodeData.Data = popUpReturnedData;
 
                         var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(popUpReturnedData);

@@ -13,12 +13,17 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     public class UpdateTextClickHandler : IRequestHandler<UpdateTextClickRequest, BaseResponse>
     {
         private readonly IMediator _mediator;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        private readonly ITreeNodeDataToTreeNodeAdapter _treeNodeDataToTreeNodeAdapter;
 
-        public UpdateTextClickHandler(IMediator mediator, ITreeNodeDataCachingService treeNodeDataCachingService)
+        public UpdateTextClickHandler(
+            IMediator mediator,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
+            ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter)
         {
             _mediator = mediator;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+            _treeNodeDataToTreeNodeAdapter = treeNodeDataToTreeNodeAdapter;
         }
 
         public async Task<BaseResponse> Handle(UpdateTextClickRequest request, CancellationToken cancellationToken)
@@ -47,7 +52,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 tvTaskList.InvokeWrapper(tvTaskList =>
                 {
-                    tvTaskList.SelectedNode.Copy(selectedNode.ToTreeNode(_treeNodeDataCachingService), _treeNodeDataCachingService, false);
+                    var treeNode = _treeNodeDataToTreeNodeAdapter.Adapt(selectedNode);
+                    if (treeNode is TreeNode treeNodeControl)
+                        tvTaskList.SelectedNode.Copy(treeNodeControl, _treeNodeToTreeNodeDataAdapter, false);
                 });
             }
 

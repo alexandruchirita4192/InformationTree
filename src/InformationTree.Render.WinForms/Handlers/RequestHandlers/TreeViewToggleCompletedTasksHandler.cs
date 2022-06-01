@@ -6,18 +6,17 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class TreeViewToggleCompletedTasksHandler : IRequestHandler<TreeViewToggleCompletedTasksRequest, BaseResponse>
     {
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
 
-        public TreeViewToggleCompletedTasksHandler(ITreeNodeDataCachingService treeNodeDataCachingService)
+        public TreeViewToggleCompletedTasksHandler(ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
         {
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public Task<BaseResponse> Handle(TreeViewToggleCompletedTasksRequest request, CancellationToken cancellationToken)
@@ -37,7 +36,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 foreach (TreeNode node in tv.Nodes)
                 {
-                    var completed = node.ToTreeNodeData(_treeNodeDataCachingService)
+                    var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                         .PercentCompleted
                         .ValidatePercentage();
 
@@ -69,7 +68,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                 foreach (TreeNode node in nodes)
                 {
-                    var completed = node.ToTreeNodeData(_treeNodeDataCachingService)
+                    var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                         .PercentCompleted
                         .ValidatePercentage();
 

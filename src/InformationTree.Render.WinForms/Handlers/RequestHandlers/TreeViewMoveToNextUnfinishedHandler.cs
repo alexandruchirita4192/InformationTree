@@ -5,18 +5,16 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class TreeViewMoveToNextUnfinishedHandler : IRequestHandler<TreeViewCollapseAndRefreshRequest, BaseResponse>
     {
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
-
-        public TreeViewMoveToNextUnfinishedHandler(ITreeNodeDataCachingService treeNodeDataCachingService)
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        public TreeViewMoveToNextUnfinishedHandler(ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
         {
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public Task<BaseResponse> Handle(TreeViewCollapseAndRefreshRequest request, CancellationToken cancellationToken)
@@ -43,7 +41,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             foreach (TreeNode node in currentNode.Nodes)
             {
-                var completed = currentNode.ToTreeNodeData(_treeNodeDataCachingService)
+                var completed = _treeNodeToTreeNodeDataAdapter.Adapt(currentNode)
                     .PercentCompleted
                     .ValidatePercentage();
                 

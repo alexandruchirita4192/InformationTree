@@ -378,7 +378,7 @@ namespace InformationTree.Forms
                 ActionType = PgpActionType.Decrypt,
                 FromFile = FromFile,
                 DataIsPgpEncrypted = DataIsPgpEncrypted,
-                PopUpEditForm = this
+                FormToCenterTo = this
             };
             
             if (await _mediator.Send(request) is not PgpEncryptDecryptDataResponse response)
@@ -395,7 +395,7 @@ namespace InformationTree.Forms
                 ActionType = PgpActionType.Encrypt,
                 FromFile = FromFile,
                 DataIsPgpEncrypted = DataIsPgpEncrypted,
-                PopUpEditForm = this
+                FormToCenterTo = this
             };
             
             if (await _mediator.Send(request) is not PgpEncryptDecryptDataResponse response)

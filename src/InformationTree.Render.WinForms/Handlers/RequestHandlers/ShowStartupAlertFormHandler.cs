@@ -6,7 +6,6 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Forms;
-using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -15,19 +14,21 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     {
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IMediator _mediator;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
-        
+        private readonly ITreeNodeDataToTreeNodeAdapter _treeNodeDataToTreeNodeAdapter;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
         private TreeView _tvTaskList;
         private TextBox _tbSearchBox;
 
         public ShowStartupAlertFormHandler(
             IImportTreeFromXmlService importTreeFromXmlService,
             IMediator mediator,
-            ITreeNodeDataCachingService treeNodeDataCachingService)
+            ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
         {
             _importTreeFromXmlService = importTreeFromXmlService;
             _mediator = mediator;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeDataToTreeNodeAdapter = treeNodeDataToTreeNodeAdapter;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public Task<BaseResponse> Handle(ShowStartupAlertFormRequest request, CancellationToken cancellationToken)
@@ -41,11 +42,12 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             _tbSearchBox = tbSearchBox;
 
             var alertNodesRoot = new TreeNodeData();
-            var haveAlerts = _importTreeFromXmlService.LoadTreeNodesByCategory(tvTaskList.ToTreeNodeData(_treeNodeDataCachingService), alertNodesRoot, true);
+            var treeNodeDataFromTreeViewRoot = _treeNodeToTreeNodeDataAdapter.AdaptTreeView(tvTaskList);
+            var haveAlerts = _importTreeFromXmlService.LoadTreeNodesByCategory(treeNodeDataFromTreeViewRoot, alertNodesRoot, true);
 
             if (haveAlerts)
             {
-                var form = new StartupAlertForm(_treeNodeDataCachingService, alertNodesRoot);
+                var form = new StartupAlertForm(_treeNodeDataToTreeNodeAdapter, alertNodesRoot);
                 form.FormClosing += StartupAlertForm_FormClosing;
                 form.ShowDialog();
                 tvTaskList.Refresh();

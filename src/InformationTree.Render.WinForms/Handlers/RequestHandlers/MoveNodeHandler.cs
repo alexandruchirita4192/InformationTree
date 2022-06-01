@@ -5,7 +5,6 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -14,16 +13,16 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     {
         private readonly IMediator _mediator;
         private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
 
         public MoveNodeHandler(
             IMediator mediator,
             ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
-            ITreeNodeDataCachingService treeNodeDataCachingService)
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
         {
             _mediator = mediator;
             _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public async Task<BaseResponse> Handle(MoveNodeRequest request, CancellationToken cancellationToken)
@@ -43,7 +42,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             else
                 tv.Nodes.Remove(oldSelection);
 
-            var currentSelectionTagData = currentSelection.ToTreeNodeData(_treeNodeDataCachingService);
+            var currentSelectionTagData = _treeNodeToTreeNodeDataAdapter.Adapt(currentSelection);
             if (currentSelection.Text.IsEmpty() &&
             currentSelectionTagData.IsEmptyData &&
             currentSelection.Parent == null &&

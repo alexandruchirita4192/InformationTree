@@ -28,7 +28,7 @@ namespace InformationTree.Render.WinForms.Extensions
         public static void Copy(
             this TreeNode destination,
             TreeNode source,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             bool includeChildren = true,
             int? filterHigherThan = null,
             int? filterLowerThan = null,
@@ -40,19 +40,19 @@ namespace InformationTree.Render.WinForms.Extensions
                 throw new ArgumentNullException(nameof(destination));
             if (destination.Nodes == null)
                 throw new ArgumentNullException(nameof(destination.Nodes));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (treeNodeToTreeNodeDataAdapter == null)
+                throw new ArgumentNullException(nameof(treeNodeToTreeNodeDataAdapter));
 
-            var tagData = source.ToTreeNodeData(treeNodeDataCachingService);
+            var sourceTreeNodeData = treeNodeToTreeNodeDataAdapter.Adapt(source);
 
             // Filter nodes by added number or urgency depending on the type
-            if ((filterType == CopyNodeFilterType.FilterByAddedNumber) && (tagData.AddedNumber >= filterLowerThan) || (tagData.AddedNumber < filterHigherThan))
+            if ((filterType == CopyNodeFilterType.FilterByAddedNumber) && (sourceTreeNodeData.AddedNumber >= filterLowerThan) || (sourceTreeNodeData.AddedNumber < filterHigherThan))
                 return;
-            else if ((filterType == CopyNodeFilterType.FilterByUrgency) && (tagData.Urgency >= filterLowerThan) || (tagData.Urgency < filterHigherThan))
+            else if ((filterType == CopyNodeFilterType.FilterByUrgency) && (sourceTreeNodeData.Urgency >= filterLowerThan) || (sourceTreeNodeData.Urgency < filterHigherThan))
                 return;
 
-            var toTag = destination.ToTreeNodeData(treeNodeDataCachingService);
-            toTag.Copy(tagData);
+            var destinationTreeNodeData = treeNodeToTreeNodeDataAdapter.Adapt(destination);
+            destinationTreeNodeData.Copy(sourceTreeNodeData);
 
             // Shallow copy of the used properties only
             destination.Text = source.Text;
@@ -68,72 +68,9 @@ namespace InformationTree.Render.WinForms.Extensions
             if (includeChildren)
             {
                 foreach (TreeNode node in source.Nodes)
-                    destination.Nodes.Copy(node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
+                    destination.Nodes.Copy(node, treeNodeToTreeNodeDataAdapter, filterHigherThan, filterLowerThan, filterType);
 
             }
-        }
-
-        // TODO: Create an adapter with that, to change from TreeNode to TreeNodeData and vice versa and remove the dependency requirement in extension parameters
-        public static TreeNodeData ToTreeNodeData(this TreeNode treeNode, ITreeNodeDataCachingService treeNodeDataCachingService)
-        {
-            if (treeNode == null)
-                throw new ArgumentNullException(nameof(treeNode));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
-
-            TreeNodeData treeNodeData;
-            var treeNodeIdentifier = treeNode.Tag as Guid?;
-
-            if (treeNodeIdentifier == null)
-                (treeNodeData, treeNodeIdentifier) = treeNode.CreateTreeNodeDataAndAddToCache(treeNodeDataCachingService);
-            else
-            {
-                treeNodeData = treeNodeDataCachingService.GetFromCache(treeNodeIdentifier.Value);
-                if (treeNodeData == null)
-                    (treeNodeData, treeNodeIdentifier) = treeNode.CreateTreeNodeDataAndAddToCache(treeNodeDataCachingService);
-            }
-            treeNode.Tag = treeNodeData != null ? treeNodeIdentifier : null;
-
-            // Children might already be in place because the cache gives a reference to a TreeNodeData with it's children,
-            // but here children are refreshed anyway
-            treeNodeData.Children.Clear();
-
-            foreach (TreeNode childTreeNode in treeNode.Nodes)
-            {
-                var childTreeNodeData = childTreeNode.ToTreeNodeData(treeNodeDataCachingService);
-                treeNodeData.Children.Add(childTreeNodeData);
-            }
-
-            return treeNodeData;
-        }
-
-        private static (TreeNodeData, Guid) CreateTreeNodeDataAndAddToCache(this TreeNode treeNode, ITreeNodeDataCachingService treeNodeDataCachingService)
-        {
-            var treeNodeData = CreateNewTreeNodeData(treeNode);
-            var newGuid = treeNodeDataCachingService.AddToCache(treeNodeData);
-            return (treeNodeData, newGuid);
-        }
-
-        private static TreeNodeData CreateNewTreeNodeData(TreeNode treeNode)
-        {
-            var fontFamily = treeNode.NodeFont?.FontFamily ?? WinFormsConstants.FontDefaults.DefaultFontFamily;
-
-            return new TreeNodeData
-            {
-                Text = treeNode.Text,
-                Name = treeNode.Name,
-                NodeFont = new TreeNodeFont
-                {
-                    Bold = treeNode.NodeFont?.Bold ?? false,
-                    Italic = treeNode.NodeFont?.Italic ?? false,
-                    Strikeout = treeNode.NodeFont?.Strikeout ?? false,
-                    Underline = treeNode.NodeFont?.Underline ?? false,
-                    Size = treeNode.NodeFont?.Size ?? WinFormsConstants.FontDefaults.DefaultFontSize,
-                    FontFamilyName = fontFamily?.Name
-                },
-                AddedDate = DateTime.Now,
-                LastChangeDate = DateTime.Now
-            };
         }
     }
 }

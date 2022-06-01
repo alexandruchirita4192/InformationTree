@@ -71,12 +71,12 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         {
             var deletedItemsWithName = 0;
 
-            if (selectedTask != null && selectedTask.Text.Equals(taskName /*StartsWith + " [" */))
+            if (selectedTask != null && selectedTask.Text.Equals(taskName))
                 deletedItemsWithName = InternalParseToDelete(tvTaskList, selectedTask, taskName, fakeDelete);
             else
                 foreach (TreeNode node in tvTaskList.Nodes)
                 {
-                    if (node != null && node.Text.Equals(taskName /*StartsWith + " [" */))
+                    if (node != null && node.Text.Equals(taskName))
                     {
                         node.Nodes.Clear();
                         tvTaskList.Nodes.Remove(node);
@@ -98,7 +98,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 throw new ArgumentNullException(nameof(nodeNameToDelete));
 
             int ret = 0;
-            if (topNode.Text.Equals(nodeNameToDelete /* StartsWith + " [" */))
+            if (topNode.Text.Equals(nodeNameToDelete))
             {
                 if (!fakeDelete)
                 {
@@ -110,7 +110,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             else
                 foreach (TreeNode node in topNode.Nodes)
                 {
-                    if (node != null && node.Text.Equals(nodeNameToDelete /* StartsWith + " [" */))
+                    if (node != null && node.Text.Equals(nodeNameToDelete))
                     {
                         if (!fakeDelete)
                         {

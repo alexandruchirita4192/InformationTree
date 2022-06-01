@@ -22,12 +22,13 @@ namespace InformationTree.Render.WinForms.Services
         private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
         private readonly ICanvasFormFactory _canvasFormFactory;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
         private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ICachingService _cachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        private readonly ITreeNodeDataToTreeNodeAdapter _treeNodeDataToTreeNodeAdapter;
 
         public WinFormsApplication(
             IConfigurationReader configurationReader,
@@ -36,12 +37,13 @@ namespace InformationTree.Render.WinForms.Services
             IGraphicsFileFactory graphicsFileRecursiveGenerator,
             ICanvasFormFactory canvasFormFactory,
             IExportNodeToRtfService exportNodeToRtfService,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
             IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
-            ICachingService cachingService)
+            ICachingService cachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
+            ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter)
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
@@ -49,12 +51,13 @@ namespace InformationTree.Render.WinForms.Services
             _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
             _canvasFormFactory = canvasFormFactory;
             _exportNodeToRtfService = exportNodeToRtfService;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
             _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _cachingService = cachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+            _treeNodeDataToTreeNodeAdapter = treeNodeDataToTreeNodeAdapter;
         }
 
         #region extern
@@ -207,12 +210,13 @@ namespace InformationTree.Render.WinForms.Services
                 _popUpService,
                 _configurationReader,
                 _exportNodeToRtfService,
-                _treeNodeDataCachingService,
                 _importTreeFromXmlService,
                 _exportTreeToXmlService,
                 _importExportTreeXmlService,
                 _mediator,
-                _cachingService
+                _cachingService,
+                _treeNodeToTreeNodeDataAdapter,
+                _treeNodeDataToTreeNodeAdapter
                 ));
         }
 

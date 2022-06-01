@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Services;
-using InformationTree.Render.WinForms.Extensions;
 
 namespace InformationTree.Forms
 {
@@ -16,15 +15,16 @@ namespace InformationTree.Forms
             }
         }
 
-        public StartupAlertForm(ITreeNodeDataCachingService treeNodeDataCachingService, TreeNodeData treeNodeData = null)
+        public StartupAlertForm(ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter, TreeNodeData treeNodeData = null)
         {
             InitializeComponent();
 
             if (treeNodeData != null && tvAlertCategoryAndTasks?.Nodes != null)
             {
                 tvAlertCategoryAndTasks.Nodes.Add(new TreeNode("None"));
-                foreach (TreeNodeData child in treeNodeData.Children)
-                    tvAlertCategoryAndTasks.Nodes.Add(child.ToTreeNode(treeNodeDataCachingService, false));
+                foreach (TreeNodeData childTreeNodeData in treeNodeData.Children)
+                    if (treeNodeDataToTreeNodeAdapter.Adapt(childTreeNodeData, false) is TreeNode childTreeNode)
+                        tvAlertCategoryAndTasks.Nodes.Add(childTreeNode);
             }
 
             StartPosition = FormStartPosition.CenterScreen;

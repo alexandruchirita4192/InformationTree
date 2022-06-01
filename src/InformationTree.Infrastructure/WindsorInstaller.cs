@@ -38,7 +38,9 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<IImportExportTreeXmlService>().ImplementedBy<ImportExportTreeXmlService>().LifeStyle.Singleton);
             container.Register(Component.For<ITreeNodeSelectionCachingService>().ImplementedBy<TreeNodeSelectionCachingService>().LifeStyle.Singleton);
             container.Register(Component.For<ICachingService>().ImplementedBy<CachingService>().LifeStyle.Singleton);
-
+            container.Register(Component.For<ITreeNodeToTreeNodeDataAdapter>().ImplementedBy<TreeNodeToTreeNodeDataAdapter>().LifeStyle.Singleton);
+            container.Register(Component.For<ITreeNodeDataToTreeNodeAdapter>().ImplementedBy<TreeNodeDataToTreeNodeAdapter>().LifeStyle.Singleton);
+            
             container.RegisterMediatorForUsageFrom(typeof(MainForm).Assembly);
         }
     }

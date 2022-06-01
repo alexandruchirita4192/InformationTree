@@ -12,7 +12,7 @@ namespace InformationTree.Render.WinForms.Extensions
         public static void Copy(
             this TreeNodeCollection destination,
             TreeNodeCollection source,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             int? filterHigherThan = null,
             int? filterLowerThan = null,
             CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
@@ -21,17 +21,17 @@ namespace InformationTree.Render.WinForms.Extensions
                 throw new ArgumentNullException(nameof(source));
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (treeNodeToTreeNodeDataAdapter == null)
+                throw new ArgumentNullException(nameof(treeNodeToTreeNodeDataAdapter));
 
             foreach (TreeNode node in source)
-                destination.Copy(node, treeNodeDataCachingService, filterHigherThan, filterLowerThan, filterType);
+                destination.Copy(node, treeNodeToTreeNodeDataAdapter, filterHigherThan, filterLowerThan, filterType);
         }
 
         public static void Copy(
             this TreeNodeCollection destination,
             TreeNode source,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             int? filterHigherThan = null,
             int? filterLowerThan = null,
             CopyNodeFilterType filterType = CopyNodeFilterType.NoFilter)
@@ -40,11 +40,11 @@ namespace InformationTree.Render.WinForms.Extensions
                 throw new ArgumentNullException(nameof(source));
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (treeNodeToTreeNodeDataAdapter == null)
+                throw new ArgumentNullException(nameof(treeNodeToTreeNodeDataAdapter));
 
             var node = new TreeNode();
-            node.Copy(source, treeNodeDataCachingService, true, filterHigherThan, filterLowerThan, filterType);
+            node.Copy(source, treeNodeToTreeNodeDataAdapter, true, filterHigherThan, filterLowerThan, filterType);
 
             if ((filterLowerThan == null && filterHigherThan == null) || (filterLowerThan != null && filterHigherThan != null))
                 destination.Add(node);
@@ -70,22 +70,22 @@ namespace InformationTree.Render.WinForms.Extensions
             }
         }
 
-        public static void SetStyleForSearch(this TreeNodeCollection collection, string text, ITreeNodeDataCachingService treeNodeDataCachingService)
+        public static void SetStyleForSearch(this TreeNodeCollection collection, string text, ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
             if (text.IsEmpty())
                 throw new ArgumentNullException(nameof(text));
-            if (treeNodeDataCachingService == null)
-                throw new ArgumentNullException(nameof(treeNodeDataCachingService));
+            if (treeNodeToTreeNodeDataAdapter == null)
+                throw new ArgumentNullException(nameof(treeNodeToTreeNodeDataAdapter));
 
             text = text.ToLower();
             if (collection.Count > 0)
             {
                 foreach (TreeNode node in collection)
                 {
-                    var nodeTagData = node.ToTreeNodeData(treeNodeDataCachingService);
-                    var nodeData = nodeTagData != null && !string.IsNullOrEmpty(nodeTagData.Data) ? nodeTagData.Data : null;
+                    var nodeTagData = treeNodeToTreeNodeDataAdapter.Adapt(node);
+                    var nodeData = nodeTagData != null && nodeTagData.Data.IsNotEmpty() ? nodeTagData.Data : null;
                     var foundCondition = (node.Text != null && node.Text.ToLower().Split('[')[0].Contains(text))
                         || (nodeData != null && nodeData.ToLower().Contains(text));
 
@@ -100,7 +100,7 @@ namespace InformationTree.Render.WinForms.Extensions
                     }
 
                     if (node.Nodes != null && node.Nodes.Count > 0)
-                        node.Nodes.SetStyleForSearch(text, treeNodeDataCachingService);
+                        node.Nodes.SetStyleForSearch(text, treeNodeToTreeNodeDataAdapter);
                 }
             }
         }

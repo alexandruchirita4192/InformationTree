@@ -14,15 +14,18 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     {
         private readonly IMediator _mediator;
         private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
 
         public MakeSubTreeWithChildrenOfSelectedNodeHandler(
             IMediator mediator,
             ITreeNodeDataCachingService treeNodeDataCachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             IExportTreeToXmlService exportTreeToXmlService)
         {
             _mediator = mediator;
             _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
             _exportTreeToXmlService = exportTreeToXmlService;
         }
 
@@ -41,25 +44,25 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 if (node.Nodes.Count == 0 && !useSelectedNode)
                     return null;
 
-                var tagData = node.ToTreeNodeData(_treeNodeDataCachingService);
-                tagData.Link = tbLink.Text;
+                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
+                treeNodeData.Link = tbLink.Text;
 
-                if (tagData.Link.IsEmpty() || !tagData.Link.EndsWith(".xml") || tagData.Link.Contains(" "))
-                    tagData.Link = node.Text.Replace(" ", "_") + ".xml";
+                if (treeNodeData.Link.IsEmpty() || !treeNodeData.Link.EndsWith(".xml") || treeNodeData.Link.Contains(" "))
+                    treeNodeData.Link = node.Text.Replace(" ", "_") + ".xml";
 
-                tbLink.Text = tagData.Link;
+                tbLink.Text = treeNodeData.Link;
 
                 var treeView = new TreeView();
                 if (useSelectedNode)
                 {
                     var parentNode = new TreeNode();
-                    parentNode.Copy(node, _treeNodeDataCachingService);
+                    parentNode.Copy(node, _treeNodeToTreeNodeDataAdapter);
                     treeView.Nodes.Add(parentNode);
-                    tagData.Data = null;
+                    treeNodeData.Data = null;
                 }
                 else
                 {
-                    treeView.Nodes.Copy(node.Nodes, _treeNodeDataCachingService);
+                    treeView.Nodes.Copy(node.Nodes, _treeNodeToTreeNodeDataAdapter);
                 }
 
                 if (await _mediator.Send(new GetTreeStateRequest(), cancellationToken) is not GetTreeStateResponse getTreeStateResponse)
@@ -69,14 +72,14 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                 var setTreeStateFileInfoRequest = new SetTreeStateRequest
                 {
-                    FileInformation = new FileInformation { FileName = tagData.Link }
+                    FileInformation = new FileInformation { FileName = treeNodeData.Link }
                 };
                 await _mediator.Send(setTreeStateFileInfoRequest, cancellationToken);
 
                 if (await _mediator.Send(new GetTreeStateRequest(), cancellationToken) is not GetTreeStateResponse getTreeStateResponseUpdated)
                     return null;
 
-                var root = treeView.ToTreeNodeData(_treeNodeDataCachingService);
+                var root = _treeNodeToTreeNodeDataAdapter.AdaptTreeView(treeView);
                 _exportTreeToXmlService.SaveTree(root, getTreeStateResponseUpdated.FileName);
 
                 setTreeStateFileInfoRequest = new SetTreeStateRequest

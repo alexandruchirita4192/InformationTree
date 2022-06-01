@@ -14,14 +14,14 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     internal class SearchBoxKeyUpHandler : IRequestHandler<SearchBoxKeyUpRequest, BaseResponse>
     {
         private readonly ICachingService _cachingService;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
 
         public SearchBoxKeyUpHandler(
             ICachingService cachingService,
-            ITreeNodeDataCachingService treeNodeDataCachingService)
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
         {
             _cachingService = cachingService;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public Task<BaseResponse> Handle(SearchBoxKeyUpRequest request, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                 if (searchText.IsNotEmpty())
                 {
-                    tvTaskList.Nodes.SetStyleForSearch(searchText, _treeNodeDataCachingService);
+                    tvTaskList.Nodes.SetStyleForSearch(searchText, _treeNodeToTreeNodeDataAdapter);
                 }
             }
             

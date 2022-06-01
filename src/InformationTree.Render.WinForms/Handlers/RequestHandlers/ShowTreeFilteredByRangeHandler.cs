@@ -15,16 +15,16 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     public class ShowTreeFilteredByRangeHandler : IRequestHandler<ShowTreeFilteredByRangeRequest, BaseResponse>
     {
         private readonly IMediator _mediator;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
         private readonly ICachingService _cachingService;
 
         public ShowTreeFilteredByRangeHandler(
             IMediator mediator,
-            ITreeNodeDataCachingService treeNodeDataCachingService,
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             ICachingService cachingService)
         {
             _mediator = mediator;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
             _cachingService = cachingService;
         }
 
@@ -110,12 +110,12 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 nodes.Clear();
 
                 // Copy tree to cache to save current tree state
-                nodes.Copy(tvTaskList.Nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
+                nodes.Copy(tvTaskList.Nodes, _treeNodeToTreeNodeDataAdapter, null, null, CopyNodeFilterType.NoFilter);
                 _cachingService.Set(Constants.CacheKeys.NodesList, nodes);
 
                 // Update tree view with filtered nodes
                 tvTaskList.Nodes.Clear();
-                tvTaskList.Nodes.Copy(nodes, _treeNodeDataCachingService, (int)filterHigherThan, (int)filterLowerThan, filterType);
+                tvTaskList.Nodes.Copy(nodes, _treeNodeToTreeNodeDataAdapter, (int)filterHigherThan, (int)filterLowerThan, filterType);
             }
             else
             {
@@ -123,7 +123,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 tvTaskList.Nodes.Clear();
 
                 // Copy tree back from cache to tree view to restore current tree state
-                tvTaskList.Nodes.Copy(nodes, _treeNodeDataCachingService, null, null, CopyNodeFilterType.NoFilter);
+                tvTaskList.Nodes.Copy(nodes, _treeNodeToTreeNodeDataAdapter, null, null, CopyNodeFilterType.NoFilter);
             }
 
             // Update read only state that keeps track of whether the tree is filtered or not

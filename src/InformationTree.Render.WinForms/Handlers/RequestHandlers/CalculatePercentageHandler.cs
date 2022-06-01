@@ -7,7 +7,6 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
@@ -15,15 +14,15 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
     public class CalculatePercentageHandler : IRequestHandler<CalculatePercentageRequest, BaseResponse>
     {
         private readonly IMediator _mediator;
-        private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
+        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
 
         public CalculatePercentageHandler(
             IMediator mediator,
-            ITreeNodeDataCachingService treeNodeDataCachingService
+            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter
             )
         {
             _mediator = mediator;
-            _treeNodeDataCachingService = treeNodeDataCachingService;
+            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
         }
 
         public async Task<BaseResponse> Handle(CalculatePercentageRequest request, CancellationToken cancellationToken)
@@ -35,7 +34,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 var percentage = GetPercentageFromChildren(selectedNode)
                     .ValidatePercentage();
-                selectedNode.ToTreeNodeData(_treeNodeDataCachingService)
+                _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
                     .PercentCompleted = percentage;
 
                 var setTreeStateRequest = new SetTreeStateRequest
@@ -46,7 +45,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             }
             else if (request.Direction == CalculatePercentageDirection.FromSelectedNodeToLeafs)
             {
-                var percentage = selectedNode.ToTreeNodeData(_treeNodeDataCachingService)
+                var percentage = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
                     .PercentCompleted
                     .ValidatePercentage();
                 
@@ -73,7 +72,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 if (node != null && node.Nodes.Count > 0)
                 {
                     var procentCompleted = GetPercentageFromChildren(node);
-                    var procentCompletedForCurrentNode = node.ToTreeNodeData(_treeNodeDataCachingService)
+                    var procentCompletedForCurrentNode = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                         .PercentCompleted
                         .ValidatePercentage();
                     procentCompleted += procentCompletedForCurrentNode;
@@ -82,7 +81,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 }
                 else
                 {
-                    var procentCompleted = node.ToTreeNodeData(_treeNodeDataCachingService)
+                    var procentCompleted = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                         .PercentCompleted
                         .ValidatePercentage();
                     sum += procentCompleted;
@@ -104,7 +103,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             {
                 if (node != null)
                 {
-                    node.ToTreeNodeData(_treeNodeDataCachingService)
+                    _treeNodeToTreeNodeDataAdapter.Adapt(node)
                         .PercentCompleted = percentage;
                     if (node.Nodes.Count > 0)
                         SetPercentageToChildren(node, percentage);

@@ -14,6 +14,7 @@ using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
+    // TODO: Make another request and handler that doesn't use the RicherTextBox and call it here (move all logic to it)
     public class PgpEncryptDecryptDataHandler : IRequestHandler<PgpEncryptDecryptDataRequest, BaseResponse>
     {
         #region Fields
@@ -43,7 +44,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         private PgpEncryptDecryptDataRequest _request;
         private RicherTextBox.Controls.RicherTextBox _tbData;
         private Label _lblEncryption;
-        private PopUpEditForm _popUpEditForm;
+        private Form _formToCenterTo;
 
         #endregion Request
 
@@ -67,22 +68,22 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             if (request.DataRicherTextBox is not RicherTextBox.Controls.RicherTextBox tbData)
                 return Task.FromResult<BaseResponse>(null);
             if (request.EncryptionLabel is not Label lblEncryption)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.PopUpEditForm is not PopUpEditForm popUpEditForm)
+                lblEncryption = null; // Allow requests without an encryption label, this is information only
+            if (request.FormToCenterTo is not Form formToCenterTo)
                 return Task.FromResult<BaseResponse>(null);
 
-            SetFields(request, tbData, lblEncryption, popUpEditForm);
+            SetFields(request, tbData, lblEncryption, formToCenterTo);
             var result = InternalHandle();
 
             return Task.FromResult(result);
         }
 
-        private void SetFields(PgpEncryptDecryptDataRequest request, RicherTextBox.Controls.RicherTextBox tbData, Label lblEncryption, PopUpEditForm popUpEditForm)
+        private void SetFields(PgpEncryptDecryptDataRequest request, RicherTextBox.Controls.RicherTextBox tbData, Label lblEncryption, Form formToCenterTo)
         {
             _request = request;
             _tbData = tbData;
             _lblEncryption = lblEncryption;
-            _popUpEditForm = popUpEditForm;
+            _formToCenterTo = formToCenterTo;
             _response = new PgpEncryptDecryptDataResponse();
         }
 
@@ -116,7 +117,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                         {
                             _response.Data = null;
                             _tbData.Text = resultedText;
-                            _lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
+                            
+                            if (_lblEncryption != null)
+                                _lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
                         }
                         return _response;
                     }
@@ -134,7 +137,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                         {
                             _response.Data = null;
                             _tbData.Text = resultedText;
-                            _lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
+
+                            if (_lblEncryption != null)
+                                _lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
                         }
                         return _response;
                     }
@@ -160,7 +165,9 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                     {
                         _response.Data = null;
                         _tbData.Text = resultedText;
-                        _lblEncryption.Text = "Encrypted with node key";
+
+                        if (_lblEncryption != null)
+                            _lblEncryption.Text = "Encrypted with node key";
                     }
                     return _response;
                 }
@@ -224,7 +231,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             if (titleOverride.IsNotEmpty())
                 form.Text = titleOverride;
 
-            WinFormsApplication.CenterForm(form, _popUpEditForm);
+            WinFormsApplication.CenterForm(form, _formToCenterTo);
 
             form.FormClosed += PgpDecryptForm_FormClosed;
             form.ShowDialog();
@@ -242,12 +249,16 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 if (_request.FromFile)
                 {
                     result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(_tbData.Text, _pgpPrivateKeyFile, _pgpPassword);
-                    _lblEncryption.Text = $"Decrypted with key: {_pgpPrivateKeyFile}";
+
+                    if (_lblEncryption != null)
+                        _lblEncryption.Text = $"Decrypted with key: {_pgpPrivateKeyFile}";
                 }
                 else
                 {
                     result = _encryptionAndSigningProvider.GetDecryptedStringFromString(_tbData.Text, _pgpPrivateKeyText, _pgpPassword);
-                    _lblEncryption.Text = "Decrypted with node key";
+
+                    if (_lblEncryption != null)
+                        _lblEncryption.Text = "Decrypted with node key";
                 }
 
                 _tbData.Rtf = result;
