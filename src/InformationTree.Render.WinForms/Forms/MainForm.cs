@@ -495,7 +495,53 @@ namespace InformationTree.Forms
             await _mediator.Send(updateNodeCountRequest);
 
             // TODO: Fix properly
-            btnUpdateText_Click(sender, e); // workaround fix for some weirdly added spaces
+            // workaround fix for some weirdly added spaces
+            if (tvTaskList.SelectedNode == null)
+                return;
+
+            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
+            var updateTextClickRequest = new UpdateTextClickRequest
+            {
+                SelectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
+                TaskPercentCompleted = nudCompleteProgress.Value,
+                TaskName = tbTaskName.Text,
+                Link = tbLink.Text,
+                Urgency = (int)nudUrgency.Value,
+                Category = tbCategory.Text,
+                IsStartupAlert = cbIsStartupAlert.Checked,
+                TaskListTreeView = tvTaskList,
+                AfterSelectRequest = new TaskListAfterSelectRequest
+                {
+                    TreeView = tvTaskList,
+                    Form = this,
+                    SelectedNode = tvTaskList.SelectedNode,
+                    SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
+                    TaskPercentCompleted = nudCompleteProgress.Value,
+                    StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                    TimeSpentGroupBox = gbTimeSpent,
+                    StyleCheckedListBox = clbStyle,
+                    FontFamilyComboBox = cbFontFamily,
+                    TaskNameTextBox = tbTaskName,
+                    AddedDateTextBox = tbAddedDate,
+                    LastChangeDateTextBox = tbLastChangeDate,
+                    AddedNumberTextBox = tbAddedNumber,
+                    UrgencyNumericUpDown = nudUrgency,
+                    LinkTextBox = tbLink,
+                    IsStartupAlertCheckBox = cbIsStartupAlert,
+                    CompleteProgressNumericUpDown = nudCompleteProgress,
+                    CategoryTextBox = tbCategory,
+                    DataSizeTextBox = tbDataSize,
+                    HoursNumericUpDown = nudHours,
+                    MinutesNumericUpDown = nudMinutes,
+                    SecondsNumericUpDown = nudSeconds,
+                    MillisecondsNumericUpDown = nudMilliseconds,
+                    FontSizeNumericUpDown = nudFontSize,
+                    TextColorTextBox = tbTextColor,
+                    BackgroundColorTextBox = tbBackgroundColor,
+                }
+            };
+
+            await _mediator.Send(updateTextClickRequest);
         }
 
         private async void btnDelete_Click(object sender, EventArgs e)
@@ -1374,9 +1420,10 @@ namespace InformationTree.Forms
             if (_configuration.ApplicationFeatures.EnableAlerts == false)
                 return;
 
-            var ticks = DateTime.Now.Ticks;
-            // TODO: Maybe remove unchecked but still make this work for exceptional cases (maybe with try-catch?)
-            var ticksSeedAsInt = unchecked((int)ticks);
+            var ticksSeedAsInt = DateTime.Now
+                .Ticks
+                .ToInt();
+            
             var interval = 0;
 
             while (interval == 0)
