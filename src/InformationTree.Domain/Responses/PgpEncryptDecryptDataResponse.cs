@@ -2,6 +2,8 @@
 {
     public class PgpEncryptDecryptDataResponse : BaseResponse
     {
-        public string Data { get; set; }
+        public string ResultText { get; set; }
+        public string ResultRtf { get; set; }
+        public string EncryptionInfo { get; set; }
     }
 }

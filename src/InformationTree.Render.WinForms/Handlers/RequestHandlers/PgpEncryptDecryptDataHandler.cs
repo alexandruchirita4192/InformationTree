@@ -14,10 +14,18 @@ using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
-    // TODO: Make another request and handler that doesn't use the RicherTextBox and call it here (move all logic to it)
     public class PgpEncryptDecryptDataHandler : IRequestHandler<PgpEncryptDecryptDataRequest, BaseResponse>
     {
-        #region Fields
+        public PgpEncryptDecryptDataHandler(
+            IPopUpService popUpService,
+            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
+            IConfigurationReader configurationReader)
+        {
+            _popUpService = popUpService;
+            _encryptionAndSigningProvider = encryptionAndSigningProvider;
+            _configurationReader = configurationReader;
+            _configuration = _configurationReader.GetConfiguration();
+        }
 
         #region Services
 
@@ -42,49 +50,22 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         #region Request
 
         private PgpEncryptDecryptDataRequest _request;
-        private RicherTextBox.Controls.RicherTextBox _tbData;
-        private Label _lblEncryption;
         private Form _formToCenterTo;
 
         #endregion Request
 
         private PgpEncryptDecryptDataResponse _response;
 
-        #endregion Fields
-
-        public PgpEncryptDecryptDataHandler(
-            IPopUpService popUpService,
-            IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            IConfigurationReader configurationReader)
-        {
-            _popUpService = popUpService;
-            _encryptionAndSigningProvider = encryptionAndSigningProvider;
-            _configurationReader = configurationReader;
-            _configuration = _configurationReader.GetConfiguration();
-        }
-
         public Task<BaseResponse> Handle(PgpEncryptDecryptDataRequest request, CancellationToken cancellationToken)
         {
-            if (request.DataRicherTextBox is not RicherTextBox.Controls.RicherTextBox tbData)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.EncryptionLabel is not Label lblEncryption)
-                lblEncryption = null; // Allow requests without an encryption label, this is information only
-            if (request.FormToCenterTo is not Form formToCenterTo)
+            if (request.FormToCenterTo is not Form formCenterTo)
                 return Task.FromResult<BaseResponse>(null);
 
-            SetFields(request, tbData, lblEncryption, formToCenterTo);
-            var result = InternalHandle();
-
-            return Task.FromResult(result);
-        }
-
-        private void SetFields(PgpEncryptDecryptDataRequest request, RicherTextBox.Controls.RicherTextBox tbData, Label lblEncryption, Form formToCenterTo)
-        {
             _request = request;
-            _tbData = tbData;
-            _lblEncryption = lblEncryption;
-            _formToCenterTo = formToCenterTo;
+            _formToCenterTo = formCenterTo;
             _response = new PgpEncryptDecryptDataResponse();
+
+            return Task.FromResult(InternalHandle());
         }
 
         private BaseResponse InternalHandle()
@@ -92,7 +73,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             if (_request.ActionType == PgpActionType.Encrypt)
             {
                 var result = _popUpService.ShowQuestion("Do you want to encrypt as RTF? (Otherwise it would be text only.)", "Encrypt as RTF?", DefaultPopUpButton.No);
-                var decryptedData = result == PopUpResult.Yes ? _tbData.Rtf : _tbData.Text;
+                var decryptedData = result == PopUpResult.Yes ? _request.InputDataRtf : _request.InputDataText;
 
                 if (decryptedData.IsEmpty())
                 {
@@ -110,16 +91,13 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
                         GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
 
-                        var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(_tbData.Rtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
+                        var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(_request.InputDataRtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
                         resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
 
-                        if (_tbData.Text != resultedText)
+                        if (_request.InputDataText != resultedText)
                         {
-                            _response.Data = null;
-                            _tbData.Text = resultedText;
-                            
-                            if (_lblEncryption != null)
-                                _lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
+                            _response.ResultText = resultedText;
+                            _response.EncryptionInfo = $"Encrypted with key: {_pgpPublicKeyFile}";
                         }
                         return _response;
                     }
@@ -133,13 +111,10 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                         using var reader = new StreamReader(outputStream);
 
                         var resultedText = reader.ReadToEnd();
-                        if (_tbData.Text != resultedText)
+                        if (_request.InputDataText != resultedText)
                         {
-                            _response.Data = null;
-                            _tbData.Text = resultedText;
-
-                            if (_lblEncryption != null)
-                                _lblEncryption.Text = $"Encrypted with key: {_pgpPublicKeyFile}";
+                            _response.ResultText = resultedText;
+                            _response.EncryptionInfo = $"Encrypted with key: {_pgpPublicKeyFile}";
                         }
                         return _response;
                     }
@@ -153,28 +128,25 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                     {
                         GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
 
-                        resultedText = _encryptionAndSigningProvider.EncryptAndSignString(_tbData.Rtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
+                        resultedText = _encryptionAndSigningProvider.EncryptAndSignString(_request.InputDataRtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
                     }
                     else
                     {
-                        resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(_tbData.Rtf, _pgpPublicKeyText, true, true);
+                        resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(_request.InputDataRtf, _pgpPublicKeyText, true, true);
                     }
                     resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
 
-                    if (_tbData.Text != resultedText)
+                    if (_request.InputDataText != resultedText)
                     {
-                        _response.Data = null;
-                        _tbData.Text = resultedText;
-
-                        if (_lblEncryption != null)
-                            _lblEncryption.Text = "Encrypted with node key";
+                        _response.ResultText = resultedText;
+                        _response.EncryptionInfo = "Encrypted with node key";
                     }
                     return _response;
                 }
             }
             else if (_request.ActionType == PgpActionType.Decrypt)
             {
-                if (_tbData.Text.IsEmpty())
+                if (_request.InputDataText.IsEmpty())
                 {
                     _popUpService.ShowError("No data to decrypt.");
                     return null;
@@ -248,20 +220,18 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 string result;
                 if (_request.FromFile)
                 {
-                    result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(_tbData.Text, _pgpPrivateKeyFile, _pgpPassword);
+                    result = _encryptionAndSigningProvider.GetDecryptedStringFromFile(_request.InputDataText, _pgpPrivateKeyFile, _pgpPassword);
 
-                    if (_lblEncryption != null)
-                        _lblEncryption.Text = $"Decrypted with key: {_pgpPrivateKeyFile}";
+                    _response.EncryptionInfo = $"Decrypted with key: {_pgpPrivateKeyFile}";
                 }
                 else
                 {
-                    result = _encryptionAndSigningProvider.GetDecryptedStringFromString(_tbData.Text, _pgpPrivateKeyText, _pgpPassword);
+                    result = _encryptionAndSigningProvider.GetDecryptedStringFromString(_request.InputDataText, _pgpPrivateKeyText, _pgpPassword);
 
-                    if (_lblEncryption != null)
-                        _lblEncryption.Text = "Decrypted with node key";
+                    _response.EncryptionInfo = "Decrypted with node key";
                 }
 
-                _tbData.Rtf = result;
+                _response.ResultRtf = result;
             }
         }
     }

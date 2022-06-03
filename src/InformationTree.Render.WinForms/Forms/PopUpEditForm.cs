@@ -371,7 +371,7 @@ namespace InformationTree.Forms
         {
             data = cbKeepCrypt.Checked ? Data : null;
 
-            var request = new PgpEncryptDecryptDataRequest
+            var request = new PgpEncryptDecryptDataForRicherTextBoxRequest
             {
                 DataRicherTextBox = tbData,
                 EncryptionLabel = lblEncryption,
@@ -380,15 +380,16 @@ namespace InformationTree.Forms
                 DataIsPgpEncrypted = DataIsPgpEncrypted,
                 FormToCenterTo = this
             };
-            
-            if (await _mediator.Send(request) is not PgpEncryptDecryptDataResponse response)
+
+            if (await _mediator.Send(request) is not PgpEncryptDecryptDataForRicherTextBoxResponse response)
                 return;
-            data = response.Data;
+            if (response.DataIsNull)
+                data = null;
         }
 
         private async void btnPgpEncryptData_Click(object sender, EventArgs e)
         {
-            var request = new PgpEncryptDecryptDataRequest
+            var request = new PgpEncryptDecryptDataForRicherTextBoxRequest
             {
                 DataRicherTextBox = tbData,
                 EncryptionLabel = lblEncryption,
@@ -397,10 +398,11 @@ namespace InformationTree.Forms
                 DataIsPgpEncrypted = DataIsPgpEncrypted,
                 FormToCenterTo = this
             };
-            
-            if (await _mediator.Send(request) is not PgpEncryptDecryptDataResponse response)
+
+            if (await _mediator.Send(request) is not PgpEncryptDecryptDataForRicherTextBoxResponse response)
                 return;
-            data = response.Data;
+            if (response.DataIsNull)
+                data = null;
         }
 
         private void PopUpEditForm_DoubleClick(object sender, EventArgs e)
