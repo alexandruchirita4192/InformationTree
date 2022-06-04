@@ -75,7 +75,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                         var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
                         treeNodeData.Data = popUpReturnedData;
 
-                        var strippedData = RicherTextBox.Controls.RicherTextBox.StripRTF(popUpReturnedData);
+                        var strippedData = popUpReturnedData.StripRTF();
                         selectedNode.ToolTipText = (selectedNode.Text +
                             (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
                             (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""))

@@ -15,6 +15,7 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
+using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 using NLog;
 
@@ -286,7 +287,7 @@ namespace InformationTree.Render.WinForms.Services
             
             attrPercentCompleted = attrPercentCompleted.ValidatePercentage();
 
-            var attrDataStripped = RicherTextBox.Controls.RicherTextBox.StripRTF(attrData);
+            var attrDataStripped = attrData.StripRTF();
             var tooltipText = (attrText +
                 (attrName.IsNotEmpty() && attrName != "0" ? $"{Environment.NewLine} TimeSpent: {attrName}" : "") +
                 (attrDataStripped.IsNotEmpty() ? $"{Environment.NewLine} Data: {attrDataStripped}" : ""))

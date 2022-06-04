@@ -98,7 +98,7 @@ namespace InformationTree.Forms
                 var nodeData = WinFormsApplication.MainForm.TaskListRoot.GetFirstNodeWith(textToFind);
                 if (nodeData != null)
                 {
-                    PgpPrivateKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
+                    PgpPrivateKeyText = nodeData.Data.StripRTF();
 
                     _popUpService.ShowMessage($"Private key taken from data of node {nodeData.Text}", $"Node {nodeData.Text} used");
                 }
