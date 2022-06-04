@@ -294,6 +294,7 @@ namespace InformationTree.Forms
 
         #endregion Constructor
 
+        // Handler for PopUpEditFormProcessCmdKeyRequest
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
@@ -330,17 +331,20 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for PopUpEditFormExitPopUpAndSaveClickRequest
         private void tbExitPopUpAndSave_Click(object sender, EventArgs e)
         {
             if (ReferenceEquals(sender, tbExitPopUpAndSave))
                 Close();
         }
 
+        // TODO: Handler for PopUpEditFormDataLinkClickedRequest
         private void tbData_LinkClicked(object sender, LinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.LinkText);
         }
 
+        // TODO: Handler for PopUpEditFormDataKeyUpRequest
         private void tbData_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyData == (Keys.B | Keys.Control))
@@ -365,6 +369,7 @@ namespace InformationTree.Forms
                 tbData.InsertPicture();
         }
 
+        // TODO: Handler for PopUpEditFormPgpDecryptDataClickRequest
         private async void btnPgpDecryptData_Click(object sender, EventArgs e)
         {
             data = cbKeepCrypt.Checked ? Data : null;
@@ -403,17 +408,22 @@ namespace InformationTree.Forms
                 data = null;
         }
 
+        // TODO: Handler for PopUpEditFormDoubleClickRequest
         private void PopUpEditForm_DoubleClick(object sender, EventArgs e)
         {
             FormBorderStyle = FormBorderStyle == FormBorderStyle.Sizable ? FormBorderStyle.None : FormBorderStyle.Sizable;
         }
 
+        // TODO: Handler for FormKeyUpRequest (try to reuse FormCloseRequest here if possible,
+        // search for other handlers because all forms might want to close when Esc is pressed,
+        // try to reuse this in other handlers if possible too)
         private void PopUpEditForm_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
                 Close();
         }
 
+        // TODO: Handler for PopUpEditFormCalculateClickRequest
         private void btnCalculate_Click(object sender, EventArgs e)
         {
             // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service which should implement basic calculation functions
@@ -421,6 +431,7 @@ namespace InformationTree.Forms
             _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
         }
 
+        // TODO: Handler for PopUpEditFormShowGraphicsClickRequest
         private void btnShowGraphics_Click(object sender, EventArgs e)
         {
             var text = tbData.TextBox.SelectedText.Length > 0 ? tbData.TextBox.SelectedText : tbData.TextBox.Text;

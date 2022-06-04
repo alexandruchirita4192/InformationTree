@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Extensions;
 using InformationTree.Render.WinForms.Extensions;
 
 namespace InformationTree.Forms
@@ -63,6 +64,7 @@ namespace InformationTree.Forms
 
         #region Handlers
 
+        // TODO: Handler for LoadingFormTimerElapsedRequest
         private void T_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (pbFileLoad.Style != ProgressBarStyle.Marquee)
@@ -82,6 +84,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for LoadingFormIconPaintRequest
         private void pbIcon_Paint(object sender, PaintEventArgs e)
         {
             var currentAssembly = Assembly.GetEntryAssembly();
@@ -89,7 +92,7 @@ namespace InformationTree.Forms
                 return;
 
             var currentAssemblyLocation = currentAssembly.Location;
-            if (string.IsNullOrEmpty(currentAssemblyLocation))
+            if (currentAssemblyLocation.IsEmpty())
                 return;
 
             var extractedIconFromCurrentAssembly = Icon.ExtractAssociatedIcon(currentAssemblyLocation);
@@ -99,6 +102,7 @@ namespace InformationTree.Forms
             e.Graphics.DrawIcon(extractedIconFromCurrentAssembly, 0, 0);
         }
 
+        // TODO: Handler for LoadingFormLoadingGraphicsPaintRequest
         private void pbLoadingGraphics_Paint(object sender, PaintEventArgs e)
         {
             GraphicsFile.Show(e.Graphics);

@@ -30,6 +30,7 @@ namespace InformationTree.Forms
             StartPosition = FormStartPosition.CenterScreen;
         }
 
+        // TODO: Handler for FormCloseRequest
         private void btnSelectTaskOrCategory_Click(object sender, EventArgs e)
         {
             Close();

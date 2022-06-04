@@ -32,6 +32,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for SearchFormFindKeyUpRequest (reuse Handler for FormKeyUpRequest or FormCloseRequest if possible)
         private void tbFind_KeyUp(object sender, KeyEventArgs e)
         {
             if (object.ReferenceEquals(tbFind, sender) && e.KeyData == Keys.Enter)

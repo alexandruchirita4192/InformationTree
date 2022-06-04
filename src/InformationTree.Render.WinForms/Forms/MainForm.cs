@@ -315,6 +315,7 @@ namespace InformationTree.Forms
             await _mediator.Send(taskListAfterSelectRequest);
         }
 
+        // TODO: Handler for MainFormNoTaskClickRequest
         private async void btnNoTask_Click(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode == null)
@@ -409,6 +410,7 @@ namespace InformationTree.Forms
             await _mediator.Send(updateTextClickRequest);
         }
 
+        // TODO: Handler for MainFormAddTaskClickRequest
         private async void btnAddTask_Click(object sender, EventArgs e)
         {
             var taskPercentCompleted = nudCompleteProgress.Value;
@@ -590,6 +592,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormCompleteProgressValueChangedRequest
         private async void nudCompleteProgress_ValueChanged(object sender, EventArgs e)
         {
             pbPercentComplete.Maximum = 100;
@@ -614,6 +617,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormStartCountingClickRequest
         private void btnStartCounting_Click(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
@@ -624,6 +628,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormStopCountingClickRequest
         private void btnStopCounting_Click(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
@@ -654,11 +659,13 @@ namespace InformationTree.Forms
             gbTaskList.Enabled = true;
         }
 
+        // TODO: Handler for TreeViewExpandOrCollapseRequest (ChangeType=Expand,Collapse)
         private void btnExpand_Click(object sender, EventArgs e)
         {
             tvTaskList.ExpandAll();
         }
 
+        // TODO: Handler for TreeViewExpandOrCollapseRequest (ChangeType=Expand,Collapse)
         private void btnCollapse_Click(object sender, EventArgs e)
         {
             tvTaskList.CollapseAll();
@@ -695,6 +702,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormFontSizeValueChangedRequest
         public async void nudFontSize_ValueChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
@@ -714,6 +722,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormStyleItemCheckRequest
         public async void clbStyle_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
@@ -773,6 +782,7 @@ namespace InformationTree.Forms
             return currentFontStyle;
         }
 
+        // TODO: Handler for MainFormColorTextChangedRequest, ColorType=TextColor, BackColor
         private async void tbTextColor_TextChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
@@ -788,6 +798,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormColorTextChangedRequest, ColorType=TextColor, BackColor
         private async void tbBackgroundColor_TextChanged(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode != null)
@@ -821,6 +832,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormColorMoveTaskRequest, MoveDirection=Up,Down
         private async void btnMoveTaskUp_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
@@ -857,6 +869,7 @@ namespace InformationTree.Forms
             await _mediator.Send(setTreeStateRequest);
         }
 
+        // TODO: Handler for MainFormColorMoveTaskRequest, MoveDirection=Up,Down
         private async void btnMoveTaskDown_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
@@ -895,6 +908,7 @@ namespace InformationTree.Forms
             await _mediator.Send(setTreeStateRequest);
         }
 
+        // TODO: Handler for MainFormResetExceptionClickRequest
         private async void btnResetException_Click(object sender, EventArgs e)
         {
             var setTreeStateRequest = new SetTreeStateRequest
@@ -966,6 +980,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormDoNotSaveClickRequest
         private async void btnDoNotSave_Click(object sender, EventArgs e)
         {
             var setTreeStateRequest = new SetTreeStateRequest
@@ -999,6 +1014,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormTreeViewDoubleClickRequest
         public async void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
             var node = tvTaskList.SelectedNode;
@@ -1070,6 +1086,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormGoToDefaultTreeClickRequest
         private async void btnGoToDefaultTree_Click(object sender, EventArgs e)
         {
             (_, var fileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
@@ -1109,6 +1126,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormShowCanvasPopUpClickRequest
         private void btnShowCanvasPopUp_Click(object sender, EventArgs e)
         {
             var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
@@ -1160,6 +1178,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormExecCommandClickRequest
         private void btnExecCommand_Click(object sender, EventArgs e)
         {
             if (tbCommand.Lines.Length <= 0)
@@ -1190,6 +1209,7 @@ namespace InformationTree.Forms
             _canvasForm.Show();
         }
 
+        // TODO: Handler for MainFormDeleteCanvasClickRequest
         private void btnDeleteCanvas_Click(object sender, EventArgs e)
         {
             var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
@@ -1202,6 +1222,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormGenerateClickRequest
         private async void btnGenerate_Click(object sender, EventArgs e)
         {
             var x = (double)nudX.Value;
@@ -1240,6 +1261,7 @@ namespace InformationTree.Forms
                 tbCommand.Lines = _graphicsFileRecursiveGenerator.GenerateFigureLines(points, x, y, radius, theta, number, iterations, computeType).Distinct().ToArray();
         }
 
+        // TODO: Handler for MainFormUseDefaultsCheckedChangedRequest
         private void cbUseDefaults_CheckedChanged(object sender, EventArgs e)
         {
             var cbUseDefaultsChecked = cbUseDefaults.Checked;
@@ -1260,6 +1282,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormGenerateFiguresAndExecClickRequest
         private void btnGenerateFiguresAndExec_Click(object sender, EventArgs e)
         {
             btnGenerate_Click(sender, e);
@@ -1267,6 +1290,7 @@ namespace InformationTree.Forms
             btnExecCommand_Click(sender, e);
         }
 
+        // TODO: Handler for MainFormUnchangedClickRequest
         private async void lblUnchanged_Click(object sender, EventArgs e)
         {
             if (await _mediator.Send(new GetTreeStateRequest()) is not GetTreeStateResponse getTreeStateResponse)
@@ -1279,11 +1303,13 @@ namespace InformationTree.Forms
             await _mediator.Send(setTreeStateRequest);
         }
 
+        // TODO: Handler for MainFormKeyUpRequest
         public void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, false);
         }
 
+        // TODO: Handler for MainFormTreeViewKeyDownRequest
         public async void tvTaskList_KeyDown(object sender, KeyEventArgs e)
         {
             _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, e.Control);
@@ -1367,6 +1393,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormTreeViewMouseClickRequest
         public async void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
             var isControlKeyPressed = _cachingService.Get<bool>(Constants.CacheKeys.IsControlKeyPressed);
@@ -1379,6 +1406,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormDoubleClickRequest
         private void MainForm_DoubleClick(object sender, EventArgs e)
         {
             if (FormBorderStyle == FormBorderStyle.Sizable)
@@ -1387,11 +1415,13 @@ namespace InformationTree.Forms
                 FormBorderStyle = FormBorderStyle.Sizable;
         }
 
+        // TODO: Handler for MainFormDoubleClickRequest
         private void tbTreeChange_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             MainForm_DoubleClick(sender, e);
         }
 
+        // TODO: Handler for MainFormChangeTreeTypeClickRequest
         private void lblChangeTreeType_Click(object sender, EventArgs e)
         {
             if (_randomTimer == null)
@@ -1412,7 +1442,6 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: I guess better this will be handled as an MediatR event and this will be solved, it will be separate handler for alerts (if possible with the timer access and all)
         private void RandomTimer_ChangeIntervalAndSound()
         {
             if (_randomTimer == null)
@@ -1437,6 +1466,7 @@ namespace InformationTree.Forms
             _cachingService.Set(Constants.CacheKeys.SoundNumber, soundNumber);
         }
 
+        // TODO: Handler for MainFormRandomTimerElapsedRequest
         private void RandomTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (_configuration.ApplicationFeatures.EnableAlerts == false)
@@ -1460,6 +1490,7 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
+        // TODO: Handler for MainFormShowChildrenAsListToolStripMenuItemClickRequest
         private void showChildrenAsListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var selectedItem = tvTaskList.SelectedNode;
@@ -1523,6 +1554,7 @@ namespace InformationTree.Forms
             }
         }
 
+        // TODO: Handler for MainFormExportToRtfClickRequest
         private void btnExportToRtf_Click(object sender, EventArgs e)
         {
             var selectedNode = tvTaskList.SelectedNode;
@@ -1554,6 +1586,7 @@ namespace InformationTree.Forms
             return treeNodeData;
         }
 
+        // TODO: Handler for MainFormDoubleClickRequest
         private void tbTask_DoubleClick(object sender, EventArgs e)
         {
             MainForm_DoubleClick(sender, e);
