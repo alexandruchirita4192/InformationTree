@@ -43,6 +43,7 @@ namespace InformationTree.Domain.Extensions
             }
             return convertedDateTime;
         }
+
         public static string GetToolTipText(this string text, int linesCount = 10, int charsCount = 200)
         {
             try
@@ -62,6 +63,23 @@ namespace InformationTree.Domain.Extensions
                 return text;
 
             return new string(text.Take(charsCount).ToArray()) + "[...]";
+        }
+
+        public static bool StartsWithSignature(this string testString, string signature)
+        {
+            return testString.IsNotEmpty()
+                && testString.Trim()
+                .StartsWith(signature);
+        }
+
+        public static bool IsRichText(this string testString)
+        {
+            return testString.StartsWithSignature("{\\rtf");
+        }
+
+        public static bool IsPgpEncrypted(this string testString)
+        {
+            return testString.StartsWithSignature("-----BEGIN PGP");
         }
     }
 }

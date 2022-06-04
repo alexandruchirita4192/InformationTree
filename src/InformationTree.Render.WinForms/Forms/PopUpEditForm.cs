@@ -60,9 +60,7 @@ namespace InformationTree.Forms
         {
             get
             {
-                return tbData.Text.IsNotEmpty()
-                    ? tbData.Text.Trim().StartsWith("-----BEGIN PGP")
-                    : false;
+                return tbData.Text.IsPgpEncrypted();
             }
         }
 

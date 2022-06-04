@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using NLog;
 
@@ -446,7 +447,7 @@ namespace RicherTextBox.Controls
             }
             set
             {
-                if (IsRichText(value))
+                if (value.IsRichText())
                 {
                     try
                     {
@@ -904,39 +905,6 @@ namespace RicherTextBox.Controls
         #region Public methods
 
         public Func<string, string> EncryptFunction, DecryptFunction, CalculateFunction, TableFunction;
-
-        public static bool IsRichText(string testString)
-        {
-            return (testString != null) && (testString.Trim().StartsWith("{\\rtf"));
-        }
-
-        public static string StripRTF(string rtfString)
-        {
-            string result = rtfString;
-
-            try
-            {
-                if (IsRichText(rtfString))
-                {
-                    // Put body into a RichTextBox so we can strip RTF
-                    using (var rtfTemp = new RichTextBox())
-                    {
-                        rtfTemp.Rtf = rtfString;
-                        result = rtfTemp.Text;
-                    }
-                }
-                else
-                {
-                    result = rtfString;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-            }
-
-            return result;
-        }
 
         public void SetFontFamily(FontFamily family)
         {

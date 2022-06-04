@@ -1469,34 +1469,58 @@ namespace InformationTree.Forms
 
         private async void encryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _popUpService.ShowWarning("Not implemented.");
-            // TODO: Call handler from btnPgpEncryptData_Click after it is a MediatR handler
-            //var request = new PgpEncryptDecryptDataRequest
-            //{
-            //    DataRicherTextBox = null, // TODO: Make another request and handler that doesn't use the RicherTextBox and call it here (move all logic to it)
-            //    EncryptionLabel = null,
-            //    FormToCenterTo = this,
-            //    ActionType = PgpActionType.Encrypt,
-            //    FromFile = false,
-            //    DataIsPgpEncrypted = false,
-            //};
-            //await _mediator.Send(request);
+            var mouseCoordinates = tvTaskList.PointToClient(Cursor.Position);
+            var treeNodeAtCoordinates = tvTaskList.GetNodeAt(mouseCoordinates);
+            var treeNodeDataAtCoordinates = _treeNodeToTreeNodeDataAdapter.Adapt(treeNodeAtCoordinates);
+
+            var data = treeNodeDataAtCoordinates.Data;
+            var dataStrippedRtf = data.StripRTF();
+            var isPgpEncrypted = dataStrippedRtf.IsPgpEncrypted();
+            
+            var request = new PgpEncryptDecryptDataRequest
+            {
+                InputDataRtf = data,
+                InputDataText = dataStrippedRtf,
+                FormToCenterTo = this,
+                ActionType = PgpActionType.Encrypt,
+                FromFile = false,
+                DataIsPgpEncrypted = isPgpEncrypted,
+            };
+            if (await _mediator.Send(request) is PgpEncryptDecryptDataResponse pgpEncryptDecryptDataResponse)
+            {
+                if (pgpEncryptDecryptDataResponse.ResultRtf.IsNotEmpty())
+                    treeNodeDataAtCoordinates.Data = pgpEncryptDecryptDataResponse.ResultRtf;
+                else if (pgpEncryptDecryptDataResponse.ResultText.IsNotEmpty())
+                    treeNodeDataAtCoordinates.Data = pgpEncryptDecryptDataResponse.ResultText;
+            }
         }
 
         private async void decryptToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _popUpService.ShowWarning("Not implemented.");
-            // TODO: Call handler from btnPgpEncryptData_Click after it is a MediatR handler
-            //var request = new PgpEncryptDecryptDataRequest
-            //{
-            //    DataRicherTextBox = null, // TODO: Make another request and handler that doesn't use the RicherTextBox and call it here (move all logic to it)
-            //    EncryptionLabel = null,
-            //    FormToCenterTo = this,
-            //    ActionType = PgpActionType.Decrypt,
-            //    FromFile = false,
-            //    DataIsPgpEncrypted = false,
-            //};
-            //await _mediator.Send(request);
+            var mouseCoordinates = tvTaskList.PointToClient(Cursor.Position);
+            var treeNodeAtCoordinates = tvTaskList.GetNodeAt(mouseCoordinates);
+            var treeNodeDataAtCoordinates = _treeNodeToTreeNodeDataAdapter.Adapt(treeNodeAtCoordinates);
+
+            var data = treeNodeDataAtCoordinates.Data;
+            var dataStrippedRtf = data.StripRTF();
+            var dataIsPgpEncrypted = dataStrippedRtf.IsPgpEncrypted();
+
+            var request = new PgpEncryptDecryptDataRequest
+            {
+                InputDataRtf = data,
+                InputDataText = dataStrippedRtf,
+                FormToCenterTo = this,
+                ActionType = PgpActionType.Decrypt,
+                FromFile = false,
+                DataIsPgpEncrypted = dataIsPgpEncrypted,
+            };
+            if (await _mediator.Send(request) is PgpEncryptDecryptDataResponse pgpEncryptDecryptDataResponse)
+            {
+                if (pgpEncryptDecryptDataResponse.ResultRtf.IsNotEmpty())
+                    treeNodeDataAtCoordinates.Data = pgpEncryptDecryptDataResponse.ResultRtf;
+                else if (pgpEncryptDecryptDataResponse.ResultText.IsNotEmpty())
+                    treeNodeDataAtCoordinates.Data = pgpEncryptDecryptDataResponse.ResultText;
+            }
         }
 
         private void btnExportToRtf_Click(object sender, EventArgs e)

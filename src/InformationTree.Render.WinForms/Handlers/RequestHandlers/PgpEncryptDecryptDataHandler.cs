@@ -92,7 +92,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                         GetPrivateKeyWithPassword("Get private key required for signing encrypted data");
 
                         var resultedText = _encryptionAndSigningProvider.EncryptAndSignString(_request.InputDataRtf, _pgpPublicKeyText, _pgpPrivateKeyText, _pgpPassword, true);
-                        resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
+                        resultedText = resultedText.StripRTF();
 
                         if (_request.InputDataText != resultedText)
                         {
@@ -134,7 +134,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                     {
                         resultedText = _encryptionAndSigningProvider.GetEncryptedStringFromString(_request.InputDataRtf, _pgpPublicKeyText, true, true);
                     }
-                    resultedText = RicherTextBox.Controls.RicherTextBox.StripRTF(resultedText);
+                    resultedText = resultedText.StripRTF();
 
                     if (_request.InputDataText != resultedText)
                     {
@@ -186,7 +186,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 var nodeData = WinFormsApplication.MainForm.TaskListRoot.GetFirstNodeWith(textToFind);
                 if (nodeData != null)
                 {
-                    _pgpPublicKeyText = RicherTextBox.Controls.RicherTextBox.StripRTF(nodeData.Data);
+                    _pgpPublicKeyText = nodeData.Data.StripRTF();
 
                     _popUpService.ShowMessage($"Public key taken from data of node {nodeData.Text}", $"Node {nodeData.Text} used");
                 }
