@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
-using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
@@ -31,7 +29,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             var selectedTask = tvTaskList.SelectedNode;
             var taskName = request.TaskNameText;
-            var deletedItemsWithName = InternalParseToDelete(tvTaskList, selectedTask, taskName, true);
+            var deletedItemsWithName = ParseToDelete(tvTaskList, selectedTask, taskName, true);
 
             if (deletedItemsWithName != 0)
             {
@@ -61,69 +59,40 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 }
             }
 
-            // TODO: After checking throughly delete zombie code and add a proper comment specifying exactly which event is called on "control delete"
-            //TreeNodeHelper.TreeUnchanged = false; // on control delete is added too
+            // on control delete TreeUnchanged is set false too (tvTaskList_ControlRemoved)
             return new BaseResponse();
         }
 
-        // TODO: Maybe refactor and join the following 2 methods (they had same name, have same parameters, have some common logic)
         private int ParseToDelete(TreeView tvTaskList, TreeNode selectedTask, string taskName, bool fakeDelete)
         {
             var deletedItemsWithName = 0;
 
             if (selectedTask != null && selectedTask.Text.Equals(taskName))
-                deletedItemsWithName = InternalParseToDelete(tvTaskList, selectedTask, taskName, fakeDelete);
+            {
+                if (!fakeDelete)
+                {
+                    selectedTask.Nodes.Clear();
+                    tvTaskList.Nodes.Remove(selectedTask);
+                }
+                deletedItemsWithName++;
+            }
             else
                 foreach (TreeNode node in tvTaskList.Nodes)
                 {
                     if (node != null && node.Text.Equals(taskName))
                     {
-                        node.Nodes.Clear();
-                        tvTaskList.Nodes.Remove(node);
-                    }
-                    if (node.Nodes.Count > 0)
-                        deletedItemsWithName = InternalParseToDelete(tvTaskList, node, taskName, fakeDelete);
-                }
-
-            return deletedItemsWithName;
-        }
-
-        private int InternalParseToDelete(TreeView tv, TreeNode topNode, string nodeNameToDelete, bool fakeDelete = true)
-        {
-            if (tv == null)
-                throw new ArgumentNullException(nameof(tv));
-            if (topNode == null)
-                throw new ArgumentNullException(nameof(topNode));
-            if (nodeNameToDelete.IsEmpty())
-                throw new ArgumentNullException(nameof(nodeNameToDelete));
-
-            int ret = 0;
-            if (topNode.Text.Equals(nodeNameToDelete))
-            {
-                if (!fakeDelete)
-                {
-                    topNode.Nodes.Clear();
-                    tv.Nodes.Remove(topNode);
-                }
-                ret++;
-            }
-            else
-                foreach (TreeNode node in topNode.Nodes)
-                {
-                    if (node != null && node.Text.Equals(nodeNameToDelete))
-                    {
                         if (!fakeDelete)
                         {
                             node.Nodes.Clear();
-                            tv.Nodes.Remove(node);
+                            tvTaskList.Nodes.Remove(node);
                         }
-
-                        ret++;
+                        deletedItemsWithName++;
                     }
-                    if (node != null && node.Nodes.Count > 0)
-                        ret += InternalParseToDelete(tv, node, nodeNameToDelete);
+                    if (node.Nodes.Count > 0)
+                        deletedItemsWithName += ParseToDelete(tvTaskList, node, taskName, fakeDelete);
                 }
-            return ret;
+
+            return deletedItemsWithName;
         }
     }
 }

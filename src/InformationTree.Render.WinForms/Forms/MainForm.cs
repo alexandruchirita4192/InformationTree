@@ -76,7 +76,7 @@ namespace InformationTree.Forms
             _cachingService = cachingService;
             _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
             _treeNodeDataToTreeNodeAdapter = treeNodeDataToTreeNodeAdapter;
-            
+
             InitializeComponent();
 
             // SetStyleTo(this, Color.Black, Color.White);
@@ -485,7 +485,7 @@ namespace InformationTree.Forms
 
                 tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
 
-                //TreeNodeHelper.TreeUnchanged = false; // on control add it is added too
+                // on control add TreeUnchanged is set false too (tvTaskList_ControlAdded
             }
 
             var updateNodeCountRequest = new UpdateNodeCountRequest
@@ -597,7 +597,7 @@ namespace InformationTree.Forms
         {
             pbPercentComplete.Maximum = 100;
             pbPercentComplete.Value = (int)nudCompleteProgress.Value;
-            
+
             if (tvTaskList.SelectedNode != null)
             {
                 _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode)
@@ -1452,7 +1452,7 @@ namespace InformationTree.Forms
             var ticksSeedAsInt = DateTime.Now
                 .Ticks
                 .ToInt();
-            
+
             var interval = 0;
 
             while (interval == 0)
@@ -1507,7 +1507,7 @@ namespace InformationTree.Forms
             var data = treeNodeDataAtCoordinates.Data;
             var dataStrippedRtf = data.StripRTF();
             var isPgpEncrypted = dataStrippedRtf.IsPgpEncrypted();
-            
+
             var request = new PgpEncryptDecryptDataRequest
             {
                 InputDataRtf = data,
