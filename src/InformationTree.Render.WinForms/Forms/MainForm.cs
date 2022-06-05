@@ -710,24 +710,14 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormFontSizeValueChangedRequest
         public async void nudFontSize_ValueChanged(object sender, EventArgs e)
         {
-            if (tvTaskList.SelectedNode != null)
+            var request = new MainFormFontSizeValueChangedRequest
             {
-                var oldFont = tvTaskList.SelectedNode.NodeFont;
-                if (oldFont != null)
-                {
-                    tvTaskList.SelectedNode.NodeFont = new Font(oldFont.FontFamily, (float)nudFontSize.Value, oldFont.Style);
-
-                    // on font changed is added too??
-                    var setTreeStateRequest = new SetTreeStateRequest
-                    {
-                        TreeUnchanged = false
-                    };
-                    await _mediator.Send(setTreeStateRequest);
-                }
-            }
+                SelectedTreeNode = tvTaskList.SelectedNode,
+                FontSizeNumericUpDown = nudFontSize,
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormStyleItemCheckRequest
