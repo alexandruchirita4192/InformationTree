@@ -659,16 +659,24 @@ namespace InformationTree.Forms
             gbTaskList.Enabled = true;
         }
 
-        // TODO: Handler for TreeViewExpandOrCollapseRequest (ChangeType=Expand,Collapse)
-        private void btnExpand_Click(object sender, EventArgs e)
+        private async void btnExpand_Click(object sender, EventArgs e)
         {
-            tvTaskList.ExpandAll();
+            var request = new TreeViewExpandOrCollapseRequest
+            {
+                TreeView = tvTaskList,
+                ChangeType = ExpandOrCollapseChangeType.ExpandAll,
+            };
+            await _mediator.Send(request);
         }
 
-        // TODO: Handler for TreeViewExpandOrCollapseRequest (ChangeType=Expand,Collapse)
-        private void btnCollapse_Click(object sender, EventArgs e)
+        private async void btnCollapse_Click(object sender, EventArgs e)
         {
-            tvTaskList.CollapseAll();
+            var request = new TreeViewExpandOrCollapseRequest
+            {
+                TreeView = tvTaskList,
+                ChangeType = ExpandOrCollapseChangeType.CollapseAll,
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnCalculatePercentageFromLeafsToSelectedNode_Click(object sender, EventArgs e)
