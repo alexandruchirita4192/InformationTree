@@ -19,11 +19,13 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         public PgpEncryptDecryptDataHandler(
             IPopUpService popUpService,
             IPGPEncryptionAndSigningProvider encryptionAndSigningProvider,
-            IConfigurationReader configurationReader)
+            IConfigurationReader configurationReader,
+            IMediator mediator)
         {
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
             _configurationReader = configurationReader;
+            _mediator = mediator;
             _configuration = _configurationReader.GetConfiguration();
         }
 
@@ -32,6 +34,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionAndSigningProvider _encryptionAndSigningProvider;
         private readonly IConfigurationReader _configurationReader;
+        private readonly IMediator _mediator;
 
         #endregion Services
 
@@ -165,7 +168,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
         private void FindNodeWithPublicKey()
         {
-            var form = new SearchForm(_popUpService);
+            var form = new SearchForm(_mediator);
 
             WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
 
@@ -198,7 +201,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
         private void GetPrivateKeyWithPassword(string titleOverride = null)
         {
-            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, _request.FromFile);
+            var form = new PgpDecrypt(_popUpService, _encryptionAndSigningProvider, _mediator, _request.FromFile);
 
             if (titleOverride.IsNotEmpty())
                 form.Text = titleOverride;

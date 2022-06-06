@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
-using InformationTree.Domain.Services;
 using InformationTree.Forms;
 using InformationTree.Render.WinForms.Services;
 using MediatR;
@@ -12,17 +11,14 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 {
     public class SearchBoxDoubleClickHandler : IRequestHandler<SearchBoxDoubleClickRequest, BaseResponse>
     {
-        private readonly IPopUpService _popUpService;
         private readonly IMediator _mediator;
 
         private TextBox _tbSearchBox;
         private TreeView _tvTaskList;
 
         public SearchBoxDoubleClickHandler(
-            IPopUpService popUpService,
             IMediator mediator)
         {
-            _popUpService = popUpService;
             _mediator = mediator;
         }
 
@@ -38,7 +34,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             _tbSearchBox = tbSearchBox;
             _tvTaskList = tvTaskList;
 
-            var form = new SearchForm(_popUpService, tbSearchBox.Text);
+            var form = new SearchForm(_mediator, tbSearchBox.Text);
 
             WinFormsApplication.CenterForm(form, mainForm);
 

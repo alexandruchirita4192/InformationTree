@@ -6,6 +6,7 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
+using MediatR;
 
 namespace InformationTree.Forms
 {
@@ -15,6 +16,7 @@ namespace InformationTree.Forms
 
         private readonly IPopUpService _popUpService;
         private readonly IPGPEncryptionProvider _encryptionAndSigningProvider;
+        private readonly IMediator _mediator;
 
         #endregion Fields
 
@@ -44,12 +46,14 @@ namespace InformationTree.Forms
         public PgpDecrypt(
             IPopUpService popUpService,
             IPGPEncryptionProvider encryptionAndSigningProvider,
+            IMediator mediator,
             bool fromFile)
             : this()
         {
             _popUpService = popUpService;
             _encryptionAndSigningProvider = encryptionAndSigningProvider;
-
+            _mediator = mediator;
+            
             DecryptFromFile = fromFile;
 
             if (DecryptFromFile)
@@ -77,7 +81,7 @@ namespace InformationTree.Forms
 
         private void FindNodeWithPrivateKey()
         {
-            var form = new SearchForm(_popUpService);
+            var form = new SearchForm(_mediator);
 
             WinFormsApplication.CenterForm(form, WinFormsApplication.MainForm);
 

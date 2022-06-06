@@ -81,5 +81,13 @@ namespace InformationTree.Domain.Extensions
         {
             return testString.StartsWithSignature("-----BEGIN PGP");
         }
+
+        public static string RemoveEndLines(this string text)
+        {
+            return text
+                ?.Replace("\n", string.Empty)
+                ?.Replace("\r", string.Empty)
+                ?? string.Empty;
+        }
     }
 }
