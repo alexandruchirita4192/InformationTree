@@ -1404,13 +1404,13 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormDoubleClickRequest
-        private void MainForm_DoubleClick(object sender, EventArgs e)
+        private async void MainForm_DoubleClick(object sender, EventArgs e)
         {
-            if (FormBorderStyle == FormBorderStyle.Sizable)
-                FormBorderStyle = FormBorderStyle.None;
-            else
-                FormBorderStyle = FormBorderStyle.Sizable;
+            var request = new FormMouseDoubleClickRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormDoubleClickRequest

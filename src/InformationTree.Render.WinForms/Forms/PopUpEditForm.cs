@@ -408,10 +408,13 @@ namespace InformationTree.Forms
                 data = null;
         }
 
-        // TODO: Handler for PopUpEditFormDoubleClickRequest
-        private void PopUpEditForm_DoubleClick(object sender, EventArgs e)
+        private async void PopUpEditForm_DoubleClick(object sender, EventArgs e)
         {
-            FormBorderStyle = FormBorderStyle == FormBorderStyle.Sizable ? FormBorderStyle.None : FormBorderStyle.Sizable;
+            var request = new FormMouseDoubleClickRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for FormKeyUpRequest (try to reuse FormCloseRequest here if possible,

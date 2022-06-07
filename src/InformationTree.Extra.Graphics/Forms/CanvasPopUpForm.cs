@@ -1,6 +1,8 @@
 ﻿using System.Timers;
 using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Requests;
 using InformationTree.Extra.Graphics.Computation;
+using MediatR;
 using D = System.Drawing;
 
 namespace InformationTree.Forms
@@ -9,12 +11,18 @@ namespace InformationTree.Forms
     {
         private int op, nr, x, y, r;
         public System.Timers.Timer RunTimer { get; private set; }
+
+        private readonly IMediator _mediator;
+
         public IGraphicsFile GraphicsFile { get; private set; }
         private D.BufferedGraphicsContext context = D.BufferedGraphicsManager.Current;
         private D.BufferedGraphics grafx;
 
-        public CanvasPopUpForm(IGraphicsFile graphicsFile)
+        public CanvasPopUpForm(
+            IMediator mediator,
+            IGraphicsFile graphicsFile)
         {
+            _mediator = mediator;
             GraphicsFile = graphicsFile;
             
             InitializeComponent();
@@ -93,12 +101,13 @@ namespace InformationTree.Forms
             Refresh();
         }
 
-        private void CanvasPopUpForm_MouseDoubleClick(object sender, MouseEventArgs e)
+        private async void CanvasPopUpForm_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (FormBorderStyle == FormBorderStyle.Sizable)
-                FormBorderStyle = FormBorderStyle.None;
-            else
-                FormBorderStyle = FormBorderStyle.Sizable;
+            var request = new FormMouseDoubleClickRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
 
         private void CanvasPopUpForm_Paint(object sender, PaintEventArgs e)
