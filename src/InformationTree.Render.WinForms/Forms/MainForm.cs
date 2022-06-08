@@ -1377,10 +1377,13 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormDoubleClickRequest
-        private void tbTreeChange_MouseDoubleClick(object sender, MouseEventArgs e)
+        private async void tbTreeChange_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            MainForm_DoubleClick(sender, e);
+            var request = new FormMouseDoubleClickRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormChangeTreeTypeClickRequest
@@ -1548,10 +1551,13 @@ namespace InformationTree.Forms
             return treeNodeData;
         }
 
-        // TODO: Handler for MainFormDoubleClickRequest
-        private void tbTask_DoubleClick(object sender, EventArgs e)
+        private async void tbTask_DoubleClick(object sender, EventArgs e)
         {
-            MainForm_DoubleClick(sender, e);
+            var request = new FormMouseDoubleClickRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
 
         #endregion Handlers
