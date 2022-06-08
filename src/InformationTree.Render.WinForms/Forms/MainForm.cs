@@ -1036,30 +1036,15 @@ namespace InformationTree.Forms
                     await _mediator.Send(setTreeStateRequest);
                 }
             }
-            else if (_configuration.ApplicationFeatures.EnableExtraGraphics)
+            else
             {
                 var figureLines = tvTaskList.GenerateStringGraphicsLinesFromTree();
 
-                var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
-                if (_canvasForm == null || _canvasForm.IsDisposed)
+                var request = new ShowCanvasPopUpRequest
                 {
-                    _canvasForm = _canvasFormFactory.Create(figureLines);
-                    _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
-                }
-                else
-                {
-                    _canvasForm.RunTimer.Enabled = false;
-                    try
-                    {
-                        _canvasForm.GraphicsFile.Clean();
-                        _canvasForm.GraphicsFile.ParseLines(figureLines);
-                    }
-                    finally
-                    {
-                        _canvasForm.RunTimer.Enabled = true;
-                    }
-                }
-                _canvasForm.Show();
+                    FigureLines = figureLines
+                };
+                await _mediator.Send(request);
             }
         }
 
@@ -1124,19 +1109,15 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormShowCanvasPopUpClickRequest
-        private void btnShowCanvasPopUp_Click(object sender, EventArgs e)
+        private async void btnShowCanvasPopUp_Click(object sender, EventArgs e)
         {
-            var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
-            if (_canvasForm == null || _canvasForm.IsDisposed)
+            var figureLines = tvTaskList.GenerateStringGraphicsLinesFromTree();
+
+            var request = new ShowCanvasPopUpRequest
             {
-                var figureLines = tvTaskList.GenerateStringGraphicsLinesFromTree();
-
-                _canvasForm = _canvasFormFactory.Create(figureLines);
-                _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
-            }
-
-            _canvasForm.Show();
+                FigureLines = figureLines
+            };
+            await _mediator.Send(request);
         }
 
         public async void tvTaskList_ControlAdded(object sender, ControlEventArgs e)
@@ -1176,35 +1157,18 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormExecCommandClickRequest
-        private void btnExecCommand_Click(object sender, EventArgs e)
+        private async void btnExecCommand_Click(object sender, EventArgs e)
         {
             if (tbCommand.Lines.Length <= 0)
                 return;
 
             var figureLines = tbCommand.Lines;
 
-            var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
-            if (_canvasForm == null || _canvasForm.IsDisposed)
+            var request = new ShowCanvasPopUpRequest
             {
-                _canvasForm = _canvasFormFactory.Create(figureLines);
-                _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
-            }
-            else
-            {
-                _canvasForm.RunTimer.Enabled = false;
-                try
-                {
-                    _canvasForm.GraphicsFile.Clean();
-                    _canvasForm.GraphicsFile.ParseLines(figureLines);
-                }
-                finally
-                {
-                    _canvasForm.RunTimer.Enabled = false;
-                }
-            }
-
-            _canvasForm.Show();
+                FigureLines = figureLines
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormDeleteCanvasClickRequest

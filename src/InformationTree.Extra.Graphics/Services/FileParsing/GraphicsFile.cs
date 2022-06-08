@@ -46,6 +46,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         public void ParseLines(string[] lines)
         {
+            if (lines == null)
+                return;
             if (lines.Length <= 0)
                 return;
 
