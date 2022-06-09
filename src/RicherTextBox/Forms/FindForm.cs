@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Windows.Forms;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
+using MediatR;
 
 namespace RicherTextBox
 {
     public partial class FindForm : Form
     {
         private readonly IPopUpService _popUpService;
-        
+        private readonly IMediator _mediator;
         private int lastFound = 0;
         private RichTextBox rtbInstance = null;
 
@@ -29,10 +31,13 @@ namespace RicherTextBox
             TopMost = true;
         }
 
-        public FindForm(IPopUpService popUpService)
+        public FindForm(
+            IPopUpService popUpService,
+            IMediator mediator)
             : this()
         {
             _popUpService = popUpService;
+            _mediator = mediator;
         }
         
         private void rtbInstance_SelectionChanged(object sender, EventArgs e)
@@ -40,10 +45,14 @@ namespace RicherTextBox
             lastFound = rtbInstance.SelectionStart;
         }
 
-        private void btnDone_Click(object sender, EventArgs e)
+        private async void btnDone_Click(object sender, EventArgs e)
         {
-            this.rtbInstance.SelectionChanged -= rtbInstance_SelectionChanged;
-            this.Close();
+            rtbInstance.SelectionChanged -= rtbInstance_SelectionChanged;
+            var request = new FormCloseRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
 
         private void btnFindNext_Click(object sender, EventArgs e)
@@ -68,7 +77,7 @@ namespace RicherTextBox
         private void FindForm_Load(object sender, EventArgs e)
         {
             if (rtbInstance != null)
-                this.rtbInstance.SelectionChanged += new EventHandler(rtbInstance_SelectionChanged);
+                rtbInstance.SelectionChanged += new EventHandler(rtbInstance_SelectionChanged);
         }
     }
 }

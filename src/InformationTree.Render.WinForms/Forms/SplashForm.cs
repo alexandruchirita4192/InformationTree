@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services.Graphics;
+using MediatR;
 
 namespace InformationTree.Forms
 {
@@ -19,23 +21,21 @@ namespace InformationTree.Forms
 
         private void InitializeComponent()
         {
-            this.SuspendLayout();
+            SuspendLayout();
             //
             // SplashForm
             //
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(631, 448);
-            this.Location = new System.Drawing.Point(0, 0);
-            this.Name = "SplashForm";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            ClientSize = new System.Drawing.Size(631, 448);
+            Location = new System.Drawing.Point(0, 0);
+            Name = "SplashForm";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion Constructor
 
         #region Static
-
-        private delegate void CloseDelegate();
 
         //The type of form to be displayed as the splash screen.
         private static List<SplashForm> splashFormList;
@@ -75,18 +75,18 @@ namespace InformationTree.Forms
             return splashFormList != null && splashFormList.Count > 0 && splashFormList.Any(f => !f.IsDisposed);
         }
 
-        public static void CloseForm()
+        public static void CloseForm(IMediator _mediator)
         {
             if (splashFormList != null)
             {
                 foreach (var form in splashFormList)
-                    form.Invoke(new CloseDelegate(() => CloseFormInternal(form)));
+                    form.Invoke(() => CloseFormInternal(form, _mediator));
                 splashFormList.Clear();
                 splashFormList = null;
             }
         }
 
-        private static void CloseFormInternal(SplashForm form)
+        private async static void CloseFormInternal(SplashForm form, IMediator _mediator)
         {
             if (form != null)
             {
@@ -97,7 +97,11 @@ namespace InformationTree.Forms
                     form.Timer.Dispose();
                     form.Timer = null;
                 }
-                form.Close();
+                var formCloseRequest = new FormCloseRequest
+                {
+                    Form = form
+                };
+                await _mediator.Send(formCloseRequest);
             }
         }
 

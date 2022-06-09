@@ -194,7 +194,7 @@ namespace InformationTree.Forms
             // shouldn't be set manually in here because RicherTextBox constructor uses _configurationReader.GetConfiguration()
             // to set the values based on configuration (visible and enabled set too).
 
-            tbData = new RicherTextBox.Controls.RicherTextBox(_popUpService, _configurationReader)
+            tbData = new RicherTextBox.Controls.RicherTextBox(_popUpService, _configurationReader, _mediator)
             {
                 AlignCenterVisible = true,
                 AlignLeftVisible = true,
@@ -332,10 +332,13 @@ namespace InformationTree.Forms
         }
 
         // TODO: Handler for PopUpEditFormExitPopUpAndSaveClickRequest
-        private void tbExitPopUpAndSave_Click(object sender, EventArgs e)
+        private async void tbExitPopUpAndSave_Click(object sender, EventArgs e)
         {
             if (ReferenceEquals(sender, tbExitPopUpAndSave))
-                Close();
+            {
+                var request = new FormCloseRequest { Form = this };
+                await _mediator.Send(request);
+            }
         }
 
         // TODO: Handler for PopUpEditFormDataLinkClickedRequest
@@ -417,13 +420,19 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for FormKeyUpRequest (try to reuse FormCloseRequest here if possible,
-        // search for other handlers because all forms might want to close when Esc is pressed,
+        // TODO: Handler for FormKeyUpRequest
+        // (search for other handlers because all forms might want to close when Esc is pressed,
         // try to reuse this in other handlers if possible too)
-        private void PopUpEditForm_KeyUp(object sender, KeyEventArgs e)
+        private async void PopUpEditForm_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
-                Close();
+            {
+                var request = new FormCloseRequest
+                {
+                    Form = this
+                };
+                await _mediator.Send(request);
+            }
         }
 
         // TODO: Handler for PopUpEditFormCalculateClickRequest

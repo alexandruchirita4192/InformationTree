@@ -47,7 +47,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             if (haveAlerts)
             {
-                var form = new StartupAlertForm(_treeNodeDataToTreeNodeAdapter, alertNodesRoot);
+                var form = new StartupAlertForm(_treeNodeDataToTreeNodeAdapter, _mediator, alertNodesRoot);
                 form.FormClosing += StartupAlertForm_FormClosing;
                 form.ShowDialog();
                 tvTaskList.Refresh();

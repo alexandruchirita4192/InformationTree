@@ -144,7 +144,7 @@ namespace InformationTree.Render.WinForms.Services
             }
             finally
             {
-                SplashForm.CloseForm();
+                SplashForm.CloseForm(_mediator);
 
                 if (controlToSetWaitCursor is Control control)
                 {

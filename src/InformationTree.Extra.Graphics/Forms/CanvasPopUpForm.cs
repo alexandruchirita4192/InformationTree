@@ -131,7 +131,7 @@ namespace InformationTree.Forms
                 GraphicsFile.Show(g);
         }
 
-        private void CanvasPopUpForm_KeyDown(object sender, KeyEventArgs e)
+        private async void CanvasPopUpForm_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
@@ -261,7 +261,11 @@ namespace InformationTree.Forms
                 case Keys.Q:
                 case Keys.X:
                 case Keys.Escape:
-                    Close();
+                    var request = new FormCloseRequest
+                    {
+                        Form = this
+                    };
+                    await _mediator.Send(request);
                     break;
 
                 case Keys.D:

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
+using MediatR;
 
 namespace InformationTree.Forms
 {
     public partial class StartupAlertForm : Form
     {
+        private readonly ITreeNodeDataToTreeNodeAdapter _treeNodeDataToTreeNodeAdapter;
+        private readonly IMediator _mediator;
+
         public TreeNode SelectedItemOrCategory
         {
             get
@@ -15,25 +20,38 @@ namespace InformationTree.Forms
             }
         }
 
-        public StartupAlertForm(ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter, TreeNodeData treeNodeData = null)
+        public StartupAlertForm()
         {
             InitializeComponent();
+        }
 
+        public StartupAlertForm(
+            ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter,
+            IMediator mediator,
+            TreeNodeData treeNodeData = null)
+            : this()
+        {
+            _treeNodeDataToTreeNodeAdapter = treeNodeDataToTreeNodeAdapter;
+            _mediator = mediator;
+            
             if (treeNodeData != null && tvAlertCategoryAndTasks?.Nodes != null)
             {
                 tvAlertCategoryAndTasks.Nodes.Add(new TreeNode("None"));
                 foreach (TreeNodeData childTreeNodeData in treeNodeData.Children)
-                    if (treeNodeDataToTreeNodeAdapter.Adapt(childTreeNodeData, false) is TreeNode childTreeNode)
+                    if (_treeNodeDataToTreeNodeAdapter.Adapt(childTreeNodeData, false) is TreeNode childTreeNode)
                         tvAlertCategoryAndTasks.Nodes.Add(childTreeNode);
             }
 
             StartPosition = FormStartPosition.CenterScreen;
         }
 
-        // TODO: Handler for FormCloseRequest
-        private void btnSelectTaskOrCategory_Click(object sender, EventArgs e)
+        private async void btnSelectTaskOrCategory_Click(object sender, EventArgs e)
         {
-            Close();
+            var request = new FormCloseRequest
+            {
+                Form = this
+            };
+            await _mediator.Send(request);
         }
     }
 }

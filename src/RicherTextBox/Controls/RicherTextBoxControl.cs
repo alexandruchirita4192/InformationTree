@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Services;
+using MediatR;
 using NLog;
 
 namespace RicherTextBox.Controls
@@ -18,6 +19,7 @@ namespace RicherTextBox.Controls
 
         private readonly IPopUpService _popUpService;
         private readonly IConfigurationReader _configurationReader;
+        private readonly IMediator _mediator;
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -498,12 +500,16 @@ namespace RicherTextBox.Controls
             InitializeComponent();
         }
 
-        public RicherTextBox(IPopUpService popUpService, IConfigurationReader configurationReader)
+        public RicherTextBox(
+            IPopUpService popUpService,
+            IConfigurationReader configurationReader,
+            IMediator mediator)
         {
             InitializeComponent();
 
             _popUpService = popUpService;
             _configurationReader = configurationReader;
+            _mediator = mediator;
 
             _configuration = _configurationReader?.GetConfiguration();
             
@@ -1208,7 +1214,7 @@ namespace RicherTextBox.Controls
 
         private void tsbtnFind_Click(object sender, EventArgs e)
         {
-            var findForm = new FindForm
+            var findForm = new FindForm(_popUpService, _mediator)
             {
                 RtbInstance = rtbDocument,
                 InitialText = tstxtSearchText.Text

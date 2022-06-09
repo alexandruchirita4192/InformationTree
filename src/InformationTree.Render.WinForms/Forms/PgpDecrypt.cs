@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
+using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
@@ -69,7 +71,11 @@ namespace InformationTree.Forms
                 }
                 else
                 {
-                    Close();
+                    Task.Run(async () =>
+                    {
+                        var request = new FormCloseRequest { Form = this };
+                        await _mediator.Send(request);
+                    });
                     return;
                 }
             }
@@ -113,7 +119,7 @@ namespace InformationTree.Forms
             }
         }
 
-        private void mtbPgpDecrypt_KeyUp(object sender, KeyEventArgs e)
+        private async void mtbPgpDecrypt_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -126,17 +132,26 @@ namespace InformationTree.Forms
 
                 if (ReferenceEquals(sender, mtbPgpDecrypt))
                 {
+                    var formCloseRequest = new FormCloseRequest
+                    {
+                        Form = this
+                    };
+                    
                     if (DecryptFromFile)
                     {
                         if (_encryptionAndSigningProvider.ExistsPassword(PgpPrivateKeyFile, password.ToCharArray()))
-                            Close();
+                        {
+                            await _mediator.Send(formCloseRequest);
+                        }
                         else
                             _popUpService.ShowMessage("Password is not valid for the selected PGP file", "Invalid password or PGP file");
                     }
                     else
                     {
                         if (_encryptionAndSigningProvider.ExistsPasswordFromString(PgpPrivateKeyText, password.ToCharArray()))
-                            Close();
+                        {
+                            await _mediator.Send(formCloseRequest);
+                        }
                         else
                             _popUpService.ShowMessage("Password is not valid for the selected PGP key", "Invalid password or PGP file");
                     }
