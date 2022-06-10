@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -88,6 +89,17 @@ namespace InformationTree.Domain.Extensions
                 ?.Replace("\n", string.Empty)
                 ?.Replace("\r", string.Empty)
                 ?? string.Empty;
+        }
+
+        public static Color? ToColor(this string colorName)
+        {
+            if (colorName.IsEmpty())
+                return null;
+            if (Enum.TryParse<KnownColor>(colorName, true, out var knownColor) == false)
+                return null;
+
+            var color = Color.FromKnownColor(knownColor);
+            return color;
         }
     }
 }

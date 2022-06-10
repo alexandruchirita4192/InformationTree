@@ -780,36 +780,26 @@ namespace InformationTree.Forms
             return currentFontStyle;
         }
 
-        // TODO: Handler for MainFormColorTextChangedRequest, ColorType=TextColor, BackColor
         private async void tbTextColor_TextChanged(object sender, EventArgs e)
         {
-            if (tvTaskList.SelectedNode != null)
+            var request = new MainFormColorTextChangedRequest
             {
-                tvTaskList.SelectedNode.ForeColor = Color.FromName(tbTextColor.Text);
-
-                // on font changed is added too??
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest);
-            }
+                SelectedTreeNode = tvTaskList.SelectedNode,
+                ColorTextBox = tbTextColor,
+                ChangeType = ColorChangeType.TextColor
+            };
+            await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormColorTextChangedRequest, ColorType=TextColor, BackColor
         private async void tbBackgroundColor_TextChanged(object sender, EventArgs e)
         {
-            if (tvTaskList.SelectedNode != null)
+            var request = new MainFormColorTextChangedRequest
             {
-                tvTaskList.SelectedNode.BackColor = Color.FromName(tbBackgroundColor.Text);
-
-                // on font changed is added too??
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest);
-            }
+                SelectedTreeNode = tvTaskList.SelectedNode,
+                ColorTextBox = tbBackgroundColor,
+                ChangeType = ColorChangeType.BackColor
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnToggleCompletedTasks_Click(object sender, EventArgs e)
