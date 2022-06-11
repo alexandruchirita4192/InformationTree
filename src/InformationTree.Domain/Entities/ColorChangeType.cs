@@ -1,4 +1,4 @@
-﻿namespace InformationTree.Domain.Requests
+﻿namespace InformationTree.Domain.Entities
 {
     public enum ColorChangeType
     {

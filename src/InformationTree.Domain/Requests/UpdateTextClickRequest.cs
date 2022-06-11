@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Newtonsoft.Json;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests.Base;
 
@@ -13,7 +14,10 @@ namespace InformationTree.Domain.Requests
         public int Urgency { get; set; }
         public string Category { get; set; }
         public bool IsStartupAlert { get; set; }
+
+        [JsonIgnore]
         public Component TaskListTreeView { get; set; }
+
         public TaskListAfterSelectRequest AfterSelectRequest { get; set; }
     }
 }

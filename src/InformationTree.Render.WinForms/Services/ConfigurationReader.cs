@@ -22,7 +22,8 @@ namespace InformationTree.Render.WinForms.Services
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.ApplicationFeatures.EnableExtraGraphics)),
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.ApplicationFeatures.EnableExtraSound)),
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.ApplicationFeatures.EnableAlerts)),
-                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.ApplicationFeatures.MediatorSelfTest))
+                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.ApplicationFeatures.MediatorSelfTest)),
+                        ReadConfiguration(appSettings, nameof(Domain.Entities.Features.ApplicationFeatures.EnableProfiling))
                         ),
                     new Domain.Entities.Features.RicherTextBoxFeatures(
                         ReadConfiguration(appSettings, nameof(Domain.Entities.Features.RicherTextBoxFeatures.EnableRtfLoading)),

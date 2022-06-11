@@ -39,6 +39,7 @@ namespace InformationTree.Infrastructure
             container.Register(Component.For<ICachingService>().ImplementedBy<CachingService>().LifeStyle.Singleton);
             container.Register(Component.For<ITreeNodeToTreeNodeDataAdapter>().ImplementedBy<TreeNodeToTreeNodeDataAdapter>().LifeStyle.Singleton);
             container.Register(Component.For<ITreeNodeDataToTreeNodeAdapter>().ImplementedBy<TreeNodeDataToTreeNodeAdapter>().LifeStyle.Singleton);
+            container.Register(Component.For<IProfilingService>().ImplementedBy<ProfilingService>().LifeStyle.Singleton);
             
             container.RegisterMediatorForUsageFrom(typeof(MainForm).Assembly);
         }
