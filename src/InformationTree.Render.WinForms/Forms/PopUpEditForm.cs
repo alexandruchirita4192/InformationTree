@@ -419,20 +419,15 @@ namespace InformationTree.Forms
             };
             await _mediator.Send(request);
         }
-
-        // TODO: Handler for FormKeyUpRequest
-        // (search for other handlers because all forms might want to close when Esc is pressed,
-        // try to reuse this in other handlers if possible too)
+        
         private async void PopUpEditForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Escape)
+            var request = new FormKeyUpRequest
             {
-                var request = new FormCloseRequest
-                {
-                    Form = this
-                };
-                await _mediator.Send(request);
-            }
+                Form = this,
+                KeyData = (int)e.KeyData
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for PopUpEditFormCalculateClickRequest

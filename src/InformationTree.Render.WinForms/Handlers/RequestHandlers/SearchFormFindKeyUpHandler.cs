@@ -28,14 +28,13 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 return null;
             if (request.FindTextBox is not TextBox tbFind)
                 return null;
-            var keyData = (Keys)request.KeyData;
-
+            
             var formCloseRequest = new FormCloseRequest
             {
                 Form = form
             };
             
-            if (ReferenceEquals(tbFind, form) && keyData == Keys.Enter)
+            if (ReferenceEquals(tbFind, form) && request.KeyData == (int)Keys.Enter)
             {
                 if (tbFind.Text.IsNotEmpty() && tbFind.Text.Length > 3)
                 {
@@ -46,7 +45,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 }
             }
 
-            if (keyData == Keys.Escape)
+            if (request.KeyData == (int)Keys.Escape)
             {
                 tbFind.Text = null;
                 
