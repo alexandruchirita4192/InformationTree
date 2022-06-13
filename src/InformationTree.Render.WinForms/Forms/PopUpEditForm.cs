@@ -438,27 +438,17 @@ namespace InformationTree.Forms
             _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
         }
 
-        // TODO: Handler for PopUpEditFormShowGraphicsClickRequest
-        private void btnShowGraphics_Click(object sender, EventArgs e)
+        private async void btnShowGraphics_Click(object sender, EventArgs e)
         {
             var text = tbData.TextBox.SelectedText.Length > 0 ? tbData.TextBox.SelectedText : tbData.TextBox.Text;
             if (text.Length <= 0)
                 return;
-            var canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
-            if (canvasForm == null || canvasForm.IsDisposed)
+            
+            var request = new ShowCanvasPopUpRequest
             {
-                canvasForm = _canvasFormFactory.Create(new[] { text });
-                _cachingService.Set(Constants.CacheKeys.CanvasForm, canvasForm);
-            }
-            else
-            {
-                canvasForm.RunTimer.Stop();
-                canvasForm.GraphicsFile.Clean();
-                canvasForm.GraphicsFile.ParseLines(new[] { text });
-                canvasForm.RunTimer.Start();
-            }
-
-            canvasForm.Show();
+                FigureLines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
+            };
+            await _mediator.Send(request);
         }
     }
 }
