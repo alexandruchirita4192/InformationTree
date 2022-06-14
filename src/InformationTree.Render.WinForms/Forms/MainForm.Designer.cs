@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System.Threading.Tasks;
+using System.Windows.Forms;
+using InformationTree.Render.WinForms.Handlers.RequestHandlers;
 
 namespace InformationTree.Forms
 {
@@ -31,9 +33,15 @@ namespace InformationTree.Forms
 
             if (disposing && _randomTimer != null)
             {
-                _randomTimer.Stop();
-                _randomTimer.Elapsed -= RandomTimer_Elapsed;
-                _randomTimer = null;
+                if (_mediator != null)
+                {
+                    var request = new TimerDisposeRequest
+                    {
+                        Timer = _randomTimer,
+                        ElapsedEventHandler = MainFormChangeTreeTypeClickHandler.ElapsedEventHandler
+                    };
+                    Task.Run(async () => await _mediator.Send(request));
+                }
             }
             
             base.Dispose(disposing);

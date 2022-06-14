@@ -1376,62 +1376,13 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormChangeTreeTypeClickRequest
-        private void lblChangeTreeType_Click(object sender, EventArgs e)
+        private async void lblChangeTreeType_Click(object sender, EventArgs e)
         {
-            if (_randomTimer == null)
-                return;
-            if (_configuration.ApplicationFeatures.EnableAlerts == false)
-                return;
-
-            if (!_randomTimer.Enabled)
-            {
-                _randomTimer.Elapsed += RandomTimer_Elapsed; // timer disposed in Dispose(bool)
-                RandomTimer_ChangeIntervalAndSound();
-                _randomTimer.Start();
-            }
-            else
-            {
-                _randomTimer.Elapsed -= RandomTimer_Elapsed;
-                _randomTimer.Stop();
-            }
-        }
-
-        private void RandomTimer_ChangeIntervalAndSound()
-        {
-            if (_randomTimer == null)
-                return;
-            if (_configuration.ApplicationFeatures.EnableAlerts == false)
-                return;
-
-            var ticksSeedAsInt = DateTime.Now
-                .Ticks
-                .ToInt();
-
-            var interval = 0;
-
-            while (interval == 0)
-                interval = (new Random(ticksSeedAsInt).Next() % 10000);
-
-            _randomTimer.Interval = interval;
-
-            var soundNumber = -1;
-            while (soundNumber < 1 || soundNumber > 4)
-                soundNumber = (new Random(ticksSeedAsInt).Next() % 4) + 1;
-            _cachingService.Set(Constants.CacheKeys.SoundNumber, soundNumber);
-        }
-
-        // TODO: Handler for MainFormRandomTimerElapsedRequest
-        private void RandomTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if (_configuration.ApplicationFeatures.EnableAlerts == false)
-                return;
-            if (_configuration.ApplicationFeatures.EnableExtraSound == false)
-                return;
-
-            var soundNumber = _cachingService.Get<int>(Constants.CacheKeys.SoundNumber);
-            _soundProvider.PlaySystemSound(soundNumber);
-            RandomTimer_ChangeIntervalAndSound();
+            var request = new MainFormChangeTreeTypeClickRequest
+            { 
+                Timer = _randomTimer
+            };
+            await _mediator.Send(request);
         }
 
         private async void editToolStripMenuItem_Click(object sender, EventArgs e)
