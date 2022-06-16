@@ -331,14 +331,15 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: Handler for PopUpEditFormExitPopUpAndSaveClickRequest
         private async void tbExitPopUpAndSave_Click(object sender, EventArgs e)
         {
-            if (ReferenceEquals(sender, tbExitPopUpAndSave))
+            var request = new PopUpEditFormExitPopUpAndSaveClickRequest
             {
-                var request = new FormCloseRequest { Form = this };
-                await _mediator.Send(request);
-            }
+                ExitPopUpAndSaveTextBox = tbExitPopUpAndSave,
+                Form = this,
+                Sender = sender
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for PopUpEditFormDataLinkClickedRequest
@@ -372,7 +373,6 @@ namespace InformationTree.Forms
                 tbData.InsertPicture();
         }
 
-        // TODO: Handler for PopUpEditFormPgpDecryptDataClickRequest
         private async void btnPgpDecryptData_Click(object sender, EventArgs e)
         {
             data = cbKeepCrypt.Checked ? Data : null;
