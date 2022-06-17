@@ -38,13 +38,13 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             WinFormsApplication.CenterForm(form, mainForm);
 
-            form.FormClosed += SearchForm_FormClosed;
+            form.FormClosed += (object sender, FormClosedEventArgs e) => SearchForm_FormClosed(sender, e, cancellationToken);
             form.ShowDialog();
 
             return Task.FromResult(new BaseResponse());
         }
 
-        private async void SearchForm_FormClosed(object sender, FormClosedEventArgs e)
+        private async void SearchForm_FormClosed(object sender, FormClosedEventArgs e, CancellationToken cancellationToken)
         {
             if (sender is SearchForm form)
             {
@@ -57,7 +57,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                     TreeView = _tvTaskList,
                     KeyData = (int)Keys.Enter
                 };
-                await _mediator.Send(searchBoxKeyUpRequest);
+                await _mediator.Send(searchBoxKeyUpRequest, cancellationToken);
             }
         }
     }

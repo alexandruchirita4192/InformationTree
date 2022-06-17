@@ -48,7 +48,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             if (haveAlerts)
             {
                 var form = new StartupAlertForm(_treeNodeDataToTreeNodeAdapter, _mediator, alertNodesRoot);
-                form.FormClosing += StartupAlertForm_FormClosing;
+                form.FormClosing += (object sender, FormClosingEventArgs e) => StartupAlertForm_FormClosing(sender, e, cancellationToken);
                 form.ShowDialog();
                 tvTaskList.Refresh();
             }
@@ -56,7 +56,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             return Task.FromResult(new BaseResponse());
         }
 
-        private async void StartupAlertForm_FormClosing(object sender, FormClosingEventArgs e)
+        private async void StartupAlertForm_FormClosing(object sender, FormClosingEventArgs e, CancellationToken cancellationToken)
         {
             var form = sender as StartupAlertForm;
             if (form != null)
@@ -74,7 +74,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                     SearchBoxTextBox = _tbSearchBox,
                     KeyData = (int)Keys.Enter,
                 };
-                await _mediator.Send(request);
+                await _mediator.Send(request, cancellationToken);
 
                 ////if (tvTaskList.Nodes.Contains(selectedNode))
                 ////    tvTaskList.SelectedNode = selectedNode;

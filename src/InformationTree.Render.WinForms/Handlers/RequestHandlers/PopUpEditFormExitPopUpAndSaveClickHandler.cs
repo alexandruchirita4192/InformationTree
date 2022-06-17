@@ -28,7 +28,7 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
             if (ReferenceEquals(request.Sender, tbExitPopUpAndSave))
             {
                 var formCloseRequest = new FormCloseRequest { Form = form };
-                await _mediator.Send(formCloseRequest);
+                await _mediator.Send(formCloseRequest, cancellationToken);
             }
 
             return new BaseResponse();
