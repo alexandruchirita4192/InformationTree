@@ -1,9 +1,8 @@
-﻿namespace InformationTree.Domain.Responses
+﻿namespace InformationTree.Domain.Responses;
+
+public class PgpEncryptDecryptDataResponse : BaseResponse
 {
-    public class PgpEncryptDecryptDataResponse : BaseResponse
-    {
-        public string ResultText { get; set; }
-        public string ResultRtf { get; set; }
-        public string EncryptionInfo { get; set; }
-    }
+    public string ResultText { get; set; }
+    public string ResultRtf { get; set; }
+    public string EncryptionInfo { get; set; }
 }

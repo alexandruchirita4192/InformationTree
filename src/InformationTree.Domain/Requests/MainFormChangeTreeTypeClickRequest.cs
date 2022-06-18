@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel;
 using InformationTree.Domain.Requests.Base;
 
-namespace InformationTree.Domain.Requests
+namespace InformationTree.Domain.Requests;
+
+public class MainFormChangeTreeTypeClickRequest : BaseRequest
 {
-    public class MainFormChangeTreeTypeClickRequest : BaseRequest
-    {
-        public Component Timer { get; set; }
-    }
+    public Component Timer { get; set; }
 }

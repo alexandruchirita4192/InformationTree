@@ -2,23 +2,22 @@
 using Newtonsoft.Json;
 using InformationTree.Domain.Requests.Base;
 
-namespace InformationTree.Domain.Requests
+namespace InformationTree.Domain.Requests;
+
+public class MainFormInitializeComponentAddEventsRequest : BaseRequest
 {
-    public class MainFormInitializeComponentAddEventsRequest : BaseRequest
-    {
-        [JsonIgnore]
-        public Component Form { get; set; }
+    [JsonIgnore]
+    public Component Form { get; set; }
 
-        [JsonIgnore]
-        public Component TaskListTreeView { get; set; }
+    [JsonIgnore]
+    public Component TaskListTreeView { get; set; }
 
-        [JsonIgnore]
-        public Component StyleCheckedListBox { get; set; }
+    [JsonIgnore]
+    public Component StyleCheckedListBox { get; set; }
 
-        [JsonIgnore]
-        public Component FontFamilyComboBox { get; set; }
+    [JsonIgnore]
+    public Component FontFamilyComboBox { get; set; }
 
-        [JsonIgnore]
-        public Component FontSizeNumericUpDown { get; set; }
-    }
+    [JsonIgnore]
+    public Component FontSizeNumericUpDown { get; set; }
 }

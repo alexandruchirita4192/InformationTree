@@ -1,7 +1,6 @@
-﻿namespace InformationTree.Domain.Responses
+﻿namespace InformationTree.Domain.Responses;
+
+public class PgpEncryptDecryptDataForRicherTextBoxResponse : BaseResponse
 {
-    public class PgpEncryptDecryptDataForRicherTextBoxResponse : BaseResponse
-    {
-        public bool DataIsNull { get; set; }
-    }
+    public bool DataIsNull { get; set; }
 }

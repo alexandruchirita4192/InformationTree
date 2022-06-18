@@ -2,14 +2,13 @@
 using Newtonsoft.Json;
 using InformationTree.Domain.Requests.Base;
 
-namespace InformationTree.Domain.Requests
-{
-    public class ShowStartupAlertFormRequest : BaseRequest
-    {
-        [JsonIgnore]
-        public Component TreeView { get; set; }
+namespace InformationTree.Domain.Requests;
 
-        [JsonIgnore]
-        public Component SearchBoxTextBox { get; set; }
-    }
+public class ShowStartupAlertFormRequest : BaseRequest
+{
+    [JsonIgnore]
+    public Component TreeView { get; set; }
+
+    [JsonIgnore]
+    public Component SearchBoxTextBox { get; set; }
 }

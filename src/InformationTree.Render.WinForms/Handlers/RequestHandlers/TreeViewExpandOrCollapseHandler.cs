@@ -6,25 +6,24 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class TreeViewExpandOrCollapseHandler : IRequestHandler<TreeViewExpandOrCollapseRequest, BaseResponse>
 {
-    public class TreeViewExpandOrCollapseHandler : IRequestHandler<TreeViewExpandOrCollapseRequest, BaseResponse>
+    public Task<BaseResponse> Handle(TreeViewExpandOrCollapseRequest request, CancellationToken cancellationToken)
     {
-        public Task<BaseResponse> Handle(TreeViewExpandOrCollapseRequest request, CancellationToken cancellationToken)
+        if (request.TreeView is not TreeView tvTaskList)
+            return Task.FromResult<BaseResponse>(null);
+
+        if (request.ChangeType == ExpandOrCollapseChangeType.ExpandAll)
         {
-            if (request.TreeView is not TreeView tvTaskList)
-                return Task.FromResult<BaseResponse>(null);
-
-            if (request.ChangeType == ExpandOrCollapseChangeType.ExpandAll)
-            {
-                tvTaskList.ExpandAll();
-            }
-            else if (request.ChangeType == ExpandOrCollapseChangeType.CollapseAll)
-            {
-                tvTaskList.CollapseAll();
-            }
-
-            return Task.FromResult(new BaseResponse());
+            tvTaskList.ExpandAll();
         }
+        else if (request.ChangeType == ExpandOrCollapseChangeType.CollapseAll)
+        {
+            tvTaskList.CollapseAll();
+        }
+
+        return Task.FromResult(new BaseResponse());
     }
 }

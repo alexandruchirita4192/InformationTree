@@ -7,58 +7,57 @@ using InformationTree.Forms;
 using InformationTree.Render.WinForms.Services;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class SearchBoxDoubleClickHandler : IRequestHandler<SearchBoxDoubleClickRequest, BaseResponse>
 {
-    public class SearchBoxDoubleClickHandler : IRequestHandler<SearchBoxDoubleClickRequest, BaseResponse>
+    private readonly IMediator _mediator;
+
+    private TextBox _tbSearchBox;
+    private TreeView _tvTaskList;
+
+    public SearchBoxDoubleClickHandler(
+        IMediator mediator)
     {
-        private readonly IMediator _mediator;
+        _mediator = mediator;
+    }
 
-        private TextBox _tbSearchBox;
-        private TreeView _tvTaskList;
+    public Task<BaseResponse> Handle(SearchBoxDoubleClickRequest request, CancellationToken cancellationToken)
+    {
+        if (request.Form is not MainForm mainForm)
+            return Task.FromResult<BaseResponse>(null);
+        if (request.SearchBoxTextBox is not TextBox tbSearchBox)
+            return Task.FromResult<BaseResponse>(null);
+        if (request.TreeView is not TreeView tvTaskList)
+            return Task.FromResult<BaseResponse>(null);
 
-        public SearchBoxDoubleClickHandler(
-            IMediator mediator)
+        _tbSearchBox = tbSearchBox;
+        _tvTaskList = tvTaskList;
+
+        var form = new SearchForm(_mediator, tbSearchBox.Text);
+
+        WinFormsApplication.CenterForm(form, mainForm);
+
+        form.FormClosed += (object sender, FormClosedEventArgs e) => SearchForm_FormClosed(sender, e, cancellationToken);
+        form.ShowDialog();
+
+        return Task.FromResult(new BaseResponse());
+    }
+
+    private async void SearchForm_FormClosed(object sender, FormClosedEventArgs e, CancellationToken cancellationToken)
+    {
+        if (sender is SearchForm form)
         {
-            _mediator = mediator;
-        }
+            var textToFind = form.TextToFind;
+            _tbSearchBox.Text = textToFind;
 
-        public Task<BaseResponse> Handle(SearchBoxDoubleClickRequest request, CancellationToken cancellationToken)
-        {
-            if (request.Form is not MainForm mainForm)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.SearchBoxTextBox is not TextBox tbSearchBox)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.TreeView is not TreeView tvTaskList)
-                return Task.FromResult<BaseResponse>(null);
-
-            _tbSearchBox = tbSearchBox;
-            _tvTaskList = tvTaskList;
-
-            var form = new SearchForm(_mediator, tbSearchBox.Text);
-
-            WinFormsApplication.CenterForm(form, mainForm);
-
-            form.FormClosed += (object sender, FormClosedEventArgs e) => SearchForm_FormClosed(sender, e, cancellationToken);
-            form.ShowDialog();
-
-            return Task.FromResult(new BaseResponse());
-        }
-
-        private async void SearchForm_FormClosed(object sender, FormClosedEventArgs e, CancellationToken cancellationToken)
-        {
-            if (sender is SearchForm form)
+            var searchBoxKeyUpRequest = new SearchBoxKeyUpRequest
             {
-                var textToFind = form.TextToFind;
-                _tbSearchBox.Text = textToFind;
-
-                var searchBoxKeyUpRequest = new SearchBoxKeyUpRequest
-                {
-                    SearchBoxTextBox = _tbSearchBox,
-                    TreeView = _tvTaskList,
-                    KeyData = (int)Keys.Enter
-                };
-                await _mediator.Send(searchBoxKeyUpRequest, cancellationToken);
-            }
+                SearchBoxTextBox = _tbSearchBox,
+                TreeView = _tvTaskList,
+                KeyData = (int)Keys.Enter
+            };
+            await _mediator.Send(searchBoxKeyUpRequest, cancellationToken);
         }
     }
 }

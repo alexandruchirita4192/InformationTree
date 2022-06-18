@@ -6,24 +6,23 @@ using InformationTree.Domain.Responses;
 using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class FormMouseDoubleClickHandler : IRequestHandler<FormMouseDoubleClickRequest, BaseResponse>
 {
-    public class FormMouseDoubleClickHandler : IRequestHandler<FormMouseDoubleClickRequest, BaseResponse>
+    public Task<BaseResponse> Handle(FormMouseDoubleClickRequest request, CancellationToken cancellationToken)
     {
-        public Task<BaseResponse> Handle(FormMouseDoubleClickRequest request, CancellationToken cancellationToken)
+        if (request.Form is not Form form)
+            return Task.FromResult<BaseResponse>(null);
+
+        form.InvokeWrapper(form =>
         {
-            if (request.Form is not Form form)
-                return Task.FromResult<BaseResponse>(null);
+            form.FormBorderStyle =
+                form.FormBorderStyle == FormBorderStyle.Sizable
+                    ? FormBorderStyle.None
+                    : FormBorderStyle.Sizable;
+        });
 
-            form.InvokeWrapper(form =>
-            {
-                form.FormBorderStyle =
-                    form.FormBorderStyle == FormBorderStyle.Sizable
-                        ? FormBorderStyle.None
-                        : FormBorderStyle.Sizable;
-            });
-
-            return Task.FromResult(new BaseResponse());
-        }
+        return Task.FromResult(new BaseResponse());
     }
 }

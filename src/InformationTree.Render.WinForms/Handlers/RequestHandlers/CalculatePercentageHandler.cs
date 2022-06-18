@@ -9,105 +9,104 @@ using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class CalculatePercentageHandler : IRequestHandler<CalculatePercentageRequest, BaseResponse>
 {
-    public class CalculatePercentageHandler : IRequestHandler<CalculatePercentageRequest, BaseResponse>
+    private readonly IMediator _mediator;
+    private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+
+    public CalculatePercentageHandler(
+        IMediator mediator,
+        ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter
+        )
     {
-        private readonly IMediator _mediator;
-        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        _mediator = mediator;
+        _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+    }
 
-        public CalculatePercentageHandler(
-            IMediator mediator,
-            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter
-            )
+    public async Task<BaseResponse> Handle(CalculatePercentageRequest request, CancellationToken cancellationToken)
+    {
+        if (request.SelectedNode is not TreeNode selectedNode)
+            return null;
+
+        if (request.Direction == CalculatePercentageDirection.FromLeafsToSelectedNode)
         {
-            _mediator = mediator;
-            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+            var percentage = GetPercentageFromChildren(selectedNode)
+                .ValidatePercentage();
+            _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
+                .PercentCompleted = percentage;
+
+            var setTreeStateRequest = new SetTreeStateRequest
+            {
+                TreeUnchanged = false
+            };
+            return await _mediator.Send(setTreeStateRequest, cancellationToken);
         }
-
-        public async Task<BaseResponse> Handle(CalculatePercentageRequest request, CancellationToken cancellationToken)
+        else if (request.Direction == CalculatePercentageDirection.FromSelectedNodeToLeafs)
         {
-            if (request.SelectedNode is not TreeNode selectedNode)
-                return null;
+            var percentage = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
+                .PercentCompleted
+                .ValidatePercentage();
+            
+            SetPercentageToChildren(selectedNode, percentage);
 
-            if (request.Direction == CalculatePercentageDirection.FromLeafsToSelectedNode)
+            var setTreeStateRequest = new SetTreeStateRequest
             {
-                var percentage = GetPercentageFromChildren(selectedNode)
-                    .ValidatePercentage();
-                _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
-                    .PercentCompleted = percentage;
+                TreeUnchanged = false
+            };
+            return await _mediator.Send(setTreeStateRequest, cancellationToken);
+        }
+        return new BaseResponse();
+    }
 
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                return await _mediator.Send(setTreeStateRequest, cancellationToken);
-            }
-            else if (request.Direction == CalculatePercentageDirection.FromSelectedNodeToLeafs)
+    private decimal GetPercentageFromChildren(TreeNode topNode)
+    {
+        if (topNode == null)
+            throw new ArgumentNullException(nameof(topNode));
+
+        var sum = 0m;
+        var nr = 0;
+        foreach (TreeNode node in topNode.Nodes)
+        {
+            if (node != null && node.Nodes.Count > 0)
             {
-                var percentage = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
+                var procentCompleted = GetPercentageFromChildren(node);
+                var procentCompletedForCurrentNode = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                     .PercentCompleted
                     .ValidatePercentage();
-                
-                SetPercentageToChildren(selectedNode, percentage);
+                procentCompleted += procentCompletedForCurrentNode;
 
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                return await _mediator.Send(setTreeStateRequest, cancellationToken);
+                sum += procentCompleted;
             }
-            return new BaseResponse();
+            else
+            {
+                var procentCompleted = _treeNodeToTreeNodeDataAdapter.Adapt(node)
+                    .PercentCompleted
+                    .ValidatePercentage();
+                sum += procentCompleted;
+            }
+            nr++;
         }
 
-        private decimal GetPercentageFromChildren(TreeNode topNode)
+        return nr != 0 ? sum / nr : 0;
+    }
+
+    private void SetPercentageToChildren(TreeNode topNode, decimal percentage)
+    {
+        if (topNode == null)
+            throw new ArgumentNullException(nameof(topNode));
+        if (percentage < 0 || percentage > 100)
+            throw new ArgumentOutOfRangeException(nameof(percentage));
+
+        foreach (TreeNode node in topNode.Nodes)
         {
-            if (topNode == null)
-                throw new ArgumentNullException(nameof(topNode));
-
-            var sum = 0m;
-            var nr = 0;
-            foreach (TreeNode node in topNode.Nodes)
+            if (node != null)
             {
-                if (node != null && node.Nodes.Count > 0)
-                {
-                    var procentCompleted = GetPercentageFromChildren(node);
-                    var procentCompletedForCurrentNode = _treeNodeToTreeNodeDataAdapter.Adapt(node)
-                        .PercentCompleted
-                        .ValidatePercentage();
-                    procentCompleted += procentCompletedForCurrentNode;
-
-                    sum += procentCompleted;
-                }
-                else
-                {
-                    var procentCompleted = _treeNodeToTreeNodeDataAdapter.Adapt(node)
-                        .PercentCompleted
-                        .ValidatePercentage();
-                    sum += procentCompleted;
-                }
-                nr++;
-            }
-
-            return nr != 0 ? sum / nr : 0;
-        }
-
-        private void SetPercentageToChildren(TreeNode topNode, decimal percentage)
-        {
-            if (topNode == null)
-                throw new ArgumentNullException(nameof(topNode));
-            if (percentage < 0 || percentage > 100)
-                throw new ArgumentOutOfRangeException(nameof(percentage));
-
-            foreach (TreeNode node in topNode.Nodes)
-            {
-                if (node != null)
-                {
-                    _treeNodeToTreeNodeDataAdapter.Adapt(node)
-                        .PercentCompleted = percentage;
-                    if (node.Nodes.Count > 0)
-                        SetPercentageToChildren(node, percentage);
-                }
+                _treeNodeToTreeNodeDataAdapter.Adapt(node)
+                    .PercentCompleted = percentage;
+                if (node.Nodes.Count > 0)
+                    SetPercentageToChildren(node, percentage);
             }
         }
     }

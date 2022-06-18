@@ -9,45 +9,44 @@ using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+internal class SearchBoxKeyUpHandler : IRequestHandler<SearchBoxKeyUpRequest, BaseResponse>
 {
-    internal class SearchBoxKeyUpHandler : IRequestHandler<SearchBoxKeyUpRequest, BaseResponse>
+    private readonly ICachingService _cachingService;
+    private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+
+    public SearchBoxKeyUpHandler(
+        ICachingService cachingService,
+        ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
     {
-        private readonly ICachingService _cachingService;
-        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        _cachingService = cachingService;
+        _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+    }
 
-        public SearchBoxKeyUpHandler(
-            ICachingService cachingService,
-            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
+    public Task<BaseResponse> Handle(SearchBoxKeyUpRequest request, CancellationToken cancellationToken)
+    {
+        if (request.SearchBoxTextBox is not TextBox tbSearchBox)
+            return Task.FromResult<BaseResponse>(null);
+        if (request.TreeView is not TreeView tvTaskList)
+            return Task.FromResult<BaseResponse>(null);
+
+        _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, false);
+        if (request.KeyData == (int)Keys.Enter)
         {
-            _cachingService = cachingService;
-            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
-        }
+            var searchText = tbSearchBox.Text;
 
-        public Task<BaseResponse> Handle(SearchBoxKeyUpRequest request, CancellationToken cancellationToken)
-        {
-            if (request.SearchBoxTextBox is not TextBox tbSearchBox)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.TreeView is not TreeView tvTaskList)
+            tvTaskList.Nodes.ClearStyleAdded();
+
+            if (searchText.Length < 3)
                 return Task.FromResult<BaseResponse>(null);
 
-            _cachingService.Set(Constants.CacheKeys.IsControlKeyPressed, false);
-            if (request.KeyData == (int)Keys.Enter)
+            if (searchText.IsNotEmpty())
             {
-                var searchText = tbSearchBox.Text;
-
-                tvTaskList.Nodes.ClearStyleAdded();
-
-                if (searchText.Length < 3)
-                    return Task.FromResult<BaseResponse>(null);
-
-                if (searchText.IsNotEmpty())
-                {
-                    tvTaskList.Nodes.SetStyleForSearch(searchText, _treeNodeToTreeNodeDataAdapter);
-                }
+                tvTaskList.Nodes.SetStyleForSearch(searchText, _treeNodeToTreeNodeDataAdapter);
             }
-            
-            return Task.FromResult(new BaseResponse());
         }
+        
+        return Task.FromResult(new BaseResponse());
     }
 }

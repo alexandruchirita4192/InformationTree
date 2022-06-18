@@ -8,76 +8,75 @@ using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class TreeViewToggleCompletedTasksHandler : IRequestHandler<TreeViewToggleCompletedTasksRequest, BaseResponse>
 {
-    public class TreeViewToggleCompletedTasksHandler : IRequestHandler<TreeViewToggleCompletedTasksRequest, BaseResponse>
+    private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+
+    public TreeViewToggleCompletedTasksHandler(ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
     {
-        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+    }
 
-        public TreeViewToggleCompletedTasksHandler(ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
+    public Task<BaseResponse> Handle(TreeViewToggleCompletedTasksRequest request, CancellationToken cancellationToken)
+    {
+        if (request.TreeView is not TreeView tvTaskList)
+            return Task.FromResult<BaseResponse>(null);
+
+        var completedTasksAreHidden = TasksCompleteAreHidden(tvTaskList) ?? false;
+        ToggleCompletedTasks(!completedTasksAreHidden, tvTaskList.Nodes);
+
+        return Task.FromResult(new BaseResponse());
+    }
+
+    private bool? TasksCompleteAreHidden(TreeView tv)
+    {
+        if (tv.Nodes.Count > 0)
         {
-            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
-        }
-
-        public Task<BaseResponse> Handle(TreeViewToggleCompletedTasksRequest request, CancellationToken cancellationToken)
-        {
-            if (request.TreeView is not TreeView tvTaskList)
-                return Task.FromResult<BaseResponse>(null);
-
-            var completedTasksAreHidden = TasksCompleteAreHidden(tvTaskList) ?? false;
-            ToggleCompletedTasks(!completedTasksAreHidden, tvTaskList.Nodes);
-
-            return Task.FromResult(new BaseResponse());
-        }
-
-        private bool? TasksCompleteAreHidden(TreeView tv)
-        {
-            if (tv.Nodes.Count > 0)
+            foreach (TreeNode node in tv.Nodes)
             {
-                foreach (TreeNode node in tv.Nodes)
+                var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
+                    .PercentCompleted
+                    .ValidatePercentage();
+
+                if (completed == 100)
                 {
-                    var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
-                        .PercentCompleted
-                        .ValidatePercentage();
+                    if (node.ForeColor.Name == Constants.Colors.DefaultBackGroundColor.ToString())
+                        return true;
+                    else
+                        return false;
+                }
 
-                    if (completed == 100)
-                    {
-                        if (node.ForeColor.Name == Constants.Colors.DefaultBackGroundColor.ToString())
-                            return true;
-                        else
-                            return false;
-                    }
-
-                    if (node.Nodes.Count > 0)
-                    {
-                        var ret = TasksCompleteAreHidden(tv);
-                        if (ret.HasValue)
-                            return ret;
-                        // else continue;
-                    }
+                if (node.Nodes.Count > 0)
+                {
+                    var ret = TasksCompleteAreHidden(tv);
+                    if (ret.HasValue)
+                        return ret;
+                    // else continue;
                 }
             }
-            return null;
         }
+        return null;
+    }
 
-        private void ToggleCompletedTasks(bool toggleCompletedTasksAreHidden, TreeNodeCollection nodes)
+    private void ToggleCompletedTasks(bool toggleCompletedTasksAreHidden, TreeNodeCollection nodes)
+    {
+        if (nodes.Count > 0)
         {
-            if (nodes.Count > 0)
+            var foreColor = toggleCompletedTasksAreHidden ? Constants.Colors.DefaultForeGroundColor : Constants.Colors.DefaultBackGroundColor;
+
+            foreach (TreeNode node in nodes)
             {
-                var foreColor = toggleCompletedTasksAreHidden ? Constants.Colors.DefaultForeGroundColor : Constants.Colors.DefaultBackGroundColor;
+                var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
+                    .PercentCompleted
+                    .ValidatePercentage();
 
-                foreach (TreeNode node in nodes)
-                {
-                    var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
-                        .PercentCompleted
-                        .ValidatePercentage();
+                if (completed == 100)
+                    node.ForeColor = foreColor;
 
-                    if (completed == 100)
-                        node.ForeColor = foreColor;
-
-                    if (node.Nodes.Count > 0)
-                        ToggleCompletedTasks(toggleCompletedTasksAreHidden, node.Nodes);
-                }
+                if (node.Nodes.Count > 0)
+                    ToggleCompletedTasks(toggleCompletedTasksAreHidden, node.Nodes);
             }
         }
     }

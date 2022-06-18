@@ -2,11 +2,10 @@
 using Newtonsoft.Json;
 using InformationTree.Domain.Requests.Base;
 
-namespace InformationTree.Domain.Requests
+namespace InformationTree.Domain.Requests;
+
+public class FormMouseDoubleClickRequest : BaseRequest
 {
-    public class FormMouseDoubleClickRequest : BaseRequest
-    {
-        [JsonIgnore]
-        public Component Form { get; set; }
-    }
+    [JsonIgnore]
+    public Component Form { get; set; }
 }

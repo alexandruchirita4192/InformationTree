@@ -6,38 +6,37 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class MainFormFontSizeValueChangedHandler : IRequestHandler<MainFormFontSizeValueChangedRequest, BaseResponse>
 {
-    public class MainFormFontSizeValueChangedHandler : IRequestHandler<MainFormFontSizeValueChangedRequest, BaseResponse>
+    private readonly IMediator _mediator;
+
+    public MainFormFontSizeValueChangedHandler(IMediator mediator)
     {
-        private readonly IMediator _mediator;
+        _mediator = mediator;
+    }
 
-        public MainFormFontSizeValueChangedHandler(IMediator mediator)
+    public async Task<BaseResponse> Handle(MainFormFontSizeValueChangedRequest request, CancellationToken cancellationToken)
+    {
+        if (request.SelectedTreeNode is not TreeNode selectedNode)
+            return null;
+        if (request.FontSizeNumericUpDown is not NumericUpDown nudFontSize)
+            return null;
+
+        var oldFont = selectedNode.NodeFont;
+        if (oldFont != null)
         {
-            _mediator = mediator;
-        }
+            selectedNode.NodeFont = new Font(oldFont.FontFamily, (float)nudFontSize.Value, oldFont.Style);
 
-        public async Task<BaseResponse> Handle(MainFormFontSizeValueChangedRequest request, CancellationToken cancellationToken)
-        {
-            if (request.SelectedTreeNode is not TreeNode selectedNode)
-                return null;
-            if (request.FontSizeNumericUpDown is not NumericUpDown nudFontSize)
-                return null;
-
-            var oldFont = selectedNode.NodeFont;
-            if (oldFont != null)
+            // on font changed is added too??
+            var setTreeStateRequest = new SetTreeStateRequest
             {
-                selectedNode.NodeFont = new Font(oldFont.FontFamily, (float)nudFontSize.Value, oldFont.Style);
-
-                // on font changed is added too??
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest, cancellationToken);
-            }
-
-            return new BaseResponse();
+                TreeUnchanged = false
+            };
+            await _mediator.Send(setTreeStateRequest, cancellationToken);
         }
+
+        return new BaseResponse();
     }
 }

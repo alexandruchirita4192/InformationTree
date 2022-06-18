@@ -12,89 +12,88 @@ using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class TreeViewDoubleClickHandler : IRequestHandler<TreeViewDoubleClickRequest, BaseResponse>
 {
-    public class TreeViewDoubleClickHandler : IRequestHandler<TreeViewDoubleClickRequest, BaseResponse>
+    private readonly ICanvasFormFactory _canvasFormFactory;
+    private readonly IPopUpService _popUpService;
+    private readonly IConfigurationReader _configurationReader;
+    private readonly IMediator _mediator;
+    private readonly ICachingService _cachingService;
+    private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+
+    public TreeViewDoubleClickHandler(
+        ICanvasFormFactory canvasFormFactory,
+        IPopUpService popUpService,
+        IConfigurationReader configurationReader,
+        IMediator mediator,
+        ICachingService cachingService,
+        ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter
+        )
     {
-        private readonly ICanvasFormFactory _canvasFormFactory;
-        private readonly IPopUpService _popUpService;
-        private readonly IConfigurationReader _configurationReader;
-        private readonly IMediator _mediator;
-        private readonly ICachingService _cachingService;
-        private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
+        _canvasFormFactory = canvasFormFactory;
+        _popUpService = popUpService;
+        _configurationReader = configurationReader;
+        _mediator = mediator;
+        _cachingService = cachingService;
+        _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
+    }
 
-        public TreeViewDoubleClickHandler(
-            ICanvasFormFactory canvasFormFactory,
-            IPopUpService popUpService,
-            IConfigurationReader configurationReader,
-            IMediator mediator,
-            ICachingService cachingService,
-            ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter
-            )
+    public Task<BaseResponse> Handle(TreeViewDoubleClickRequest request, CancellationToken cancellationToken)
+    {
+        if (request.TreeView is not TreeView tvTaskList)
+            return Task.FromResult<BaseResponse>(null);
+        if (request.Form is not MainForm mainForm)
+            return Task.FromResult<BaseResponse>(null);
+        if (request.TaskNameTextBox is not TextBox tbTaskName)
+            return Task.FromResult<BaseResponse>(null);
+
+        var selectedNode = tvTaskList.SelectedNode;
+        if (selectedNode != null)
         {
-            _canvasFormFactory = canvasFormFactory;
-            _popUpService = popUpService;
-            _configurationReader = configurationReader;
-            _mediator = mediator;
-            _cachingService = cachingService;
-            _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
-        }
+            var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
+            var data = tagData.Data ?? string.Empty;
 
-        public Task<BaseResponse> Handle(TreeViewDoubleClickRequest request, CancellationToken cancellationToken)
-        {
-            if (request.TreeView is not TreeView tvTaskList)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.Form is not MainForm mainForm)
-                return Task.FromResult<BaseResponse>(null);
-            if (request.TaskNameTextBox is not TextBox tbTaskName)
-                return Task.FromResult<BaseResponse>(null);
+            var form = new PopUpEditForm(
+                _canvasFormFactory,
+                _popUpService,
+                _configurationReader,
+                _mediator,
+                _cachingService,
+                selectedNode.Text,
+                data);
 
-            var selectedNode = tvTaskList.SelectedNode;
-            if (selectedNode != null)
+            WinFormsApplication.CenterForm(form, mainForm);
+
+            form.FormClosing += async (s, ev) =>
             {
-                var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
-                var data = tagData.Data ?? string.Empty;
+                var popUpReturnedData = form.Data;
 
-                var form = new PopUpEditForm(
-                    _canvasFormFactory,
-                    _popUpService,
-                    _configurationReader,
-                    _mediator,
-                    _cachingService,
-                    selectedNode.Text,
-                    data);
-
-                WinFormsApplication.CenterForm(form, mainForm);
-
-                form.FormClosing += async (s, ev) =>
+                if (selectedNode != null)
                 {
-                    var popUpReturnedData = form.Data;
+                    var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
+                    treeNodeData.Data = popUpReturnedData;
 
-                    if (selectedNode != null)
+                    var strippedData = popUpReturnedData.StripRTF();
+                    selectedNode.ToolTipText = (selectedNode.Text +
+                        (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
+                        (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""))
+                        .GetToolTipText();
+
+                    tbTaskName.BackColor = tagData.GetTaskNameColor();
+
+                    var setTreeStateRequest = new SetTreeStateRequest
                     {
-                        var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
-                        treeNodeData.Data = popUpReturnedData;
+                        TreeUnchanged = false
+                    };
+                    await _mediator.Send(setTreeStateRequest, cancellationToken);
+                }
+            };
 
-                        var strippedData = popUpReturnedData.StripRTF();
-                        selectedNode.ToolTipText = (selectedNode.Text +
-                            (selectedNode.Name.IsNotEmpty() && selectedNode.Name != "0" ? $"{Environment.NewLine} TimeSpent: {selectedNode.Name}" : "") +
-                            (strippedData.IsNotEmpty() ? $"{Environment.NewLine} Data: {strippedData}" : ""))
-                            .GetToolTipText();
-
-                        tbTaskName.BackColor = tagData.GetTaskNameColor();
-
-                        var setTreeStateRequest = new SetTreeStateRequest
-                        {
-                            TreeUnchanged = false
-                        };
-                        await _mediator.Send(setTreeStateRequest, cancellationToken);
-                    }
-                };
-
-                form.ShowDialog();
-            }
-
-            return Task.FromResult(new BaseResponse());
+            form.ShowDialog();
         }
+
+        return Task.FromResult(new BaseResponse());
     }
 }

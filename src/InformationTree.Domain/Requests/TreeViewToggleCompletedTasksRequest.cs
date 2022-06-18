@@ -2,11 +2,10 @@
 using Newtonsoft.Json;
 using InformationTree.Domain.Requests.Base;
 
-namespace InformationTree.Domain.Requests
+namespace InformationTree.Domain.Requests;
+
+public class TreeViewToggleCompletedTasksRequest : BaseRequest
 {
-    public class TreeViewToggleCompletedTasksRequest : BaseRequest
-    {
-        [JsonIgnore]
-        public Component TreeView { get; set; }
-    }
+    [JsonIgnore]
+    public Component TreeView { get; set; }
 }

@@ -1,6 +1,5 @@
-﻿namespace InformationTree.Domain.Responses
+﻿namespace InformationTree.Domain.Responses;
+
+public class BaseResponse
 {
-    public class BaseResponse
-    {
-    }
 }

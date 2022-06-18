@@ -5,33 +5,32 @@ using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class PopUpEditFormExitPopUpAndSaveClickHandler : IRequestHandler<PopUpEditFormExitPopUpAndSaveClickRequest, BaseResponse>
 {
-    public class PopUpEditFormExitPopUpAndSaveClickHandler : IRequestHandler<PopUpEditFormExitPopUpAndSaveClickRequest, BaseResponse>
+    private readonly IMediator _mediator;
+
+    public PopUpEditFormExitPopUpAndSaveClickHandler(IMediator mediator)
     {
-        private readonly IMediator _mediator;
+        _mediator = mediator;
+    }
 
-        public PopUpEditFormExitPopUpAndSaveClickHandler(IMediator mediator)
+    public async Task<BaseResponse> Handle(PopUpEditFormExitPopUpAndSaveClickRequest request, CancellationToken cancellationToken)
+    {
+        if (request.ExitPopUpAndSaveTextBox is not TextBox tbExitPopUpAndSave)
+            return null;
+        if (request.Form is not Form form)
+            return null;
+        if (request.Sender == null)
+            return null;
+
+        if (ReferenceEquals(request.Sender, tbExitPopUpAndSave))
         {
-            _mediator = mediator;
+            var formCloseRequest = new FormCloseRequest { Form = form };
+            await _mediator.Send(formCloseRequest, cancellationToken);
         }
 
-        public async Task<BaseResponse> Handle(PopUpEditFormExitPopUpAndSaveClickRequest request, CancellationToken cancellationToken)
-        {
-            if (request.ExitPopUpAndSaveTextBox is not TextBox tbExitPopUpAndSave)
-                return null;
-            if (request.Form is not Form form)
-                return null;
-            if (request.Sender == null)
-                return null;
-
-            if (ReferenceEquals(request.Sender, tbExitPopUpAndSave))
-            {
-                var formCloseRequest = new FormCloseRequest { Form = form };
-                await _mediator.Send(formCloseRequest, cancellationToken);
-            }
-
-            return new BaseResponse();
-        }
+        return new BaseResponse();
     }
 }

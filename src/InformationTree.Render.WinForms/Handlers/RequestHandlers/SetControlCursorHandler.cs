@@ -6,19 +6,18 @@ using InformationTree.Domain.Responses;
 using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
-namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
+namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
+
+public class SetControlCursorHandler : IRequestHandler<SetControlCursorRequest, BaseResponse>
 {
-    public class SetControlCursorHandler : IRequestHandler<SetControlCursorRequest, BaseResponse>
+    public Task<BaseResponse> Handle(SetControlCursorRequest request, CancellationToken cancellationToken)
     {
-        public Task<BaseResponse> Handle(SetControlCursorRequest request, CancellationToken cancellationToken)
-        {
-            if (request.Control is Control control)
-                control.InvokeWrapper(t =>
-                {
-                    var cursor = request.IsWaitCursor ? Cursors.WaitCursor : Cursors.Default;
-                    t.Cursor = cursor;
-                });
-            return Task.FromResult(new BaseResponse());
-        }
+        if (request.Control is Control control)
+            control.InvokeWrapper(t =>
+            {
+                var cursor = request.IsWaitCursor ? Cursors.WaitCursor : Cursors.Default;
+                t.Cursor = cursor;
+            });
+        return Task.FromResult(new BaseResponse());
     }
 }
