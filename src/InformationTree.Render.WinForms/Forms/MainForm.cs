@@ -5,7 +5,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
@@ -410,108 +409,11 @@ namespace InformationTree.Forms
             await _mediator.Send(updateTextClickRequest);
         }
 
-        // TODO: Handler for MainFormAddTaskClickRequest
         private async void btnAddTask_Click(object sender, EventArgs e)
         {
-            var taskPercentCompleted = nudCompleteProgress.Value;
-            var taskName = tbTaskName.Text;
-            var urgency = (int)nudUrgency.Value;
-            var link = tbLink.Text;
-
-            // update part
-            var selectedNode = tvTaskList.SelectedNode;
-            var selectedNodeLastChildren = selectedNode != null && selectedNode.Nodes.Count > 0 ? selectedNode.Nodes[selectedNode.Nodes.Count - 1] : null;
-            if (selectedNode != null && selectedNode.Text.Equals(taskName /*StartsWith + " [" */))
-            {
-                if (selectedNode.Text != taskName)
-                {
-                    selectedNode.Text = taskName;
-                    var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
-                    tagData.LastChangeDate = DateTime.Now;
-
-                    tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
-
-                    var setTreeStateRequest = new SetTreeStateRequest
-                    {
-                        TreeUnchanged = false
-                    };
-                    await _mediator.Send(setTreeStateRequest);
-                }
-            }
-            else if (selectedNodeLastChildren != null && selectedNodeLastChildren.Text.Equals(taskName /* StartsWith + " [" */))
-            {
-                if (selectedNodeLastChildren.Text != taskName)
-                {
-                    selectedNodeLastChildren.Text = taskName;
-
-                    var tagData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNodeLastChildren);
-                    tagData.LastChangeDate = DateTime.Now;
-
-                    tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
-
-                    var setTreeStateRequest = new SetTreeStateRequest
-                    {
-                        TreeUnchanged = false
-                    };
-                    await _mediator.Send(setTreeStateRequest);
-                }
-            }
-            else //insert
-            {
-                var node = new TreeNode(taskName)
-                {
-                    Name = 0.ToString(),
-                    ForeColor = Constants.Colors.DefaultForeGroundColor,
-                    BackColor = Constants.Colors.DefaultBackGroundColor,
-                    NodeFont = WinFormsConstants.FontDefaults.DefaultFont.Clone() as Font,
-                    ToolTipText = taskName.GetToolTipText()
-                };
-                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
-                treeNodeData.AddedNumber = tvTaskList.GetNodeCount(true) + 1;
-                treeNodeData.Urgency = urgency;
-                treeNodeData.Link = link;
-                treeNodeData.IsStartupAlert = false;
-                treeNodeData.PercentCompleted = taskPercentCompleted;
-
-                node.Text = taskName;
-
-                if (tvTaskList.SelectedNode == null)
-                    tvTaskList.Nodes.Add(node);
-                else
-                {
-                    tvTaskList.SelectedNode.Nodes.Add(node);
-                    tvTaskList.SelectedNode.Expand();
-                }
-
-                tvTaskList_AfterSelect(sender, new TreeViewEventArgs(selectedNode));
-
-                // on control add TreeUnchanged is set false too (tvTaskList_ControlAdded
-            }
-
-            var updateNodeCountRequest = new UpdateNodeCountRequest
-            {
-                TreeView = tvTaskList,
-                ShowUntilNumberNumericUpDown = nudShowUntilNumber,
-                ShowFromNumberNumericUpDown = nudShowFromNumber,
-            };
-            await _mediator.Send(updateNodeCountRequest);
-
-            // TODO: Fix properly
-            // workaround fix for some weirdly added spaces
-            if (tvTaskList.SelectedNode == null)
-                return;
-
             var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
-            var updateTextClickRequest = new UpdateTextClickRequest
+            var request = new MainFormAddTaskClickRequest
             {
-                SelectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
-                TaskPercentCompleted = nudCompleteProgress.Value,
-                TaskName = tbTaskName.Text,
-                Link = tbLink.Text,
-                Urgency = (int)nudUrgency.Value,
-                Category = tbCategory.Text,
-                IsStartupAlert = cbIsStartupAlert.Checked,
-                TaskListTreeView = tvTaskList,
                 AfterSelectRequest = new TaskListAfterSelectRequest
                 {
                     TreeView = tvTaskList,
@@ -540,10 +442,11 @@ namespace InformationTree.Forms
                     FontSizeNumericUpDown = nudFontSize,
                     TextColorTextBox = tbTextColor,
                     BackgroundColorTextBox = tbBackgroundColor,
-                }
+                },
+                ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                ShowFromNumberNumericUpDown = nudShowFromNumber
             };
-
-            await _mediator.Send(updateTextClickRequest);
+            await _mediator.Send(request);
         }
 
         private async void btnDelete_Click(object sender, EventArgs e)
@@ -1379,7 +1282,7 @@ namespace InformationTree.Forms
         private async void lblChangeTreeType_Click(object sender, EventArgs e)
         {
             var request = new MainFormChangeTreeTypeClickRequest
-            { 
+            {
                 Timer = _randomTimer
             };
             await _mediator.Send(request);
