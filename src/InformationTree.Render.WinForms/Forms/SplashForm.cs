@@ -45,12 +45,12 @@ namespace InformationTree.Forms
 
         public static void ShowDefaultSplashScreen(
             IMediator mediator,
-            IGraphicsFileFactory graphicsFileRecursiveGenerator)
+            IGraphicsFileFactory graphicsFileFactory)
         {
             InternalShowSplashScreen(mediator, (currentScreenIndex) =>
             {
                 var screen = Screen.AllScreens[currentScreenIndex];
-                var graphicsFile = graphicsFileRecursiveGenerator.GetDefaultGraphicsFile(screen.Bounds.Height, screen.Bounds.Width);
+                var graphicsFile = graphicsFileFactory.GetDefaultGraphicsFile(screen.Bounds.Height, screen.Bounds.Width);
                 return graphicsFile;
             });
         }

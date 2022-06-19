@@ -25,20 +25,20 @@ namespace InformationTree.Render.WinForms.Services
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
+        private readonly IGraphicsFileFactory _graphicsFileFactory;
         private readonly ISoundProvider _soundProvider;
         private readonly IPopUpService _popUpService;
         private readonly ICompressionProvider _compressionProvider;
         private readonly IMediator _mediator;
 
         public ImportTreeFromXmlService(
-            IGraphicsFileFactory graphicsFileRecursiveGenerator,
+            IGraphicsFileFactory graphicsFileFactory,
             ISoundProvider soundProvider,
             IPopUpService popUpService,
             ICompressionProvider compressionProvider,
             IMediator mediator)
         {
-            _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
+            _graphicsFileFactory = graphicsFileFactory;
             _soundProvider = soundProvider;
             _popUpService = popUpService;
             _compressionProvider = compressionProvider;
@@ -125,7 +125,7 @@ namespace InformationTree.Render.WinForms.Services
                         .Wait();
                 }
 
-                SplashForm.ShowDefaultSplashScreen(_mediator, _graphicsFileRecursiveGenerator);
+                SplashForm.ShowDefaultSplashScreen(_mediator, _graphicsFileFactory);
                 var xDoc = new XmlDocument();
                 xDoc.Load(fileName);
 

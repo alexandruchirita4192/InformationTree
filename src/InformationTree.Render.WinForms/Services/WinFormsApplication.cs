@@ -18,9 +18,7 @@ namespace InformationTree.Render.WinForms.Services
 
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpService _popUpService;
-        private readonly ISoundProvider _soundProvider;
-        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
-        private readonly ICanvasFormFactory _canvasFormFactory;
+        private readonly IGraphicsFileFactory _graphicsFileFactory;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
@@ -33,9 +31,7 @@ namespace InformationTree.Render.WinForms.Services
         public WinFormsApplication(
             IConfigurationReader configurationReader,
             IPopUpService popUpService,
-            ISoundProvider soundProvider,
-            IGraphicsFileFactory graphicsFileRecursiveGenerator,
-            ICanvasFormFactory canvasFormFactory,
+            IGraphicsFileFactory graphicsFileFactory,
             IExportNodeToRtfService exportNodeToRtfService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
@@ -47,9 +43,7 @@ namespace InformationTree.Render.WinForms.Services
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
-            _soundProvider = soundProvider;
-            _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
-            _canvasFormFactory = canvasFormFactory;
+            _graphicsFileFactory = graphicsFileFactory;
             _exportNodeToRtfService = exportNodeToRtfService;
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
@@ -204,10 +198,7 @@ namespace InformationTree.Render.WinForms.Services
             };
 
             Application.Run(MainForm = new MainForm(
-                _soundProvider,
-                _graphicsFileRecursiveGenerator,
-                _canvasFormFactory,
-                _popUpService,
+                _graphicsFileFactory,
                 _configurationReader,
                 _exportNodeToRtfService,
                 _importTreeFromXmlService,

@@ -16,7 +16,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
+        private readonly IGraphicsFileFactory _graphicsFileFactory;
         private readonly IPopUpService _popUpService;
 
         #region Properties
@@ -28,9 +28,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
 
         #region Constructor
 
-        public GraphicsFile(IGraphicsFileFactory graphicsProvider, IPopUpService popUpService)
+        public GraphicsFile(IGraphicsFileFactory graphicsFileFactory, IPopUpService popUpService)
         {
-            _graphicsFileRecursiveGenerator = graphicsProvider;
+            _graphicsFileFactory = graphicsFileFactory;
             _popUpService = popUpService;
 
             Frame = new Frame();
@@ -354,7 +354,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                     _radius = double.Parse(words[0]);
                     _iterations = int.Parse(words[1]);
                     _computeType = words.Length == 3 ? (ComputeType)int.Parse(words[2]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
-                    ParseLines(_graphicsFileRecursiveGenerator.GenerateFigureLines(_radius, _iterations, _computeType).Distinct().ToArray());
+                    ParseLines(_graphicsFileFactory.GenerateFigureLines(_radius, _iterations, _computeType).Distinct().ToArray());
                     break;
 
                 case 7:
@@ -367,7 +367,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                     var _number = int.Parse(words[5]);
                     _iterations = int.Parse(words[6]);
                     _computeType = words.Length == 8 ? (ComputeType)int.Parse(words[7]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
-                    ParseLines(_graphicsFileRecursiveGenerator.GenerateFigureLines(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
+                    ParseLines(_graphicsFileFactory.GenerateFigureLines(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
                     break;
             }
         }

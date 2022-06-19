@@ -26,12 +26,7 @@ namespace InformationTree.Forms
     {
         #region Fields
 
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        private readonly ISoundProvider _soundProvider;
-        private readonly IGraphicsFileFactory _graphicsFileRecursiveGenerator;
-        private readonly ICanvasFormFactory _canvasFormFactory;
-        private readonly IPopUpService _popUpService;
+        private readonly IGraphicsFileFactory _graphicsFileFactory;
         private readonly IConfigurationReader _configurationReader;
         private readonly IExportNodeToRtfService _exportNodeToRtfService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
@@ -48,10 +43,7 @@ namespace InformationTree.Forms
         #region ctor
 
         public MainForm(
-            ISoundProvider soundProvider,
-            IGraphicsFileFactory graphicsFileRecursiveGenerator,
-            ICanvasFormFactory canvasFormFactory,
-            IPopUpService popUpService,
+            IGraphicsFileFactory graphicsFileFactory,
             IConfigurationReader configurationReader,
             IExportNodeToRtfService exportNodeToRtfService,
             IImportTreeFromXmlService importTreeFromXmlService,
@@ -62,10 +54,7 @@ namespace InformationTree.Forms
             ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter)
         {
-            _soundProvider = soundProvider;
-            _graphicsFileRecursiveGenerator = graphicsFileRecursiveGenerator;
-            _canvasFormFactory = canvasFormFactory;
-            _popUpService = popUpService;
+            _graphicsFileFactory = graphicsFileFactory;
             _configurationReader = configurationReader;
             _exportNodeToRtfService = exportNodeToRtfService;
             _importTreeFromXmlService = importTreeFromXmlService;
@@ -944,43 +933,24 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormGenerateClickRequest
         private async void btnGenerate_Click(object sender, EventArgs e)
         {
-            var x = (double)nudX.Value;
-            var y = (double)nudY.Value;
-            var number = (int)nudNumber.Value;
-            var points = (int)nudPoints.Value;
-            var radius = (double)nudRadius.Value;
-            var theta = (double)nudTheta.Value;
-            var iterations = (int)nudIterations.Value;
-
-            var cbUseDefaultsChecked = cbUseDefaults.Checked;
-            var computeType = (ComputeType)nudComputeType.Value;
-            var computeTypeInt = (int)computeType;
-
-            var cbLogChecked = cbLog.Checked;
-            var node = tvTaskList.SelectedNode;
-            var commandData = cbUseDefaultsChecked ?
-                $"{GraphicsFileConstants.GenerateFigureLines.DefaultName} {radius} {theta} {iterations} {computeTypeInt}" :
-                $"{GraphicsFileConstants.GenerateFigureLines.DefaultName} {points} {x} {y} {radius} {theta} {number} {iterations} {computeTypeInt}";
-
-            if (cbLogChecked && node != null)
+            var request = new MainFormGenerateClickRequest
             {
-                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
-                treeNodeData.Data += commandData + Environment.NewLine;
-
-                var setTreeStateRequest = new SetTreeStateRequest
-                {
-                    TreeUnchanged = false
-                };
-                await _mediator.Send(setTreeStateRequest);
-            }
-
-            if (cbUseDefaultsChecked)
-                tbCommand.Lines = _graphicsFileRecursiveGenerator.GenerateFigureLines(radius, iterations, computeType).Distinct().ToArray();
-            else
-                tbCommand.Lines = _graphicsFileRecursiveGenerator.GenerateFigureLines(points, x, y, radius, theta, number, iterations, computeType).Distinct().ToArray();
+                SelectedNode = tvTaskList.SelectedNode,
+                XNumericUpDown = nudX,
+                YNumericUpDown = nudY,
+                NumberNumericUpDown = nudNumber,
+                PointsNumericUpDown = nudPoints,
+                RadiusNumericUpDown = nudRadius,
+                ThetaNumericUpDown = nudTheta,
+                IterationsNumericUpDown = nudIterations,
+                UseDefaultsCheckBox = cbUseDefaults,
+                ComputeTypeNumericUpDown = nudComputeType,
+                LogCheckBox = cbLog,
+                CommandTextBox = tbCommand,
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormUseDefaultsCheckedChangedRequest
@@ -996,10 +966,10 @@ namespace InformationTree.Forms
 
             if (cbUseDefaultsChecked)
             {
-                nudX.Value = (decimal)_graphicsFileRecursiveGenerator.DefaultX;
-                nudY.Value = (decimal)_graphicsFileRecursiveGenerator.DefaultY;
-                nudNumber.Value = _graphicsFileRecursiveGenerator.DefaultNumber;
-                nudPoints.Value = _graphicsFileRecursiveGenerator.DefaultPoints;
+                nudX.Value = (decimal)_graphicsFileFactory.DefaultX;
+                nudY.Value = (decimal)_graphicsFileFactory.DefaultY;
+                nudNumber.Value = _graphicsFileFactory.DefaultNumber;
+                nudPoints.Value = _graphicsFileFactory.DefaultPoints;
                 nudTheta.Value = 0;
             }
         }
