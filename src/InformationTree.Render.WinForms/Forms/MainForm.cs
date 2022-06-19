@@ -734,15 +734,13 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormDoNotSaveClickRequest
         private async void btnDoNotSave_Click(object sender, EventArgs e)
         {
-            var setTreeStateRequest = new SetTreeStateRequest
+            var request = new MainFormDoNotSaveClickRequest
             {
-                IsSafeToSave = false
+                ResetExceptionButton = btnResetException
             };
-            await _mediator.Send(setTreeStateRequest);
-            btnResetException.Enabled = true;
+            await _mediator.Send(request);
         }
 
         public async void tvTaskList_MouseMove(object sender, MouseEventArgs e)
