@@ -55,11 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Templates\Classes\Handler.cs" />
-    <None Include="Templates\Classes\Response.cs" />
+    <None Include="Templates\Handler.cs" />
+    <None Include="Templates\Response.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Templates\Classes\Request.cs" />
+    <None Include="Templates\Request.cs" />
     <None Include="Templates\InfoTreeItemTemplate.ico" />
   </ItemGroup>
   <ItemGroup>

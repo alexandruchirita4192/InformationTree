@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
-    <Name>Response</Name>
-    <Description>MediatR Response</Description>
+    <Name>InformationTree MediatR Response</Name>
+    <Description>MediatR Response for InformationTree solution</Description>
     <Icon>InfoTreeItemTemplate.ico</Icon>
     <TemplateID>6f3ddb08-c923-447b-b367-14cbb1da5b34</TemplateID>
     <ProjectType>CSharp</ProjectType>
@@ -11,6 +11,6 @@
     <DefaultName>Response.cs</DefaultName>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem ReplaceParameters="true">Classes\Response.cs</ProjectItem>
+    <ProjectItem ReplaceParameters="true">Response.cs</ProjectItem>
   </TemplateContent>
 </VSTemplate>

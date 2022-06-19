@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="InfoTreeTemplateVsixProject.ba140ca3-6777-4095-a1e5-a7d12ab7933d" Version="1.2" Language="en-US" Publisher="Alexandru Chirita" />
+        <Identity Id="InfoTreeTemplateVsixProject.ba140ca3-6777-4095-a1e5-a7d12ab7933d" Version="1.3" Language="en-US" Publisher="Alexandru Chirita" />
         <DisplayName>InfoTreeTemplateVsixProject</DisplayName>
         <Description xml:space="preserve">VSIX Project for MediatR Item Templates used in InformationTree solution</Description>
     </Metadata>
