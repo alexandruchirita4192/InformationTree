@@ -453,29 +453,16 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormCompleteProgressValueChangedRequest
         private async void nudCompleteProgress_ValueChanged(object sender, EventArgs e)
         {
-            pbPercentComplete.Maximum = 100;
-            pbPercentComplete.Value = (int)nudCompleteProgress.Value;
-
-            if (tvTaskList.SelectedNode != null)
+            var request = new MainFormCompleteProgressValueChangedRequest
             {
-                _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode)
-                    .PercentCompleted = nudCompleteProgress.Value
-                    .ValidatePercentage();
-
-                // TODO: Find a proper way to check if progress value has changed and not because of selection change
-                var valueHasChanged = false;
-                if (valueHasChanged)
-                {
-                    var setTreeStateRequest = new SetTreeStateRequest
-                    {
-                        TreeUnchanged = false
-                    };
-                    await _mediator.Send(setTreeStateRequest);
-                }
-            }
+                PercentCompleteProgressBar = pbPercentComplete,
+                CompleteProgressNumericUpDown = nudCompleteProgress,
+                SelectedNode = tvTaskList.SelectedNode,
+            };
+            
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormStartCountingClickRequest
