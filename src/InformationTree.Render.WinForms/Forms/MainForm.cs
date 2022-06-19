@@ -288,47 +288,43 @@ namespace InformationTree.Forms
             await _mediator.Send(taskListAfterSelectRequest);
         }
 
-        // TODO: Handler for MainFormNoTaskClickRequest
         private async void btnNoTask_Click(object sender, EventArgs e)
         {
             if (tvTaskList.SelectedNode == null)
                 return;
 
-            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
-
-            var taskListAfterSelectRequest = new TaskListAfterSelectRequest
-            {
-                TreeView = tvTaskList,
-                Form = this,
-                SelectedNode = tvTaskList.SelectedNode,
-                SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
-                TaskPercentCompleted = nudCompleteProgress.Value,
-                StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
-                TimeSpentGroupBox = gbTimeSpent,
-                StyleCheckedListBox = clbStyle,
-                FontFamilyComboBox = cbFontFamily,
-                TaskNameTextBox = tbTaskName,
-                AddedDateTextBox = tbAddedDate,
-                LastChangeDateTextBox = tbLastChangeDate,
-                AddedNumberTextBox = tbAddedNumber,
-                UrgencyNumericUpDown = nudUrgency,
-                LinkTextBox = tbLink,
-                IsStartupAlertCheckBox = cbIsStartupAlert,
-                CompleteProgressNumericUpDown = nudCompleteProgress,
-                CategoryTextBox = tbCategory,
-                DataSizeTextBox = tbDataSize,
-                HoursNumericUpDown = nudHours,
-                MinutesNumericUpDown = nudMinutes,
-                SecondsNumericUpDown = nudSeconds,
-                MillisecondsNumericUpDown = nudMilliseconds,
-                FontSizeNumericUpDown = nudFontSize,
-                TextColorTextBox = tbTextColor,
-                BackgroundColorTextBox = tbBackgroundColor,
-            };
             var request = new TreeViewNoTaskRequest
             {
                 TreeView = tvTaskList,
-                AfterSelectRequest = taskListAfterSelectRequest,
+                AfterSelectRequest = new TaskListAfterSelectRequest
+                {
+                    TreeView = tvTaskList,
+                    Form = this,
+                    SelectedNode = tvTaskList.SelectedNode,
+                    SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
+                    TaskPercentCompleted = nudCompleteProgress.Value,
+                    StyleItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered),
+                    TimeSpentGroupBox = gbTimeSpent,
+                    StyleCheckedListBox = clbStyle,
+                    FontFamilyComboBox = cbFontFamily,
+                    TaskNameTextBox = tbTaskName,
+                    AddedDateTextBox = tbAddedDate,
+                    LastChangeDateTextBox = tbLastChangeDate,
+                    AddedNumberTextBox = tbAddedNumber,
+                    UrgencyNumericUpDown = nudUrgency,
+                    LinkTextBox = tbLink,
+                    IsStartupAlertCheckBox = cbIsStartupAlert,
+                    CompleteProgressNumericUpDown = nudCompleteProgress,
+                    CategoryTextBox = tbCategory,
+                    DataSizeTextBox = tbDataSize,
+                    HoursNumericUpDown = nudHours,
+                    MinutesNumericUpDown = nudMinutes,
+                    SecondsNumericUpDown = nudSeconds,
+                    MillisecondsNumericUpDown = nudMilliseconds,
+                    FontSizeNumericUpDown = nudFontSize,
+                    TextColorTextBox = tbTextColor,
+                    BackgroundColorTextBox = tbBackgroundColor,
+                },
             };
             await _mediator.Send(request);
         }
@@ -338,7 +334,6 @@ namespace InformationTree.Forms
             if (tvTaskList.SelectedNode == null)
                 return;
 
-            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             var updateTextClickRequest = new UpdateTextClickRequest
             {
                 AfterSelectRequest = new TaskListAfterSelectRequest
@@ -348,7 +343,7 @@ namespace InformationTree.Forms
                     SelectedNode = tvTaskList.SelectedNode,
                     SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                     TaskPercentCompleted = nudCompleteProgress.Value,
-                    StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                    StyleItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered),
                     TimeSpentGroupBox = gbTimeSpent,
                     StyleCheckedListBox = clbStyle,
                     FontFamilyComboBox = cbFontFamily,
@@ -377,7 +372,6 @@ namespace InformationTree.Forms
 
         private async void btnAddTask_Click(object sender, EventArgs e)
         {
-            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             var request = new MainFormAddTaskClickRequest
             {
                 AfterSelectRequest = new TaskListAfterSelectRequest
@@ -387,7 +381,7 @@ namespace InformationTree.Forms
                     SelectedNode = tvTaskList.SelectedNode,
                     SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
                     TaskPercentCompleted = nudCompleteProgress.Value,
-                    StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
+                    StyleItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered),
                     TimeSpentGroupBox = gbTimeSpent,
                     StyleCheckedListBox = clbStyle,
                     FontFamilyComboBox = cbFontFamily,
@@ -420,43 +414,41 @@ namespace InformationTree.Forms
             if (tvTaskList.SelectedNode == null)
                 return;
 
-            var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
-            var taskListAfterSelectRequest = new TaskListAfterSelectRequest
-            {
-                TreeView = tvTaskList,
-                Form = this,
-                SelectedNode = tvTaskList.SelectedNode,
-                SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
-                TaskPercentCompleted = nudCompleteProgress.Value,
-                StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
-                TimeSpentGroupBox = gbTimeSpent,
-                StyleCheckedListBox = clbStyle,
-                FontFamilyComboBox = cbFontFamily,
-                TaskNameTextBox = tbTaskName,
-                AddedDateTextBox = tbAddedDate,
-                LastChangeDateTextBox = tbLastChangeDate,
-                AddedNumberTextBox = tbAddedNumber,
-                UrgencyNumericUpDown = nudUrgency,
-                LinkTextBox = tbLink,
-                IsStartupAlertCheckBox = cbIsStartupAlert,
-                CompleteProgressNumericUpDown = nudCompleteProgress,
-                CategoryTextBox = tbCategory,
-                DataSizeTextBox = tbDataSize,
-                HoursNumericUpDown = nudHours,
-                MinutesNumericUpDown = nudMinutes,
-                SecondsNumericUpDown = nudSeconds,
-                MillisecondsNumericUpDown = nudMilliseconds,
-                FontSizeNumericUpDown = nudFontSize,
-                TextColorTextBox = tbTextColor,
-                BackgroundColorTextBox = tbBackgroundColor,
-            };
             var request = new TreeViewDeleteRequest
             {
                 TreeView = tvTaskList,
                 TaskNameText = tbTaskName.Text,
                 ShowUntilNumberNumericUpDown = nudShowUntilNumber,
                 ShowFromNumberNumericUpDown = nudShowFromNumber,
-                AfterSelectRequest = taskListAfterSelectRequest
+                AfterSelectRequest = new TaskListAfterSelectRequest
+                {
+                    TreeView = tvTaskList,
+                    Form = this,
+                    SelectedNode = tvTaskList.SelectedNode,
+                    SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
+                    TaskPercentCompleted = nudCompleteProgress.Value,
+                    StyleItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered),
+                    TimeSpentGroupBox = gbTimeSpent,
+                    StyleCheckedListBox = clbStyle,
+                    FontFamilyComboBox = cbFontFamily,
+                    TaskNameTextBox = tbTaskName,
+                    AddedDateTextBox = tbAddedDate,
+                    LastChangeDateTextBox = tbLastChangeDate,
+                    AddedNumberTextBox = tbAddedNumber,
+                    UrgencyNumericUpDown = nudUrgency,
+                    LinkTextBox = tbLink,
+                    IsStartupAlertCheckBox = cbIsStartupAlert,
+                    CompleteProgressNumericUpDown = nudCompleteProgress,
+                    CategoryTextBox = tbCategory,
+                    DataSizeTextBox = tbDataSize,
+                    HoursNumericUpDown = nudHours,
+                    MinutesNumericUpDown = nudMinutes,
+                    SecondsNumericUpDown = nudSeconds,
+                    MillisecondsNumericUpDown = nudMilliseconds,
+                    FontSizeNumericUpDown = nudFontSize,
+                    TextColorTextBox = tbTextColor,
+                    BackgroundColorTextBox = tbBackgroundColor,
+                }
             };
             await _mediator.Send(request);
         }
@@ -1045,11 +1037,20 @@ namespace InformationTree.Forms
         }
 
         // TODO: Handler for MainFormGenerateFiguresAndExecClickRequest
-        private void btnGenerateFiguresAndExec_Click(object sender, EventArgs e)
+        private async void btnGenerateFiguresAndExec_Click(object sender, EventArgs e)
         {
             btnGenerate_Click(sender, e);
 
-            btnExecCommand_Click(sender, e);
+            if (tbCommand.Lines.Length <= 0)
+                return;
+
+            var figureLines = tbCommand.Lines;
+
+            var request = new ShowCanvasPopUpRequest
+            {
+                FigureLines = figureLines
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormUnchangedClickRequest
@@ -1094,43 +1095,41 @@ namespace InformationTree.Forms
                     if (tvTaskList.SelectedNode == null)
                         return;
 
-                    var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
-                    var taskListAfterSelectRequest = new TaskListAfterSelectRequest
-                    {
-                        TreeView = tvTaskList,
-                        Form = this,
-                        SelectedNode = tvTaskList.SelectedNode,
-                        SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
-                        TaskPercentCompleted = nudCompleteProgress.Value,
-                        StyleItemCheckEntered = _clbStyle_ItemCheckEntered,
-                        TimeSpentGroupBox = gbTimeSpent,
-                        StyleCheckedListBox = clbStyle,
-                        FontFamilyComboBox = cbFontFamily,
-                        TaskNameTextBox = tbTaskName,
-                        AddedDateTextBox = tbAddedDate,
-                        LastChangeDateTextBox = tbLastChangeDate,
-                        AddedNumberTextBox = tbAddedNumber,
-                        UrgencyNumericUpDown = nudUrgency,
-                        LinkTextBox = tbLink,
-                        IsStartupAlertCheckBox = cbIsStartupAlert,
-                        CompleteProgressNumericUpDown = nudCompleteProgress,
-                        CategoryTextBox = tbCategory,
-                        DataSizeTextBox = tbDataSize,
-                        HoursNumericUpDown = nudHours,
-                        MinutesNumericUpDown = nudMinutes,
-                        SecondsNumericUpDown = nudSeconds,
-                        MillisecondsNumericUpDown = nudMilliseconds,
-                        FontSizeNumericUpDown = nudFontSize,
-                        TextColorTextBox = tbTextColor,
-                        BackgroundColorTextBox = tbBackgroundColor,
-                    };
                     var request = new TreeViewDeleteRequest
                     {
                         TreeView = tvTaskList,
                         TaskNameText = tbTaskName.Text,
                         ShowUntilNumberNumericUpDown = nudShowUntilNumber,
                         ShowFromNumberNumericUpDown = nudShowFromNumber,
-                        AfterSelectRequest = taskListAfterSelectRequest
+                        AfterSelectRequest = new TaskListAfterSelectRequest
+                        {
+                            TreeView = tvTaskList,
+                            Form = this,
+                            SelectedNode = tvTaskList.SelectedNode,
+                            SelectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
+                            TaskPercentCompleted = nudCompleteProgress.Value,
+                            StyleItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered),
+                            TimeSpentGroupBox = gbTimeSpent,
+                            StyleCheckedListBox = clbStyle,
+                            FontFamilyComboBox = cbFontFamily,
+                            TaskNameTextBox = tbTaskName,
+                            AddedDateTextBox = tbAddedDate,
+                            LastChangeDateTextBox = tbLastChangeDate,
+                            AddedNumberTextBox = tbAddedNumber,
+                            UrgencyNumericUpDown = nudUrgency,
+                            LinkTextBox = tbLink,
+                            IsStartupAlertCheckBox = cbIsStartupAlert,
+                            CompleteProgressNumericUpDown = nudCompleteProgress,
+                            CategoryTextBox = tbCategory,
+                            DataSizeTextBox = tbDataSize,
+                            HoursNumericUpDown = nudHours,
+                            MinutesNumericUpDown = nudMinutes,
+                            SecondsNumericUpDown = nudSeconds,
+                            MillisecondsNumericUpDown = nudMilliseconds,
+                            FontSizeNumericUpDown = nudFontSize,
+                            TextColorTextBox = tbTextColor,
+                            BackgroundColorTextBox = tbBackgroundColor,
+                        }
                     };
                     await _mediator.Send(request);
                 }
@@ -1155,13 +1154,11 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: Handler for MainFormTreeViewMouseClickRequest
         public async void tvTaskList_MouseClick(object sender, MouseEventArgs e)
         {
-            var isControlKeyPressed = _cachingService.Get<bool>(Constants.CacheKeys.IsControlKeyPressed);
             var request = new TreeViewMouseClickRequest
             {
-                IsControlPressed = isControlKeyPressed,
+                IsControlPressed = _cachingService.Get<bool>(Constants.CacheKeys.IsControlKeyPressed),
                 TreeView = tvTaskList,
                 MouseDelta = e.Delta
             };
