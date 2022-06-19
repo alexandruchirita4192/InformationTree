@@ -938,17 +938,10 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormDeleteCanvasClickRequest
-        private void btnDeleteCanvas_Click(object sender, EventArgs e)
+        private async void btnDeleteCanvas_Click(object sender, EventArgs e)
         {
-            var _canvasForm = _cachingService.Get<ICanvasForm>(Constants.CacheKeys.CanvasForm);
-            if (_canvasForm != null && !_canvasForm.IsDisposed)
-            {
-                _canvasForm.Close();
-                _canvasForm.Dispose();
-                _canvasForm = null;
-                _cachingService.Set(Constants.CacheKeys.CanvasForm, _canvasForm);
-            }
+            var request = new MainFormDeleteCanvasClickRequest();
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormGenerateClickRequest
