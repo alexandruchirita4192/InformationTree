@@ -461,19 +461,20 @@ namespace InformationTree.Forms
                 CompleteProgressNumericUpDown = nudCompleteProgress,
                 SelectedNode = tvTaskList.SelectedNode,
             };
-            
+
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormStartCountingClickRequest
-        private void btnStartCounting_Click(object sender, EventArgs e)
+        private async void btnStartCounting_Click(object sender, EventArgs e)
         {
-            if (tvTaskList.SelectedNode != null)
+            var request = new MainFormStartCountingClickRequest
             {
-                _timer.Start();
-                gbTask.Enabled = false;
-                gbTaskList.Enabled = false;
-            }
+                SelectedNode = tvTaskList.SelectedNode,
+                Timer = _timer,
+                TaskGroupBox = gbTask,
+                TaskListGroupBox = gbTaskList,
+            };
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormStopCountingClickRequest
