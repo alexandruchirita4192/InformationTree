@@ -18,20 +18,26 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
     private readonly IMediator _mediator;
     private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
     private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
+    private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
 
     public TaskListAfterSelectHandler(
         IMediator mediator,
         ITreeNodeDataCachingService treeNodeDataCachingService,
-        ITreeNodeSelectionCachingService treeNodeSelectionCachingService)
+        ITreeNodeSelectionCachingService treeNodeSelectionCachingService,
+        ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
     {
         _mediator = mediator;
         _treeNodeDataCachingService = treeNodeDataCachingService;
         _treeNodeSelectionCachingService = treeNodeSelectionCachingService;
+        _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
     }
 
     public async Task<BaseResponse> Handle(TaskListAfterSelectRequest request, CancellationToken cancellationToken)
     {
-        var treeNodeData = request.SelectedNodeData;
+        if (request.SelectedNode == null)
+            return null;
+        
+        var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(request.SelectedNode);
         if (treeNodeData == null || request.Form == null)
             return null;
 

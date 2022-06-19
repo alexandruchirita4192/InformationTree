@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests.Base;
 using Newtonsoft.Json;
 
@@ -16,9 +15,6 @@ public class TaskListAfterSelectRequest : BaseRequest
 
     [JsonIgnore]
     public MarshalByRefObject SelectedNode { get; set; }
-
-    [JsonIgnore]
-    public TreeNodeData SelectedNodeData { get; set; }
 
     public decimal TaskPercentCompleted { get; set; }
     public bool StyleItemCheckEntered { get; set; }
