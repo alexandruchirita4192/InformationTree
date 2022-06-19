@@ -715,80 +715,24 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormColorMoveTaskRequest, MoveDirection=Up,Down
         private async void btnMoveTaskUp_Click(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-            if (selectedNode != null && selectedNode.Parent != null && selectedNode.Parent.Nodes != null)
+            var request = new MainFormMoveTaskRequest
             {
-                var parent = selectedNode.Parent;
-                var selectedIndex = parent.Nodes.IndexOf(selectedNode);
-                if (selectedIndex > 0)
-                {
-                    parent.Nodes.RemoveAt(selectedIndex);
-                    parent.Nodes.Insert(selectedIndex - 1, selectedNode);
-                    tvTaskList.SelectedNode = selectedNode;
-                }
-                else
-                    _popUpService.ShowMessage($"Cannot move task up! Current index is {selectedIndex}.");
-            }
-            else if (selectedNode != null && selectedNode.Parent == null)
-            {
-                var selectedIndex = tvTaskList.Nodes.IndexOf(selectedNode);
-                if (selectedIndex > 0)
-                {
-                    tvTaskList.Nodes.RemoveAt(selectedIndex);
-                    tvTaskList.Nodes.Insert(selectedIndex - 1, selectedNode);
-                    tvTaskList.SelectedNode = selectedNode;
-                }
-                else
-                    _popUpService.ShowMessage($"Cannot move task up! Current index is {selectedIndex}.");
-            }
-
-            var setTreeStateRequest = new SetTreeStateRequest
-            {
-                TreeUnchanged = false
+                TreeView = tvTaskList,
+                MoveDirection = MoveTaskDirection.Up
             };
-            await _mediator.Send(setTreeStateRequest);
+            await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormColorMoveTaskRequest, MoveDirection=Up,Down
         private async void btnMoveTaskDown_Click(object sender, EventArgs e)
         {
-            var selectedNode = tvTaskList.SelectedNode;
-            if (selectedNode != null && selectedNode.Parent != null && selectedNode.Parent.Nodes != null)
+            var request = new MainFormMoveTaskRequest
             {
-                var parent = selectedNode.Parent;
-                var selectedIndex = parent.Nodes.IndexOf(selectedNode);
-                var count = parent.Nodes.Count;
-                if (selectedIndex >= 0 && selectedIndex < count)
-                {
-                    parent.Nodes.RemoveAt(selectedIndex);
-                    parent.Nodes.Insert(selectedIndex + 1, selectedNode);
-                    tvTaskList.SelectedNode = selectedNode;
-                }
-                else
-                    _popUpService.ShowMessage($"Cannot move task down! Current index is {selectedIndex}.");
-            }
-            else if (selectedNode != null && selectedNode.Parent == null)
-            {
-                var selectedIndex = tvTaskList.Nodes.IndexOf(selectedNode);
-                var count = tvTaskList.Nodes.Count;
-                if (selectedIndex >= 0 && selectedIndex < count)
-                {
-                    tvTaskList.Nodes.RemoveAt(selectedIndex);
-                    tvTaskList.Nodes.Insert(selectedIndex + 1, selectedNode);
-                    tvTaskList.SelectedNode = selectedNode;
-                }
-                else
-                    _popUpService.ShowMessage($"Cannot move task down! Current index is {selectedIndex}.");
-            }
-
-            var setTreeStateRequest = new SetTreeStateRequest
-            {
-                TreeUnchanged = false
+                TreeView = tvTaskList,
+                MoveDirection = MoveTaskDirection.Down
             };
-            await _mediator.Send(setTreeStateRequest);
+            await _mediator.Send(request);
         }
 
         // TODO: Handler for MainFormResetExceptionClickRequest
