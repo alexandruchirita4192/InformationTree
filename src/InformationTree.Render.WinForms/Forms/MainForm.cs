@@ -244,32 +244,6 @@ namespace InformationTree.Forms
             tvTaskList.Nodes.ClearStyleAdded();
         }
 
-        public void ChangeResetExceptionButton(string message)
-        {
-            if (btnResetException == null)
-                return;
-
-            var getTreeStateRequest = new GetTreeStateRequest();
-            if (Task.Run(async () => await _mediator.Send(getTreeStateRequest))
-            .Result is not GetTreeStateResponse getTreeStateResponse)
-                return;
-
-            if (!getTreeStateResponse.IsSafeToSave || message.IsNotEmpty())
-            {
-                btnResetException.Enabled = true;
-                btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
-                btnResetException.ForeColor = Constants.Colors.ExceptionColor;
-                btnResetException.Text = $"Reset exception: {message.Substring(0, 10)}";
-            }
-            else
-            {
-                btnResetException.Enabled = false;
-                btnResetException.BackColor = Constants.Colors.DefaultBackGroundColor;
-                btnResetException.ForeColor = Constants.Colors.DefaultForeGroundColor;
-                btnResetException.Text = "Reset exception";
-            }
-        }
-
         #endregion Public methods
 
         #region Handlers
@@ -735,16 +709,13 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormResetExceptionClickRequest
         private async void btnResetException_Click(object sender, EventArgs e)
         {
-            var setTreeStateRequest = new SetTreeStateRequest
+            var request = new MainFormResetExceptionClickRequest
             {
-                IsSafeToSave = true
+                ResetExceptionButton = btnResetException
             };
-            await _mediator.Send(setTreeStateRequest);
-
-            ChangeResetExceptionButton(null);
+            await _mediator.Send(request);
         }
 
         private async void btnShowFromToNumberOfTask_Click(object sender, EventArgs e)
