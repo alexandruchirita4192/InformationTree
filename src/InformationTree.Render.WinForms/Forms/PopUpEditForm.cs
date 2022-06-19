@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
 using InformationTree.Domain.Entities;
@@ -294,36 +295,20 @@ namespace InformationTree.Forms
 
         #endregion Constructor
 
-        // Handler for PopUpEditFormProcessCmdKeyRequest
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
             {
                 case Keys.Control | Keys.V:
                 case Keys.Shift | Keys.Insert:
-                    if (Clipboard.ContainsImage())
+                    // Prepare clipboard image from clipboard by resizing it to fit in RichTextBox current size
+                    var request = new PrepareClipboardImagePasteRequest
                     {
-                        var image = Clipboard.GetImage();
-                        var maxWidth = tbData.Width - 10;
-                        var maxHeight = tbData.Height - 10;
-
-                        var newWidth = maxWidth;
-                        var newHeight = image.Height * newWidth / image.Width;
-
-                        if (newHeight > maxHeight)
-                        {
-                            // Resize with height instead
-                            newWidth = image.Width * maxHeight / image.Height;
-                            newHeight = maxHeight;
-                        }
-
-                        if (newWidth != image.Width || newHeight != image.Height)
-                        {
-                            image = image.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
-                            Clipboard.SetImage(image);
-                        }
-                    }
-
+                        MaxWidth = tbData.Width,
+                        MaxHeight = tbData.Height
+                    };
+                    Task.Run(async () => await _mediator.Send(request));
+                    
                     return base.ProcessCmdKey(ref msg, keyData);
 
                 default:
@@ -418,12 +403,10 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for PopUpEditFormCalculateClickRequest
-        private void btnCalculate_Click(object sender, EventArgs e)
+        private async void btnCalculate_Click(object sender, EventArgs e)
         {
-            // TODO: Make tbData.CalculateFunction work with a new facade, interface for calculation service which should implement basic calculation functions
-
-            _popUpService.ShowInfo("This feature is not finished yet. It will be available in the next version.");
+            var request = new PopUpEditFormCalculateClickRequest();
+            await _mediator.Send(request);
         }
 
         private async void btnShowGraphics_Click(object sender, EventArgs e)
