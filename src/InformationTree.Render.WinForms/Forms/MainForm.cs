@@ -467,8 +467,9 @@ namespace InformationTree.Forms
 
         private async void btnStartCounting_Click(object sender, EventArgs e)
         {
-            var request = new MainFormStartCountingClickRequest
+            var request = new MainFormChangeCountingClickRequest
             {
+                ChangeCountingType = ChangeCountingType.StartCounting,
                 SelectedNode = tvTaskList.SelectedNode,
                 Timer = _timer,
                 TaskGroupBox = gbTask,
@@ -477,35 +478,21 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormStopCountingClickRequest
-        private void btnStopCounting_Click(object sender, EventArgs e)
+        private async void btnStopCounting_Click(object sender, EventArgs e)
         {
-            var node = tvTaskList.SelectedNode;
-            if (node == null)
-                return;
-            try
+            var request = new MainFormChangeCountingClickRequest
             {
-                _timer.Stop();
-                var oldElapsedTime = long.Parse(node.Name);
-                var elapsedTime = _timer.ElapsedMilliseconds;
-                var totalElapsedTime = (oldElapsedTime + elapsedTime);
-                node.Name = totalElapsedTime.ToString();
-                _timer.Reset();
-
-                var timeSpanTotal = TimeSpan.FromMilliseconds(totalElapsedTime);
-                nudHours.Value = timeSpanTotal.Hours;
-                nudMinutes.Value = timeSpanTotal.Minutes;
-                nudSeconds.Value = timeSpanTotal.Seconds;
-                nudMilliseconds.Value = timeSpanTotal.Milliseconds;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-                _popUpService.ShowError(ex.Message, "Exception caught in stop counting handler");
-            }
-
-            gbTask.Enabled = true;
-            gbTaskList.Enabled = true;
+                ChangeCountingType = ChangeCountingType.StopCounting,
+                SelectedNode = tvTaskList.SelectedNode,
+                Timer = _timer,
+                TaskGroupBox = gbTask,
+                TaskListGroupBox = gbTaskList,
+                HoursNumericUpDown = nudHours,
+                MinutesNumericUpDown = nudMinutes,
+                SecondsNumericUpDown = nudSeconds,
+                MillisecondsNumericUpDown = nudMilliseconds,
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnExpand_Click(object sender, EventArgs e)
