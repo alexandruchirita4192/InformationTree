@@ -766,40 +766,16 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for MainFormTreeViewDoubleClickRequest
         public async void tvTaskList_DoubleClick(object sender, EventArgs e)
         {
-            var node = tvTaskList.SelectedNode;
-            if (node != null)
+            var request = new MainFormTreeViewDoubleClickRequest
             {
-                var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
-                if (treeNodeData != null && treeNodeData.Link.IsNotEmpty())
-                {
-                    (_, var fileName) = _importExportTreeXmlService.SaveCurrentTreeAndLoadAnother(
-                        TaskListRoot,
-                        this,
-                        tvTaskList,
-                        nudShowUntilNumber,
-                        nudShowFromNumber,
-                        treeNodeData.Link);
-
-                    var setTreeStateRequest = new SetTreeStateRequest
-                    {
-                        FileInformation = new FileInformation { FileName = fileName }
-                    };
-                    await _mediator.Send(setTreeStateRequest);
-                }
-            }
-            else
-            {
-                var figureLines = tvTaskList.GenerateStringGraphicsLinesFromTree();
-
-                var request = new ShowCanvasPopUpRequest
-                {
-                    FigureLines = figureLines
-                };
-                await _mediator.Send(request);
-            }
+                ControlToSetWaitCursor = this,
+                TreeView = tvTaskList,
+                ShowUntilNumberNumericUpDown = nudShowUntilNumber,
+                ShowFromNumberNumericUpDown = nudShowFromNumber,
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnMakeSubTreeWithChildrenOfSelectedNode_Click(object sender, EventArgs e)
