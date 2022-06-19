@@ -342,35 +342,23 @@ namespace InformationTree.Forms
             await _mediator.Send(request);
         }
 
-        // TODO: Handler for PopUpEditFormDataLinkClickedRequest
-        private void tbData_LinkClicked(object sender, LinkClickedEventArgs e)
+        private async void tbData_LinkClicked(object sender, LinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(e.LinkText);
+            var request = new PopUpEditFormDataLinkClickedRequest
+            {
+                LinkText = e.LinkText
+            };
+            await _mediator.Send(request);
         }
 
-        // TODO: Handler for PopUpEditFormDataKeyUpRequest
-        private void tbData_KeyUp(object sender, KeyEventArgs e)
+        private async void tbData_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyData == (Keys.B | Keys.Control))
-                tbData.ToggleBold();
-            //else if (e.KeyData == (Keys.I | Keys.Control))
-            //    tbData.ToggleItalic();
-            else if (e.KeyData == (Keys.U | Keys.Control))
-                tbData.ToggleUnderline();
-            else if (e.KeyData == (Keys.S | Keys.Control))
-                tbData.ToggleStrikeOut();
-            //else if (e.KeyData == (Keys.Left | Keys.Control))
-            //    tbData.SetAlign(HorizontalAlignment.Left);
-            //else if (e.KeyData == (Keys.Up | Keys.Control))
-            //    tbData.SetAlign(HorizontalAlignment.Center);
-            //else if (e.KeyData == (Keys.Right | Keys.Control))
-            //    tbData.SetAlign(HorizontalAlignment.Right);
-            else if (e.KeyData == (Keys.O | Keys.Control))
-                tbData.OpenFile();
-            else if (e.KeyData == (Keys.S | Keys.Control))
-                tbData.SaveFile();
-            else if (e.KeyData == (Keys.P | Keys.Control))
-                tbData.InsertPicture();
+            var request = new PopUpEditFormDataKeyUpRequest
+            {
+                DataRicherTextBox = tbData,
+                KeyData = (int)e.KeyData
+            };
+            await _mediator.Send(request);
         }
 
         private async void btnPgpDecryptData_Click(object sender, EventArgs e)
