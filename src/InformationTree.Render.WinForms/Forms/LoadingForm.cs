@@ -1,15 +1,16 @@
 ﻿using System.Drawing;
-using System.Reflection;
 using System.Timers;
 using System.Windows.Forms;
 using InformationTree.Domain.Entities.Graphics;
-using InformationTree.Domain.Extensions;
-using InformationTree.Render.WinForms.Extensions;
+using InformationTree.Domain.Requests;
+using MediatR;
 
 namespace InformationTree.Forms
 {
     public partial class LoadingForm : Form
     {
+        private readonly IMediator _mediator;
+
         #region Properties
 
         public IGraphicsFile GraphicsFile { get; private set; }
@@ -19,9 +20,15 @@ namespace InformationTree.Forms
 
         #region Constructors
 
-        public LoadingForm(IGraphicsFile graphicsFile, int? screenIndex, System.Timers.Timer timer = null)
+        public LoadingForm(
+            IMediator mediator,
+            IGraphicsFile graphicsFile,
+            int? screenIndex,
+            System.Timers.Timer timer = null)
             : base()
         {
+            _mediator = mediator;
+
             InitializeComponent();
 
             SetProperties(screenIndex);
@@ -64,16 +71,14 @@ namespace InformationTree.Forms
 
         #region Handlers
 
-        // TODO: Handler for LoadingFormTimerElapsedRequest
-        private void T_Elapsed(object sender, ElapsedEventArgs e)
+        private async void T_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (pbFileLoad.Style != ProgressBarStyle.Marquee)
+            var request = new LoadingFormTimerElapsedRequest
             {
-                // Marquee style progress bar shouldn't perform steps manually
-                pbFileLoad.InvokeWrapper(fl=>fl.PerformStep());
-            }
-
-            pbLoadingGraphics.InvokeWrapper(lg => lg.Refresh());
+                FileLoadProgressBar = pbFileLoad,
+                LoadingGraphicsPictureBox = pbLoadingGraphics,
+            };
+            await _mediator.Send(request);
         }
 
         public ProgressBar LoadProgressBar
@@ -84,28 +89,23 @@ namespace InformationTree.Forms
             }
         }
 
-        // TODO: Handler for LoadingFormIconPaintRequest
-        private void pbIcon_Paint(object sender, PaintEventArgs e)
+        private async void pbIcon_Paint(object sender, PaintEventArgs e)
         {
-            var currentAssembly = Assembly.GetEntryAssembly();
-            if (currentAssembly == null)
-                return;
-
-            var currentAssemblyLocation = currentAssembly.Location;
-            if (currentAssemblyLocation.IsEmpty())
-                return;
-
-            var extractedIconFromCurrentAssembly = Icon.ExtractAssociatedIcon(currentAssemblyLocation);
-            if (extractedIconFromCurrentAssembly == null)
-                return;
-
-            e.Graphics.DrawIcon(extractedIconFromCurrentAssembly, 0, 0);
+            var request = new LoadingFormIconPaintRequest
+            {
+                Graphics = e.Graphics
+            };
+            await _mediator.Send(request);
         }
 
-        // TODO: Handler for LoadingFormLoadingGraphicsPaintRequest
-        private void pbLoadingGraphics_Paint(object sender, PaintEventArgs e)
+        private async void pbLoadingGraphics_Paint(object sender, PaintEventArgs e)
         {
-            GraphicsFile.Show(e.Graphics);
+            var request = new LoadingFormLoadingGraphicsPaintRequest
+            {
+                Graphics = e.Graphics,
+                GraphicsFile = GraphicsFile
+            };
+            await _mediator.Send(request);
         }
 
         #endregion Handlers

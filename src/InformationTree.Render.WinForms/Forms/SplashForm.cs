@@ -13,8 +13,11 @@ namespace InformationTree.Forms
     {
         #region Constructor
 
-        private SplashForm(IGraphicsFile graphicsFile, int? screenIndex)
-            : base(graphicsFile, screenIndex)
+        private SplashForm(
+            IMediator mediator,
+            IGraphicsFile graphicsFile,
+            int? screenIndex)
+            : base(mediator, graphicsFile, screenIndex)
         {
             InitializeComponent();
         }
@@ -40,9 +43,11 @@ namespace InformationTree.Forms
         //The type of form to be displayed as the splash screen.
         private static List<SplashForm> splashFormList;
 
-        public static void ShowDefaultSplashScreen(IGraphicsFileFactory graphicsFileRecursiveGenerator)
+        public static void ShowDefaultSplashScreen(
+            IMediator mediator,
+            IGraphicsFileFactory graphicsFileRecursiveGenerator)
         {
-            InternalShowSplashScreen((currentScreenIndex) =>
+            InternalShowSplashScreen(mediator, (currentScreenIndex) =>
             {
                 var screen = Screen.AllScreens[currentScreenIndex];
                 var graphicsFile = graphicsFileRecursiveGenerator.GetDefaultGraphicsFile(screen.Bounds.Height, screen.Bounds.Width);
@@ -50,12 +55,16 @@ namespace InformationTree.Forms
             });
         }
 
-        public static void ShowSplashScreen(IGraphicsFile graphicsFile)
+        public static void ShowSplashScreen(
+            IMediator mediator,
+            IGraphicsFile graphicsFile)
         {
-            InternalShowSplashScreen((currentScreenIndex) => graphicsFile);
+            InternalShowSplashScreen(mediator, (currentScreenIndex) => graphicsFile);
         }
 
-        private static void InternalShowSplashScreen(Func<int, IGraphicsFile> graphicsFile)
+        private static void InternalShowSplashScreen(
+            IMediator mediator,
+            Func<int, IGraphicsFile> graphicsFile)
         {
             // Make sure it is only launched once.
             if (splashFormList == null && graphicsFile != null)
@@ -63,7 +72,7 @@ namespace InformationTree.Forms
                 splashFormList = new List<SplashForm>();
                 for (int currentScreenIndex = 0; currentScreenIndex < Screen.AllScreens.Length; currentScreenIndex++)
                 {
-                    var form = new SplashForm(graphicsFile(currentScreenIndex), currentScreenIndex);
+                    var form = new SplashForm(mediator, graphicsFile(currentScreenIndex), currentScreenIndex);
                     form.Show();
                     splashFormList.Add(form);
                 }

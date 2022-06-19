@@ -125,7 +125,7 @@ namespace InformationTree.Render.WinForms.Services
                         .Wait();
                 }
 
-                SplashForm.ShowDefaultSplashScreen(_graphicsFileRecursiveGenerator);
+                SplashForm.ShowDefaultSplashScreen(_mediator, _graphicsFileRecursiveGenerator);
                 var xDoc = new XmlDocument();
                 xDoc.Load(fileName);
 
