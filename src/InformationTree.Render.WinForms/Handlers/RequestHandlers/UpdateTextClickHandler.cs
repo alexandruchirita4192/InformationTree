@@ -28,17 +28,32 @@ public class UpdateTextClickHandler : IRequestHandler<UpdateTextClickRequest, Ba
 
     public async Task<BaseResponse> Handle(UpdateTextClickRequest request, CancellationToken cancellationToken)
     {
-        var selectedNode = request.SelectedNode;
+        if (request.AfterSelectRequest == null)
+            return null;
+        if (request.AfterSelectRequest.TreeView is not TreeView tvTaskList)
+            return null;
+        if (request.AfterSelectRequest.TaskNameTextBox is not TextBox tbTaskName)
+            return null;
+        if (request.AfterSelectRequest.LinkTextBox is not TextBox tbLink)
+            return null;
+        if (request.AfterSelectRequest.UrgencyNumericUpDown is not NumericUpDown nudUrgency)
+            return null;
+        if (request.AfterSelectRequest.CategoryTextBox is not TextBox tbCategory)
+            return null;
+        if (request.AfterSelectRequest.IsStartupAlertCheckBox is not CheckBox cbIsStartupAlert)
+            return null;
+
+        var selectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode);
         if (selectedNode == null)
             return null;
 
-        selectedNode.Urgency = request.Urgency;
-        selectedNode.Link = request.Link;
-        selectedNode.Category = request.Category;
-        selectedNode.IsStartupAlert = request.IsStartupAlert;
-        selectedNode.PercentCompleted = request.TaskPercentCompleted;
+        selectedNode.Urgency = (int)nudUrgency.Value;
+        selectedNode.Link = tbLink.Text;
+        selectedNode.Category = tbCategory.Text;
+        selectedNode.IsStartupAlert = cbIsStartupAlert.Checked;
+        selectedNode.PercentCompleted = request.AfterSelectRequest.TaskPercentCompleted;
         selectedNode.LastChangeDate = DateTime.Now;
-        selectedNode.Text = request.TaskName;
+        selectedNode.Text = tbTaskName.Text;
 
         await _mediator.Send(request.AfterSelectRequest, cancellationToken);
 
@@ -48,15 +63,12 @@ public class UpdateTextClickHandler : IRequestHandler<UpdateTextClickRequest, Ba
         };
         await _mediator.Send(setTreeStateRequest, cancellationToken);
 
-        if (request.TaskListTreeView is TreeView tvTaskList)
+        tvTaskList.InvokeWrapper(tvTaskList =>
         {
-            tvTaskList.InvokeWrapper(tvTaskList =>
-            {
-                var treeNode = _treeNodeDataToTreeNodeAdapter.Adapt(selectedNode);
-                if (treeNode is TreeNode treeNodeControl)
-                    tvTaskList.SelectedNode.Copy(treeNodeControl, _treeNodeToTreeNodeDataAdapter, false);
-            });
-        }
+            var treeNode = _treeNodeDataToTreeNodeAdapter.Adapt(selectedNode);
+            if (treeNode is TreeNode treeNodeControl)
+                tvTaskList.SelectedNode.Copy(treeNodeControl, _treeNodeToTreeNodeDataAdapter, false);
+        });
 
         return new BaseResponse();
     }

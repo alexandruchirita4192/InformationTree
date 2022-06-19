@@ -139,14 +139,6 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
 
             var updateTextClickRequest = new UpdateTextClickRequest
             {
-                SelectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
-                TaskPercentCompleted = nudCompleteProgress.Value,
-                TaskName = tbTaskName.Text,
-                Link = tbLink.Text,
-                Urgency = (int)nudUrgency.Value,
-                Category = tbCategory.Text,
-                IsStartupAlert = cbIsStartupAlert.Checked,
-                TaskListTreeView = tvTaskList,
                 AfterSelectRequest = request.AfterSelectRequest
             };
 

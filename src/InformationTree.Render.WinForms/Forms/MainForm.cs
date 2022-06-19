@@ -367,14 +367,6 @@ namespace InformationTree.Forms
             var _clbStyle_ItemCheckEntered = _cachingService.Get<bool>(Constants.CacheKeys.StyleCheckedListBox_ItemCheckEntered);
             var updateTextClickRequest = new UpdateTextClickRequest
             {
-                SelectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode),
-                TaskPercentCompleted = nudCompleteProgress.Value,
-                TaskName = tbTaskName.Text,
-                Link = tbLink.Text,
-                Urgency = (int)nudUrgency.Value,
-                Category = tbCategory.Text,
-                IsStartupAlert = cbIsStartupAlert.Checked,
-                TaskListTreeView = tvTaskList,
                 AfterSelectRequest = new TaskListAfterSelectRequest
                 {
                     TreeView = tvTaskList,
