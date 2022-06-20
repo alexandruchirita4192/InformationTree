@@ -14,6 +14,8 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
     [Obsolete("Break into many classes later")] // TODO: 1. file parsing in one file
     public class GraphicsFile : IGraphicsFile, IDisposable
     {
+        private const char SpaceSeparator = ' ';
+
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly IGraphicsFileFactory _graphicsFileFactory;
@@ -59,9 +61,9 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 if (line.IsEmpty())
                     continue;
 
-                var words = line.Split(' ');
+                var words = line.Split(SpaceSeparator);
                 var firstWord = words[0];
-                var parameters = string.Join(" ", words.Skip(1));
+                var parameters = string.Join(SpaceSeparator, words.Skip(1));
                 bool breakFromLoop = false;
 
                 try
@@ -264,7 +266,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 return;
             try
             {
-                var words = parameters.Split(' ');
+                var words = parameters.Split(SpaceSeparator);
 
                 switch (words.Length)
                 {
@@ -306,7 +308,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 return;
             try
             {
-                var words = parameters.Split(' ');
+                var words = parameters.Split(SpaceSeparator);
 
                 switch (words.Length)
                 {
@@ -360,7 +362,7 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
         {
             if (parameters.IsEmpty())
                 return;
-            var words = parameters.Split(' ');
+            var words = parameters.Split(SpaceSeparator);
             double _radius;
             int _iterations;
             ComputeType _computeType;
