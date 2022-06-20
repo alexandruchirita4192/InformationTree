@@ -22,12 +22,9 @@ namespace InformationTree.Forms
     {
         #region Fields
 
-        private readonly IGraphicsFileFactory _graphicsFileFactory;
         private readonly IConfigurationReader _configurationReader;
-        private readonly IExportNodeToRtfService _exportNodeToRtfService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
-        private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ICachingService _cachingService;
         private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
@@ -39,23 +36,17 @@ namespace InformationTree.Forms
         #region ctor
 
         public MainForm(
-            IGraphicsFileFactory graphicsFileFactory,
             IConfigurationReader configurationReader,
-            IExportNodeToRtfService exportNodeToRtfService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
-            IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
             ICachingService cachingService,
             ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
             ITreeNodeDataToTreeNodeAdapter treeNodeDataToTreeNodeAdapter)
         {
-            _graphicsFileFactory = graphicsFileFactory;
             _configurationReader = configurationReader;
-            _exportNodeToRtfService = exportNodeToRtfService;
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
-            _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _cachingService = cachingService;
             _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;

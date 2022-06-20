@@ -18,11 +18,8 @@ namespace InformationTree.Render.WinForms.Services
 
         private readonly IConfigurationReader _configurationReader;
         private readonly IPopUpService _popUpService;
-        private readonly IGraphicsFileFactory _graphicsFileFactory;
-        private readonly IExportNodeToRtfService _exportNodeToRtfService;
         private readonly IImportTreeFromXmlService _importTreeFromXmlService;
         private readonly IExportTreeToXmlService _exportTreeToXmlService;
-        private readonly IImportExportTreeXmlService _importExportTreeXmlService;
         private readonly IMediator _mediator;
         private readonly ICachingService _cachingService;
         private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
@@ -31,11 +28,8 @@ namespace InformationTree.Render.WinForms.Services
         public WinFormsApplication(
             IConfigurationReader configurationReader,
             IPopUpService popUpService,
-            IGraphicsFileFactory graphicsFileFactory,
-            IExportNodeToRtfService exportNodeToRtfService,
             IImportTreeFromXmlService importTreeFromXmlService,
             IExportTreeToXmlService exportTreeToXmlService,
-            IImportExportTreeXmlService importExportTreeXmlService,
             IMediator mediator,
             ICachingService cachingService,
             ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter,
@@ -43,11 +37,8 @@ namespace InformationTree.Render.WinForms.Services
         {
             _configurationReader = configurationReader;
             _popUpService = popUpService;
-            _graphicsFileFactory = graphicsFileFactory;
-            _exportNodeToRtfService = exportNodeToRtfService;
             _importTreeFromXmlService = importTreeFromXmlService;
             _exportTreeToXmlService = exportTreeToXmlService;
-            _importExportTreeXmlService = importExportTreeXmlService;
             _mediator = mediator;
             _cachingService = cachingService;
             _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
@@ -198,12 +189,9 @@ namespace InformationTree.Render.WinForms.Services
             };
 
             Application.Run(MainForm = new MainForm(
-                _graphicsFileFactory,
                 _configurationReader,
-                _exportNodeToRtfService,
                 _importTreeFromXmlService,
                 _exportTreeToXmlService,
-                _importExportTreeXmlService,
                 _mediator,
                 _cachingService,
                 _treeNodeToTreeNodeDataAdapter,
