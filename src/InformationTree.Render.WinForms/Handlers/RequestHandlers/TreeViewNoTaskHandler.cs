@@ -23,28 +23,9 @@ public class TreeViewNoTaskHandler : IRequestHandler<TreeViewNoTaskRequest, Base
         if (request.AfterSelectRequest == null)
             return null;
 
+        // After select with a null selected node should set everything up perfectly
         tvTaskList.SelectedNode = null;
-
-        // TODO: After checking thoughly that AfterSelectRequest does all necessary things, remove zombie code
-        //tvTaskList_AfterSelect(
-        //    sender,
-        //    new TreeViewEventArgs(
-        //        new TreeNode(null)
-        //        {
-        //            ToolTipText = null,
-        //            Tag = new TreeNodeData(null)
-        //        })
-        //);
-        //gbTimeSpent.Enabled = false;
-        //tbAddedDate.Text = "-";
-        //tbAddedNumber.Text = "-";
-        //tbTaskName.Text = string.Empty;
-        //nudHours.Value = 0;
-        //nudMinutes.Value = 0;
-        //nudSeconds.Value = 0;
-        //nudMilliseconds.Value = 0;
-        //nudUrgency.Value = 0;
-
+        
         return await _mediator.Send(request.AfterSelectRequest, cancellationToken);
     }
 }

@@ -115,7 +115,7 @@ namespace InformationTree.Render.WinForms.Services
                 var attrBackgroundColor = node.BackColorName.IsNotEmpty() ? node.BackColorName : string.Empty;
                 var attrFontFamily = node.NodeFont != null
                     && node.NodeFont.FontFamilyName.IsNotEmpty()
-                    && node.NodeFont.FontFamilyName != WinFormsConstants.FontDefaults.DefaultFontFamily.Name
+                    && node.NodeFont.FontFamilyName != WinFormsConstants.FontDefaults.DefaultFontFamilyName
                     ? node.NodeFont.FontFamilyName
                     : string.Empty;
                 var attrFontSize = node.NodeFont != null

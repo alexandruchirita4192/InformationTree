@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using InformationTree.Domain;
 using InformationTree.Domain.Entities;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
@@ -15,6 +16,8 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
 
 public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectRequest, BaseResponse>
 {
+    private const string EmptyData = "-";
+    
     private readonly IMediator _mediator;
     private readonly ITreeNodeDataCachingService _treeNodeDataCachingService;
     private readonly ITreeNodeSelectionCachingService _treeNodeSelectionCachingService;
@@ -34,12 +37,11 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
 
     public async Task<BaseResponse> Handle(TaskListAfterSelectRequest request, CancellationToken cancellationToken)
     {
-        if (request.SelectedNode == null)
+        if (request.Form == null)
             return null;
         
-        var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(request.SelectedNode);
-        if (treeNodeData == null || request.Form == null)
-            return null;
+        var selectedNodeIsNotNull = request.SelectedNode != null;
+        var treeNodeData = selectedNodeIsNotNull ? _treeNodeToTreeNodeDataAdapter.Adapt(request.SelectedNode) : null;
 
         try
         {
@@ -53,7 +55,10 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             };
             await _mediator.Send(removeEventsRequest, cancellationToken);
             
-            var timeSpanTotal = treeNodeData.Name.IsNotEmpty() && long.TryParse(treeNodeData.Name, out long timeSpanMilliseconds)
+            var timeSpanTotal =
+                treeNodeData != null
+                && treeNodeData.Name.IsNotEmpty()
+                && long.TryParse(treeNodeData.Name, out long timeSpanMilliseconds)
                 ? TimeSpan.FromMilliseconds(timeSpanMilliseconds)
                 : new TimeSpan(0);
 
@@ -61,28 +66,43 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
             {
                 tbTaskName.InvokeWrapper(tbTaskName =>
                 {
-                    tbTaskName.Text = treeNodeData.Text;
-                    tbTaskName.BackColor = treeNodeData.GetTaskNameColor();
+                    tbTaskName.Text = treeNodeData?.Text;
+                    tbTaskName.BackColor = 
+                        treeNodeData != null
+                        ? treeNodeData.GetTaskNameColor()
+                        : Constants.Colors.DataBackGroundColor;
                 });
             }
             if (request.AddedDateTextBox is TextBox tbAddedDate)
-                tbAddedDate.InvokeWrapper(tbAddedDate => tbAddedDate.Text = treeNodeData.AddedDate.HasValue ? treeNodeData.AddedDate.Value.ToFormattedString() : "-");
+                tbAddedDate.InvokeWrapper(tbAddedDate => tbAddedDate.Text =
+                    treeNodeData != null
+                    && treeNodeData.AddedDate.HasValue
+                    ? treeNodeData.AddedDate.Value.ToFormattedString()
+                    : EmptyData);
             if (request.LastChangeDateTextBox is TextBox tbLastChangeDate)
-                tbLastChangeDate.InvokeWrapper(tbLastChangeDate => tbLastChangeDate.Text = treeNodeData.LastChangeDate.HasValue ? treeNodeData.LastChangeDate.Value.ToFormattedString() : "-");
+                tbLastChangeDate.InvokeWrapper(tbLastChangeDate => tbLastChangeDate.Text =
+                    treeNodeData != null
+                    && treeNodeData.LastChangeDate.HasValue
+                    ? treeNodeData.LastChangeDate.Value.ToFormattedString()
+                    : EmptyData);
             if (request.AddedNumberTextBox is TextBox tbAddedNumber)
-                tbAddedNumber.InvokeWrapper(tbAddedNumber => tbAddedNumber.Text = treeNodeData.AddedNumber.ToString());
+                tbAddedNumber.InvokeWrapper(tbAddedNumber => tbAddedNumber.Text =
+                    treeNodeData != null
+                    ? treeNodeData.AddedNumber.ToString()
+                    : EmptyData);
             if (request.UrgencyNumericUpDown is NumericUpDown nudUrgency)
-                nudUrgency.InvokeWrapper(nudUrgency => nudUrgency.Value = treeNodeData.Urgency);
+                nudUrgency.InvokeWrapper(nudUrgency => nudUrgency.Value = treeNodeData?.Urgency ?? 0);
             if (request.LinkTextBox is TextBox tbLink)
-                tbLink.InvokeWrapper(tbLink => tbLink.Text = treeNodeData.Link);
+                tbLink.InvokeWrapper(tbLink => tbLink.Text = treeNodeData?.Link);
             if (request.IsStartupAlertCheckBox is CheckBox cbIsStartupAlert)
-                cbIsStartupAlert.InvokeWrapper(cbIsStartupAlert => cbIsStartupAlert.Checked = treeNodeData.IsStartupAlert);
+                cbIsStartupAlert.InvokeWrapper(cbIsStartupAlert => cbIsStartupAlert.Checked = treeNodeData?.IsStartupAlert ?? false);
             if (request.CompleteProgressNumericUpDown is NumericUpDown nudCompleteProgress)
-                nudCompleteProgress.InvokeWrapper(nudCompleteProgress => nudCompleteProgress.Value = treeNodeData.PercentCompleted
-                    .ValidatePercentage());
+                nudCompleteProgress.InvokeWrapper(nudCompleteProgress => nudCompleteProgress.Value =
+                    (treeNodeData?.PercentCompleted ?? 0m)
+                        .ValidatePercentage());
 
             if (request.CategoryTextBox is TextBox tbCategory)
-                tbCategory.Text = treeNodeData.Category;
+                tbCategory.Text = treeNodeData?.Category;
             if (request.DataSizeTextBox is TextBox tbDataSize)
             {
                 var sizeBytes = CalculateDataSizeFromNodeAndChildren(treeNodeData, _treeNodeDataCachingService);
@@ -99,57 +119,61 @@ public class TaskListAfterSelectHandler : IRequestHandler<TaskListAfterSelectReq
                 nudMilliseconds.InvokeWrapper(nudMilliseconds => nudMilliseconds.Value = timeSpanTotal.Milliseconds);
 
             if (request.TimeSpentGroupBox is GroupBox gbTimeSpent)
-                gbTimeSpent.InvokeWrapper(gbTimeSpent => gbTimeSpent.Enabled = true);
+                gbTimeSpent.InvokeWrapper(gbTimeSpent => gbTimeSpent.Enabled = selectedNodeIsNotNull);
 
-            if (treeNodeData.NodeFont != null)
-            {
-                if (request.FontSizeNumericUpDown is NumericUpDown nudFontSize)
+            var treeNodeFont = treeNodeData?.NodeFont
+                ?? new TreeNodeFont
                 {
-                    nudFontSize.InvokeWrapper(nudFontSize =>
+                    FontFamilyName = WinFormsConstants.FontDefaults.DefaultFontFamilyName,
+                    Size = WinFormsConstants.FontDefaults.DefaultFontSize
+                };
+
+            if (request.FontSizeNumericUpDown is NumericUpDown nudFontSize)
+            {
+                nudFontSize.InvokeWrapper(nudFontSize =>
+                {
+                    var defaultSize = (decimal)WinFormsConstants.FontDefaults.DefaultFontSize;
+                    var size = ((decimal)treeNodeFont.Size) > nudFontSize.Maximum
+                        ? defaultSize
+                        : ((decimal)treeNodeFont.Size);
+                    size = size < nudFontSize.Maximum ? defaultSize : size;
+                    nudFontSize.Value = size;
+                });
+            }
+
+            if (!request.StyleItemCheckEntered)
+            {
+                if (request.StyleCheckedListBox is CheckedListBox clbStyle)
+                {
+                    UpdateCheckedListBoxBasedOnFont(true, clbStyle, FontStyle.Regular);
+                    UpdateCheckedListBoxBasedOnFont(treeNodeFont.Italic, clbStyle, FontStyle.Italic);
+                    UpdateCheckedListBoxBasedOnFont(treeNodeFont.Bold, clbStyle, FontStyle.Bold);
+                    UpdateCheckedListBoxBasedOnFont(treeNodeFont.Strikeout, clbStyle, FontStyle.Strikeout);
+                    UpdateCheckedListBoxBasedOnFont(treeNodeFont.Underline, clbStyle, FontStyle.Underline);
+                }
+
+                if (request.FontFamilyComboBox is ComboBox cbFontFamily)
+                {
+                    cbFontFamily.InvokeWrapper(cbFontFamily =>
                     {
-                        var defaultSize = 8;
-                        var size = ((decimal)treeNodeData.NodeFont.Size) > nudFontSize.Maximum
-                            ? defaultSize
-                            : ((decimal)treeNodeData.NodeFont.Size);
-                        size = size < nudFontSize.Maximum ? defaultSize : size;
-                        nudFontSize.Value = size;
+                        // Update font family based on current font
+                        if (treeNodeFont.FontFamilyName.IsNotEmpty() && cbFontFamily.Items.Count != 0)
+                            for (int i = 0; i < cbFontFamily.Items.Count; i++)
+                            {
+                                if (cbFontFamily.Items[i] is string fontFamily
+                                    && string.Compare(fontFamily, treeNodeFont.FontFamilyName, StringComparison.InvariantCultureIgnoreCase) == 0)
+                                {
+                                    cbFontFamily.SelectedIndex = i;
+                                    break;
+                                }
+                            }
                     });
                 }
 
-                if (!request.StyleItemCheckEntered)
-                {
-                    if (request.StyleCheckedListBox is CheckedListBox clbStyle)
-                    {
-                        UpdateCheckedListBoxBasedOnFont(true, clbStyle, FontStyle.Regular);
-                        UpdateCheckedListBoxBasedOnFont(treeNodeData.NodeFont.Italic, clbStyle, FontStyle.Italic);
-                        UpdateCheckedListBoxBasedOnFont(treeNodeData.NodeFont.Bold, clbStyle, FontStyle.Bold);
-                        UpdateCheckedListBoxBasedOnFont(treeNodeData.NodeFont.Strikeout, clbStyle, FontStyle.Strikeout);
-                        UpdateCheckedListBoxBasedOnFont(treeNodeData.NodeFont.Underline, clbStyle, FontStyle.Underline);
-                    }
-
-                    if (request.FontFamilyComboBox is ComboBox cbFontFamily)
-                    {
-                        cbFontFamily.InvokeWrapper(cbFontFamily =>
-                        {
-                            // Update font family based on current font
-                            if (treeNodeData.NodeFont.FontFamilyName.IsNotEmpty() && cbFontFamily.Items.Count != 0)
-                                for (int i = 0; i < cbFontFamily.Items.Count; i++)
-                                {
-                                    if (cbFontFamily.Items[i] is string fontFamily
-                                        && string.Compare(fontFamily, treeNodeData.NodeFont.FontFamilyName, StringComparison.InvariantCultureIgnoreCase) == 0)
-                                    {
-                                        cbFontFamily.SelectedIndex = i;
-                                        break;
-                                    }
-                                }
-                        });
-                    }
-
-                    if (request.TextColorTextBox is TextBox tbTextColor)
-                        tbTextColor.InvokeWrapper(tbTextColor => tbTextColor.Text = treeNodeData.ForeColorName);
-                    if (request.BackgroundColorTextBox is TextBox tbBackgroundColor)
-                        tbBackgroundColor.InvokeWrapper(tbBackgroundColor => tbBackgroundColor.Text = treeNodeData.BackColorName);
-                }
+                if (request.TextColorTextBox is TextBox tbTextColor)
+                    tbTextColor.InvokeWrapper(tbTextColor => tbTextColor.Text = treeNodeData?.ForeColorName ?? EmptyData);
+                if (request.BackgroundColorTextBox is TextBox tbBackgroundColor)
+                    tbBackgroundColor.InvokeWrapper(tbBackgroundColor => tbBackgroundColor.Text = treeNodeData?.BackColorName ?? EmptyData);
             }
 
             if (request.SelectedNode is TreeNode treeNode)

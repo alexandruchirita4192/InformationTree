@@ -276,13 +276,10 @@ namespace InformationTree.Forms
 
         private async void btnNoTask_Click(object sender, EventArgs e)
         {
-            if (tvTaskList.SelectedNode == null)
-                return;
-
             var request = new TreeViewNoTaskRequest
             {
                 TreeView = tvTaskList,
-                AfterSelectRequest = CreateAfterSelectRequest(tvTaskList.SelectedNode),
+                AfterSelectRequest = CreateAfterSelectRequest(null),
             };
             await _mediator.Send(request);
         }
