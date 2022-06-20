@@ -43,6 +43,8 @@ public class UpdateTextClickHandler : IRequestHandler<UpdateTextClickRequest, Ba
         if (request.AfterSelectRequest.IsStartupAlertCheckBox is not CheckBox cbIsStartupAlert)
             return null;
 
+        if (tvTaskList.SelectedNode == null)
+            return null;
         var selectedNode = _treeNodeToTreeNodeDataAdapter.Adapt(tvTaskList.SelectedNode);
         if (selectedNode == null)
             return null;
