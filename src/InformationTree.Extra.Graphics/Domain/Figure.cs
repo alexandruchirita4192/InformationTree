@@ -43,20 +43,20 @@ namespace InformationTree.Extra.Graphics.Domain
             SetColor();
         }
 
-        public Figure(int points, double x, double y, double r) : this()
+        public Figure(int points, double x, double y, double radius) : this()
         {
             Points = points;
             X = x;
             Y = y;
-            Radius = r;
+            Radius = radius;
         }
 
-        public Figure(int points, double x, double y, double r, double rotation) : this()
+        public Figure(int points, double x, double y, double radius, double rotation) : this()
         {
             Points = points;
             X = x;
             Y = y;
-            Radius = r;
+            Radius = radius;
             Rotation = rotation;
         }
 
@@ -102,13 +102,13 @@ namespace InformationTree.Extra.Graphics.Domain
             }
         }
 
-        public void Move(double x, double y, double r)
+        public void Move(double x, double y, double radius)
         {
             if (Points == 0 || Points > 1)
             {
                 X = x;
                 Y = y;
-                Radius = r;
+                Radius = radius;
             }
             else
                 throw new Exception("Not enough data to move a figure with " + Points.ToString() + " points!");

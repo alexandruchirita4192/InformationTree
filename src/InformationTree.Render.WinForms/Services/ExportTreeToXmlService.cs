@@ -79,7 +79,7 @@ namespace InformationTree.Render.WinForms.Services
                 || value.Equals(defaultValue)
                 || value.ToString().IsEmpty())
                 ? string.Empty
-                : ($"{attribute}=\"{HttpUtility.HtmlEncode(value)}\" ");
+                : ($"{attribute}=\"{HttpUtility.HtmlEncode(value)}\"{Constants.Parsing.SpaceSeparator}");
         }
 
         private void SaveNode(StreamWriter _streamWriter, TreeNodeData node, int indentTabs = 0)

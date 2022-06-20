@@ -8,7 +8,7 @@ namespace InformationTree.Extra.Graphics.Domain
 
         public double X { get; set; }
         public double Y { get; set; }
-        public double R { get; set; }
+        public double Radius { get; set; }
         public double RotationValue { get; set; }
         public double RotationIncrement { get; set; }
 
@@ -22,13 +22,13 @@ namespace InformationTree.Extra.Graphics.Domain
         {
         }
 
-        public Rotation(double x, double y, double r, double rotationValue, Rotation? nextRotation) : this(x, y, r, rotationValue, 0.0, nextRotation)
+        public Rotation(double x, double y, double radius, double rotationValue, Rotation? nextRotation) : this(x, y, radius, rotationValue, 0.0, nextRotation)
         {
         }
 
-        public Rotation(double x, double y, double r, double rotationValue, double rotationIncrement, Rotation? nextRotation)
+        public Rotation(double x, double y, double radius, double rotationValue, double rotationIncrement, Rotation? nextRotation)
         {
-            X = x; Y = y; R = r; RotationValue = rotationValue; RotationIncrement = rotationIncrement; NextRotation = nextRotation;
+            X = x; Y = y; Radius = radius; RotationValue = rotationValue; RotationIncrement = rotationIncrement; NextRotation = nextRotation;
         }
 
         #endregion Constructors
@@ -42,8 +42,8 @@ namespace InformationTree.Extra.Graphics.Domain
                 debugTextSb.Append($"x={X};");
             if (Y != 0)
                 debugTextSb.Append($"y={Y};");
-            if (R != 0)
-                debugTextSb.Append($"r={R};");
+            if (Radius != 0)
+                debugTextSb.Append($"radius={Radius};");
             if (RotationValue != 0)
                 debugTextSb.Append($"rotation={RotationValue};");
             if (RotationIncrement != 0)

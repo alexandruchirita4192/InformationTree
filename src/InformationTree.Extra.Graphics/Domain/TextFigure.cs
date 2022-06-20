@@ -1,4 +1,5 @@
-﻿using D = System.Drawing;
+﻿using InformationTree.Domain;
+using D = System.Drawing;
 
 namespace InformationTree.Extra.Graphics.Domain
 {
@@ -31,21 +32,21 @@ namespace InformationTree.Extra.Graphics.Domain
 
         #region Constructors
 
-        public TextFigure(string text, int x, int y) : this(text, x, y, 255, 255, 255)
+        public TextFigure(string text, double x, double y) : this(text, x, y, 255, 255, 255)
         {
         }
 
-        public TextFigure(string text, int x, int y, int r, int g, int b) : this(text, x, y, "AngelicWar.ttf", 12, r, g, b)
+        public TextFigure(string text, double x, double y, int red, int green, int blue) : this(text, x, y, "AngelicWar.ttf", 12, red, green, blue)
         {
         }
 
-        public TextFigure(string text, int x, int y, string fontFamilyName, double size, int r, int g, int b)
+        public TextFigure(string text, double x, double y, string fontFamilyName, double size, int red, int green, int blue)
         {
             Text = text;
             Move(x, y);
             _fontFamilyName = fontFamilyName;
             _size = size;
-            SetColor(r, g, b);
+            SetColor(red, green, blue);
         }
 
         #endregion Constructors
@@ -58,7 +59,7 @@ namespace InformationTree.Extra.Graphics.Domain
             var color = _red == 255 && _green == 255 && _blue == 255 ? Color.LightGreen : Color.FromArgb(_red, _green, _blue);
             var brush = new SolidBrush(color);
             var font = new Font(_fontFamilyName, (float)_size);
-            var text = Text?.Replace('_', ' ');
+            var text = Text?.Replace(Constants.Parsing.UnderscoreSeparator, Constants.Parsing.SpaceSeparator);
             graphics.DrawString(text, font, brush, point);
         }
 
@@ -68,11 +69,11 @@ namespace InformationTree.Extra.Graphics.Domain
             _size = size;
         }
 
-        public void SetColor(int r, int g, int b)
+        public void SetColor(int red, int green, int blue)
         {
-            _red = r;
-            _blue = g;
-            _green = b;
+            _red = red;
+            _blue = green;
+            _green = blue;
         }
 
         public override string GetDebugText()

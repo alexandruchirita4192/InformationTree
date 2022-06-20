@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using InformationTree.Domain;
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
@@ -47,8 +48,10 @@ public class MakeSubTreeWithChildrenOfSelectedNodeHandler : IRequestHandler<Make
             var treeNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(node);
             treeNodeData.Link = tbLink.Text;
 
-            if (treeNodeData.Link.IsEmpty() || !treeNodeData.Link.EndsWith(".xml") || treeNodeData.Link.Contains(" "))
-                treeNodeData.Link = node.Text.Replace(" ", "_") + ".xml";
+            if (treeNodeData.Link.IsEmpty() || !treeNodeData.Link.EndsWith(".xml") || treeNodeData.Link.Contains(Constants.Parsing.SpaceSeparator))
+                treeNodeData.Link = node.Text
+                    .Replace(Constants.Parsing.SpaceSeparator, Constants.Parsing.UnderscoreSeparator)
+                    + ".xml";
 
             tbLink.Text = treeNodeData.Link;
 

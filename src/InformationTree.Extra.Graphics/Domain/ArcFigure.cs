@@ -27,11 +27,11 @@ namespace InformationTree.Extra.Graphics.Domain
             ThetaTo = 0.0f;
         }
 
-        public ArcFigure(double x, double y, double r, float thetaFrom, float thetaTo)
+        public ArcFigure(double x, double y, double radius, float thetaFrom, float thetaTo)
         {
             X = x;
             Y = y;
-            Radius = r;
+            Radius = radius;
             ThetaFrom = thetaFrom;
             ThetaTo = thetaTo;
         }

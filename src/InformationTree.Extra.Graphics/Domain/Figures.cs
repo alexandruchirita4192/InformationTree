@@ -1,4 +1,5 @@
-﻿using InformationTree.Domain.Extensions;
+﻿using InformationTree.Domain;
+using InformationTree.Domain.Extensions;
 using InformationTree.Extra.Graphics.Services;
 using D = System.Drawing;
 
@@ -87,7 +88,7 @@ namespace InformationTree.Extra.Graphics.Domain
             if (parameters.IsEmpty())
                 return;
             
-            var words = parameters.Split(' ');
+            var words = parameters.Split(Constants.Parsing.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             switch (words.Length)
             {
                 case 2:
@@ -104,9 +105,10 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(position).Rotate();
         }
 
-        public void Rotate(string positionStr)
+        public void Rotate(string parameters)
         {
-            Rotate(int.Parse(positionStr));
+            if (int.TryParse(parameters, out var position))
+                Rotate(position);
         }
 
         public void RotateAround(int position)
@@ -115,22 +117,22 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(position).RotateAround();
         }
 
-        public void RotateAround(string s)
+        public void RotateAround(string parameters)
         {
-            if (int.TryParse(s, out int result))
-                RotateAround(result);
+            if (int.TryParse(parameters, out int position))
+                RotateAround(position);
         }
 
-        public void AddRotateAround(int position, double r, double addRotation)
+        public void AddRotateAround(int position, double radius, double addRotation)
         {
             if (FigureList != null && FigureList.Count > position && position >= 0)
-                FigureList.ElementAt(position).AddRotateAround(r, addRotation);
+                FigureList.ElementAt(position).AddRotateAround(radius, addRotation);
         }
 
-        public void AddRotateAround(int position, double r, double addRotation, double angle)
+        public void AddRotateAround(int position, double radius, double addRotation, double angle)
         {
             if (FigureList != null && FigureList.Count > position && position >= 0)
-                FigureList.ElementAt(position).AddRotateAround(r, addRotation, angle);
+                FigureList.ElementAt(position).AddRotateAround(radius, addRotation, angle);
         }
 
         public void AddRotateAround(string parameters)
@@ -139,24 +141,24 @@ namespace InformationTree.Extra.Graphics.Domain
                 return;
 
             int position;
-            double r, addRotation;
+            double radius, addRotation;
 
-            var words = parameters.Split(' ');
+            var words = parameters.Split(Constants.Parsing.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             switch (words.Length)
             {
                 case 3:
                     if (int.TryParse(words[0], out position)
-                    && double.TryParse(words[1], out r)
+                    && double.TryParse(words[1], out radius)
                     && double.TryParse(words[2], out addRotation))
-                        AddRotateAround(position, r, addRotation);
+                        AddRotateAround(position, radius, addRotation);
                     break;
 
                 case 4:
                     if (int.TryParse(words[0], out position)
-                    && double.TryParse(words[1], out r)
+                    && double.TryParse(words[1], out radius)
                     && double.TryParse(words[2], out addRotation)
                     && double.TryParse(words[3], out var angle))
-                        AddRotateAround(position, r, addRotation, angle);
+                        AddRotateAround(position, radius, addRotation, angle);
                     break;
             }
         }
@@ -167,21 +169,21 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ElementAt(position).Move(x, y);
         }
 
-        public void Move(int position, double x, double y, double r)
+        public void Move(int position, double x, double y, double radius)
         {
             if (FigureList != null && FigureList.Count > position && position >= 0)
             {
                 var f = FigureList.ElementAt(position);
                 if (f is Figure ff)
-                    ff.Move(x, y, r);
+                    ff.Move(x, y, radius);
             }
         }
 
-        public void Move(string s)
+        public void Move(string parameters)
         {
             int position;
             double x, y;
-            var words = s.Split(' ');
+            var words = parameters.Split(Constants.Parsing.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             switch (words.Length)
             {
                 case 3:
@@ -195,8 +197,8 @@ namespace InformationTree.Extra.Graphics.Domain
                     if (int.TryParse(words[0], out position)
                     && double.TryParse(words[1], out x)
                     && double.TryParse(words[2], out y)
-                    && double.TryParse(words[3], out var r))
-                        Move(position, x, y, r);
+                    && double.TryParse(words[3], out var radius))
+                        Move(position, x, y, radius);
                     break;
             }
         }
@@ -209,7 +211,7 @@ namespace InformationTree.Extra.Graphics.Domain
 
         public void SetPoints(string parameters)
         {
-            var words = parameters.Split(' ');
+            var words = parameters.Split(Constants.Parsing.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             switch (words.Length)
             {
                 case 2:
@@ -220,15 +222,15 @@ namespace InformationTree.Extra.Graphics.Domain
             }
         }
 
-        public void SetColor(int position, double r, double g, double b)
+        public void SetColor(int position, double red, double green, double blue)
         {
             if (FigureList != null && FigureList.Count > position && position >= 0)
-                FigureList.ElementAt(position).SetColor(r, g, b);
+                FigureList.ElementAt(position).SetColor(red, green, blue);
         }
 
         public void SetColor(string parameters)
         {
-            var words = parameters.Split(' ');
+            var words = parameters.Split(Constants.Parsing.SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             switch (words.Length)
             {
                 case 4:
@@ -275,14 +277,14 @@ namespace InformationTree.Extra.Graphics.Domain
                 FigureList.ForEach(f => f.Move(x, y));
         }
 
-        public void MoveAll(double x, double y, double r)
+        public void MoveAll(double x, double y, double radius)
         {
             if (FigureList != null)
                 FigureList.ForEach(f =>
                 {
                     // only Figure has a Radius (r)
                     if (f is Figure ff)
-                        ff.Move(x, y, r);
+                        ff.Move(x, y, radius);
                 });
         }
 
@@ -291,10 +293,10 @@ namespace InformationTree.Extra.Graphics.Domain
             FigureList.ForEach(f => f.Points = points);
         }
 
-        public void SetColorAll(double r, double g, double b)
+        public void SetColorAll(double red, double green, double blue)
         {
             if (FigureList != null)
-                FigureList.ForEach(f => f.SetColor(r, g, b));
+                FigureList.ForEach(f => f.SetColor(red, green, blue));
         }
 
         public void ShowAll(D.Graphics graphics)

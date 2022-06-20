@@ -71,24 +71,24 @@ namespace InformationTree.Extra.Graphics.Domain
                 c.RotationValue += c.RotationIncrement;
                 if (c.NextRotation != null)
                 {
-                    c.NextRotation.X = c.X + GraphicsComputation.ComputeX(c.R, c.RotationValue, 0, 1);
-                    c.NextRotation.Y = c.Y + GraphicsComputation.ComputeY(c.R, c.RotationValue, 0, 1);
+                    c.NextRotation.X = c.X + GraphicsComputation.ComputeX(c.Radius, c.RotationValue, 0, 1);
+                    c.NextRotation.Y = c.Y + GraphicsComputation.ComputeY(c.Radius, c.RotationValue, 0, 1);
                 }
                 else
                 {
-                    X = c.X + GraphicsComputation.ComputeX(c.R, c.RotationValue, 0, 1);
-                    Y = c.Y + GraphicsComputation.ComputeY(c.R, c.RotationValue, 0, 1);
+                    X = c.X + GraphicsComputation.ComputeX(c.Radius, c.RotationValue, 0, 1);
+                    Y = c.Y + GraphicsComputation.ComputeY(c.Radius, c.RotationValue, 0, 1);
                 }
 
                 c = c.NextRotation;
             }
         }
 
-        public void AddRotateAround(double r, double addRotation, double angle)
+        public void AddRotateAround(double radius, double addRotation, double angle)
         {
             if (Rot == null)
             {
-                Rot = new Rotation(X, Y, r, angle, addRotation, null);
+                Rot = new Rotation(X, Y, radius, angle, addRotation, null);
             }
             else
             {
@@ -96,13 +96,13 @@ namespace InformationTree.Extra.Graphics.Domain
                 while (c.NextRotation != null)
                     c = c.NextRotation;
 
-                c.NextRotation = new Rotation(c.X, c.Y, r, angle, addRotation, null);
+                c.NextRotation = new Rotation(c.X, c.Y, radius, angle, addRotation, null);
             }
         }
 
-        public void AddRotateAround(double r, double addRotation)
+        public void AddRotateAround(double radius, double addRotation)
         {
-            AddRotateAround(r, addRotation, 0);
+            AddRotateAround(radius, addRotation, 0);
         }
 
         public void Move(double x, double y)
@@ -111,11 +111,11 @@ namespace InformationTree.Extra.Graphics.Domain
             Y = y;
         }
 
-        public void SetColor(double r = 1.0, double g = 1.0, double b = 1.0)
+        public void SetColor(double red = 1.0, double green = 1.0, double blue = 1.0)
         {
-            Red = r;
-            Green = g;
-            Blue = b;
+            Red = red;
+            Green = green;
+            Blue = blue;
         }
 
         public abstract void Show(D.Graphics graphics);

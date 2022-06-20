@@ -16,6 +16,12 @@ namespace InformationTree.Domain
             public static readonly Color ExceptionColor = Color.Red;
         }
 
+        public static class Parsing
+        {
+            public const char SpaceSeparator = ' ';
+            public const char UnderscoreSeparator = '_';
+        }
+
         public static class XmlAttributes
         {
             public const string XmlAttrText = "text";
