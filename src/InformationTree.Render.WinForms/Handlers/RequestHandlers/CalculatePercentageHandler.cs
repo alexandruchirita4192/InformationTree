@@ -79,7 +79,7 @@ public class CalculatePercentageHandler : IRequestHandler<CalculatePercentageReq
 
                 sum += procentCompleted;
             }
-            else
+            else if (node != null)
             {
                 var procentCompleted = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                     .PercentCompleted

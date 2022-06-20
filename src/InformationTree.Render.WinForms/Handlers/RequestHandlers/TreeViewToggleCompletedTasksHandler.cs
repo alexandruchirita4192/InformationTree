@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Dynamic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InformationTree.Domain;
@@ -36,6 +37,9 @@ public class TreeViewToggleCompletedTasksHandler : IRequestHandler<TreeViewToggl
         {
             foreach (TreeNode node in tv.Nodes)
             {
+                if (node == null)
+                    continue;
+                
                 var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                     .PercentCompleted
                     .ValidatePercentage();
@@ -68,6 +72,9 @@ public class TreeViewToggleCompletedTasksHandler : IRequestHandler<TreeViewToggl
 
             foreach (TreeNode node in nodes)
             {
+                if (node == null)
+                    continue;
+                
                 var completed = _treeNodeToTreeNodeDataAdapter.Adapt(node)
                     .PercentCompleted
                     .ValidatePercentage();
