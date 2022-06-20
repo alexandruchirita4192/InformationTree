@@ -269,15 +269,24 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 switch (words.Length)
                 {
                     case 4:
+                        if (!int.TryParse(words[0], out var oldX))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(FrameRelativeToPoint)} parsing '{words[0]}' issue as {typeof(int).Name}.");
+                        if (!int.TryParse(words[1], out var oldY))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(FrameRelativeToPoint)} parsing '{words[1]}' issue as {typeof(int).Name}.");
+                        if (!int.TryParse(words[2], out var newX))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(FrameRelativeToPoint)} parsing '{words[2]}' issue as {typeof(int).Name}.");
+                        if (!int.TryParse(words[3], out var newY))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(FrameRelativeToPoint)} parsing '{words[3]}' issue as {typeof(int).Name}.");
+
                         var oldPoint = new Point
                         {
-                            X = int.Parse(words[0]),
-                            Y = int.Parse(words[1])
+                            X = oldX,
+                            Y = oldY
                         };
                         var newPoint = new Point
                         {
-                            X = int.Parse(words[2]),
-                            Y = int.Parse(words[3])
+                            X = newX,
+                            Y = newY
                         };
 
                         Frame.TranslateCenter(oldPoint, newPoint);
@@ -302,15 +311,24 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
                 switch (words.Length)
                 {
                     case 4:
+                        if (!int.TryParse(words[0], out var oldX))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(AllRelativeToPoint)} parsing '{words[0]}' issue as {typeof(int).Name}.");
+                        if (!int.TryParse(words[1], out var oldY))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(AllRelativeToPoint)} parsing '{words[1]}' issue as {typeof(int).Name}.");
+                        if (!int.TryParse(words[2], out var newX))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(AllRelativeToPoint)} parsing '{words[2]}' issue as {typeof(int).Name}.");
+                        if (!int.TryParse(words[3], out var newY))
+                            throw new Exception($"{nameof(GraphicsFile)}.{nameof(AllRelativeToPoint)} parsing '{words[3]}' issue as {typeof(int).Name}.");
+
                         var oldPoint = new Point
                         {
-                            X = int.Parse(words[0]),
-                            Y = int.Parse(words[1])
+                            X = oldX,
+                            Y = oldY
                         };
                         var newPoint = new Point
                         {
-                            X = int.Parse(words[2]),
-                            Y = int.Parse(words[3])
+                            X = newX,
+                            Y = newY
                         };
 
                         Frame.TranslateCenterAllFrames(oldPoint, newPoint);
@@ -351,22 +369,41 @@ namespace InformationTree.Extra.Graphics.Services.FileParsing
             {
                 case 2:
                 case 3:
-                    _radius = double.Parse(words[0]);
-                    _iterations = int.Parse(words[1]);
-                    _computeType = words.Length == 3 ? (ComputeType)int.Parse(words[2]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
+                    if(!double.TryParse(words[0], out _radius))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[0]}' parsing issue as {typeof(double).Name}.");
+                    if (!int.TryParse(words[1], out _iterations))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[1]}' parsing issue as {typeof(int).Name}.");
+                    if (words.Length == 3
+                        && !Enum.TryParse(words[2], out _computeType))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[2]}' parsing issue as {nameof(ComputeType)}.");
+                    else // Words length is 2
+                        _computeType = ComputeType.ExtraFiguresWithPointsNumberOfCorners;
+                    
                     ParseLines(_graphicsFileFactory.GenerateFigureLines(_radius, _iterations, _computeType).Distinct().ToArray());
                     break;
 
                 case 7:
                 case 8:
-                    var _points = int.Parse(words[0]);
-                    var _x = double.Parse(words[1]);
-                    var _y = double.Parse(words[2]);
-                    _radius = double.Parse(words[3]);
-                    var _theta = double.Parse(words[4]);
-                    var _number = int.Parse(words[5]);
-                    _iterations = int.Parse(words[6]);
-                    _computeType = words.Length == 8 ? (ComputeType)int.Parse(words[7]) : ComputeType.ExtraFiguresWithPointsNumberOfCorners;
+                    if (!int.TryParse(words[0], out var _points))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[0]}' parsing issue as {typeof(int).Name}.");
+                    if (!double.TryParse(words[1], out var _x))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[1]}' parsing issue as {typeof(double).Name}.");
+                    if (!double.TryParse(words[2], out var _y))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[2]}' parsing issue as {typeof(double).Name}.");
+                    if (!double.TryParse(words[3], out _radius))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[3]}' parsing issue as {typeof(double).Name}.");
+                    if (!double.TryParse(words[4], out var _theta))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[4]}' parsing issue as {typeof(double).Name}.");
+                    if (!int.TryParse(words[5], out var _number))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[5]}' parsing issue as {typeof(int).Name}.");
+                    if (!int.TryParse(words[6], out _iterations))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[6]}' parsing issue as {typeof(int).Name}.");
+                    if (words.Length == 8
+                        && !Enum.TryParse(words[7], out _computeType))
+                        throw new Exception($"{nameof(GraphicsFile)}.{nameof(GenerateFigureLines)}: '{words[7]}' parsing issue as {nameof(ComputeType)}.");
+                    else // Words length is 7
+                        _computeType = ComputeType.ExtraFiguresWithPointsNumberOfCorners;
+                    
                     ParseLines(_graphicsFileFactory.GenerateFigureLines(_points, _x, _y, _radius, _theta, _number, _iterations, _computeType).Distinct().ToArray());
                     break;
             }
