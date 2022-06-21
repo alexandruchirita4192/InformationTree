@@ -5,7 +5,6 @@ using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Domain.Services.Graphics;
 using InformationTree.Forms;
 using MediatR;
 using NLog;
