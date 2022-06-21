@@ -12,7 +12,6 @@ using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
-using InformationTree.Domain.Services.Graphics;
 using InformationTree.Render.WinForms.Extensions;
 using MediatR;
 
