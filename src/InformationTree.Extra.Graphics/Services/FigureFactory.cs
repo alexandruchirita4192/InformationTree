@@ -15,7 +15,7 @@ namespace InformationTree.Extra.Graphics.Services
             || !Enum.IsDefined(typeof(FigureType), words[0]))
                 return ret;
 
-            var figureType = (FigureType)Enum.Parse(typeof(FigureType), words[0]);
+            var figureType = Enum.Parse<FigureType>(words[0]);
 
             // Common variables declared beforehand even if not all of them are used by all switch statements
             // (cannot declare local variables with the same name even if it's in another switch statement)
