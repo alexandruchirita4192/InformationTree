@@ -53,21 +53,7 @@ namespace InformationTree.Render.WinForms.Services
 
         #region MainForm
 
-        private static MainForm _mainForm;
-
-        public static MainForm MainForm
-        {
-            get
-            {
-                if (_mainForm != null)
-                    return _mainForm;
-                return _mainForm;
-            }
-            set
-            {
-                _mainForm = value;
-            }
-        }
+        public static MainForm MainForm { get; set; }
 
         #endregion MainForm
 
@@ -78,10 +64,9 @@ namespace InformationTree.Render.WinForms.Services
             if (form == null || parentForm == null)
                 return;
 
-            int x = 0, y = 0;
             var locationRectangle = parentForm.DesktopBounds;
-            x = locationRectangle.X + locationRectangle.Width / 2 - form.Width / 2;
-            y = locationRectangle.Y + locationRectangle.Height / 2 - form.Height / 2;
+            var x = locationRectangle.X + locationRectangle.Width / 2 - form.Width / 2;
+            var y = locationRectangle.Y + locationRectangle.Height / 2 - form.Height / 2;
             MoveWindow(form.Handle, x, y, form.Width, form.Height, false);
         }
 
