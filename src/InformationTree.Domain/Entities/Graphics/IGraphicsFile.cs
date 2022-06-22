@@ -7,8 +7,8 @@ namespace InformationTree.Domain.Entities.Graphics
         void Clean();
         void ParseLines(string[] lines);
         void Show(System.Drawing.Graphics graphics);
-        void GoToFrame(string frame);
+        void GoToFrame(int position);
         void ChangeToPreviousFrame();
-        void ChangeToNextFrame(string v);
+        void ChangeToNextFrame(bool addNextFrameIfNextFrameIsNull);
     }
 }

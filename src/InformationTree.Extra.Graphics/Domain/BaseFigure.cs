@@ -1,9 +1,10 @@
 ﻿using D = System.Drawing;
 using InformationTree.Extra.Graphics.Computation;
+using InformationTree.Domain.Entities.Graphics;
 
 namespace InformationTree.Extra.Graphics.Domain
 {
-    public abstract class BaseFigure
+    public abstract class BaseFigure : IBaseFigure
     {
         #region Properties
 

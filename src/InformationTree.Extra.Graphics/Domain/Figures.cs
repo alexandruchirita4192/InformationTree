@@ -1,15 +1,16 @@
 ﻿using InformationTree.Domain;
+using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Extensions;
 using InformationTree.Extra.Graphics.Services;
 using D = System.Drawing;
 
 namespace InformationTree.Extra.Graphics.Domain
 {
-    public class Figures // keep? or remove and add pointer to next figure @ Figure?
+    public class Figures : IFigures // keep? or remove and add pointer to next figure @ Figure?
     {
         #region Properties
 
-        public List<BaseFigure> FigureList { get; private set; }
+        public List<IBaseFigure> FigureList { get; private set; }
         public Point CenterPoint { get; private set; }
         public Point RealCenterPoint { get; private set; }
 
@@ -19,7 +20,7 @@ namespace InformationTree.Extra.Graphics.Domain
 
         public Figures()
         {
-            FigureList = new List<BaseFigure>();
+            FigureList = new List<IBaseFigure>();
         }
 
         public Figures(BaseFigure figure) : this()
@@ -31,7 +32,7 @@ namespace InformationTree.Extra.Graphics.Domain
 
         #region Methods
 
-        public void AddFigure(BaseFigure figure)
+        public void AddFigure(IBaseFigure figure)
         {
             if (FigureList != null)
                 FigureList.Add(figure);
@@ -52,7 +53,7 @@ namespace InformationTree.Extra.Graphics.Domain
             AddFigure(textLine);
         }
 
-        public void AddFigureOnce(BaseFigure figure)
+        public void AddFigureOnce(IBaseFigure figure)
         {
             if (FigureList != null && FigureList.FirstOrDefault(f => f.Points == figure.Points && f.X == figure.X && f.Y == figure.Y) == default(BaseFigure))
                 FigureList.Add(figure);
@@ -72,7 +73,7 @@ namespace InformationTree.Extra.Graphics.Domain
 
         #region Individual methods
 
-        public BaseFigure? GetFigureAt(int position)
+        public IBaseFigure? GetFigureAt(int position)
         {
             return FigureList != null && FigureList.Count > position && position >= 0 ? FigureList.ElementAt(position) : null;
         }

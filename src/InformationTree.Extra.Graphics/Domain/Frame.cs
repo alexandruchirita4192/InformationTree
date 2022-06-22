@@ -1,15 +1,16 @@
-﻿using InformationTree.Extra.Graphics.Domain;
+﻿using InformationTree.Domain.Entities.Graphics;
+using InformationTree.Extra.Graphics.Domain;
 using D = System.Drawing;
 
 namespace InformationTree.Graphics
 {
-    public class Frame
+    public class Frame : IFrame
     {
         #region Properties
 
         public bool IsActive { get; private set; }
         public Frame? NextFrame { get; private set; }
-        public Figures Figures { get; private set; }
+        public IFigures Figures { get; private set; }
 
         public Point CenterPoint
         {
@@ -40,7 +41,11 @@ namespace InformationTree.Graphics
         }
 
         public Frame(bool isActive, Frame? nextFrame)
-        { IsActive = isActive; NextFrame = nextFrame; Figures = new Figures(); }
+        {
+            IsActive = isActive;
+            NextFrame = nextFrame;
+            Figures = new Figures();
+        }
 
         #endregion Constructor
 
@@ -182,7 +187,7 @@ namespace InformationTree.Graphics
             return GetFirstActiveFrame() != null;
         }
 
-        public Frame? GetFirstActiveFrame()
+        public IFrame? GetFirstActiveFrame()
         {
             var c = this;
             while (c.NextFrame != null)
@@ -195,7 +200,7 @@ namespace InformationTree.Graphics
             return c.IsActive ? c : null;
         }
 
-        public Frame GetActiveFrameOrThis()
+        public IFrame GetActiveFrameOrThis()
         {
             var frame = GetFirstActiveFrame();
             IsActive = frame == null || IsActive;

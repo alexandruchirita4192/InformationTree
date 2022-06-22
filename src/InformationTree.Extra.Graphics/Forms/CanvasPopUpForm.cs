@@ -138,7 +138,7 @@ namespace InformationTree.Forms
                 case Keys.D1:
                 case Keys.NumPad1:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("0");
+                        GraphicsFile.GoToFrame(0);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 1;
                     break;
@@ -146,7 +146,7 @@ namespace InformationTree.Forms
                 case Keys.D2:
                 case Keys.NumPad2:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("1");
+                        GraphicsFile.GoToFrame(1);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 1;
                     break;
@@ -154,7 +154,7 @@ namespace InformationTree.Forms
                 case Keys.D3:
                 case Keys.NumPad3:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("2");
+                        GraphicsFile.GoToFrame(2);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 2;
                     break;
@@ -162,7 +162,7 @@ namespace InformationTree.Forms
                 case Keys.D4:
                 case Keys.NumPad4:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("3");
+                        GraphicsFile.GoToFrame(3);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 3;
                     break;
@@ -170,7 +170,7 @@ namespace InformationTree.Forms
                 case Keys.D5:
                 case Keys.NumPad5:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("4");
+                        GraphicsFile.GoToFrame(4);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 4;
                     break;
@@ -178,7 +178,7 @@ namespace InformationTree.Forms
                 case Keys.D6:
                 case Keys.NumPad6:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("5");
+                        GraphicsFile.GoToFrame(5);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 5;
                     break;
@@ -186,7 +186,7 @@ namespace InformationTree.Forms
                 case Keys.D7:
                 case Keys.NumPad7:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("6");
+                        GraphicsFile.GoToFrame(6);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 6;
                     break;
@@ -194,7 +194,7 @@ namespace InformationTree.Forms
                 case Keys.D8:
                 case Keys.NumPad8:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("7");
+                        GraphicsFile.GoToFrame(7);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 7;
                     break;
@@ -202,7 +202,7 @@ namespace InformationTree.Forms
                 case Keys.D9:
                 case Keys.NumPad9:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("8");
+                        GraphicsFile.GoToFrame(8);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 8;
                     break;
@@ -210,7 +210,7 @@ namespace InformationTree.Forms
                 case Keys.D0:
                 case Keys.NumPad0:
                     if (op == 0)
-                        GraphicsFile.GoToFrame("9");
+                        GraphicsFile.GoToFrame(9);
                     else if ((op > 0) && (op < 10))
                         nr = nr * 10 + 9;
                     break;
@@ -255,7 +255,7 @@ namespace InformationTree.Forms
                     break;
 
                 case Keys.Right:
-                    GraphicsFile.ChangeToNextFrame("true");
+                    GraphicsFile.ChangeToNextFrame(true);
                     break;
 
                 case Keys.Q:

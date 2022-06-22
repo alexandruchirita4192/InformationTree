@@ -1,20 +1,12 @@
 ﻿using InformationTree.Domain.Entities.Graphics;
-using InformationTree.Domain.Services;
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
-using InformationTree.Extra.Graphics.Services.FileParsing;
+using InformationTree.Extra.Graphics.Services;
 
 namespace InformationTree.Extra.Graphics.Computation
 {
     public class GraphicsFileFactory : IGraphicsFileFactory
     {
-        private readonly IPopUpService _popUpService;
-
-        public GraphicsFileFactory(IPopUpService popUpService)
-        {
-            _popUpService = popUpService;
-        }
-
         #region Constants
 
         public const double DefaultX = 200d;
@@ -26,11 +18,18 @@ namespace InformationTree.Extra.Graphics.Computation
 
         #endregion Constants
 
+        private readonly IGraphicsParser _graphicsParsing;
+
+        public GraphicsFileFactory(IGraphicsParser graphicsParsing)
+        {
+            _graphicsParsing = graphicsParsing;
+        }
+
         #region Methods
 
         public IGraphicsFile CreateGraphicsFile()
         {
-            var graphicsFile = new GraphicsFile(this, _popUpService);
+            var graphicsFile = new GraphicsFile(_graphicsParsing);
             return graphicsFile;
         }
 
@@ -76,7 +75,7 @@ namespace InformationTree.Extra.Graphics.Computation
 
         public IGraphicsFile GetDefaultGraphicsFile(int screenBoundsHeight, int screenBoundsWidth)
         {
-            var ret = new GraphicsFile(this, _popUpService);
+            var ret = new GraphicsFile(_graphicsParsing);
 
             var y = screenBoundsHeight / 2;
             var x = screenBoundsWidth / 2;
@@ -106,7 +105,7 @@ namespace InformationTree.Extra.Graphics.Computation
             var y = screenBoundsHeight / 2;
             var x = screenBoundsWidth / 2;
 
-            var graphicsFile = new GraphicsFile(this, _popUpService);
+            var graphicsFile = new GraphicsFile(_graphicsParsing);
 
             var lines = new List<string>
             {
