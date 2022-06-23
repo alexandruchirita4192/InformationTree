@@ -33,24 +33,27 @@ namespace InformationTree.Render.WinForms.Handlers.RequestHandlers
                 return null;
 
             pbPercentComplete.Maximum = 100;
-            pbPercentComplete.Value = (int)nudCompleteProgress.Value;
 
-            if (selectedNode != null)
+            var progressValue = nudCompleteProgress.Value
+                .ValidatePercentage();
+            var isPercentCompletedChanged = pbPercentComplete.Value != (int)progressValue;
+            if (isPercentCompletedChanged)
+                pbPercentComplete.Value = (int)progressValue;
+
+            var selectedNodeData = _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode);
+
+            var isSelectedNodeDataPercentChagnged = selectedNodeData.PercentCompleted != progressValue;
+            if (isSelectedNodeDataPercentChagnged)
+                selectedNodeData.PercentCompleted = progressValue;
+
+            var percentCompletedValueHasChanged = isPercentCompletedChanged || isSelectedNodeDataPercentChagnged;
+            if (percentCompletedValueHasChanged)
             {
-                _treeNodeToTreeNodeDataAdapter.Adapt(selectedNode)
-                    .PercentCompleted = nudCompleteProgress.Value
-                    .ValidatePercentage();
-
-                // TODO: Find a proper way to check if progress value has changed and not because of selection change
-                var valueHasChanged = false;
-                if (valueHasChanged)
+                var setTreeStateRequest = new SetTreeStateRequest
                 {
-                    var setTreeStateRequest = new SetTreeStateRequest
-                    {
-                        TreeUnchanged = false
-                    };
-                    await _mediator.Send(setTreeStateRequest, cancellationToken);
-                }
+                    TreeUnchanged = false
+                };
+                await _mediator.Send(setTreeStateRequest, cancellationToken);
             }
 
             return new BaseResponse();
