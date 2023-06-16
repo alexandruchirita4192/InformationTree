@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <OutputType>WinExe</OutputType>
     <StartupObject>InformationTree.Infrastructure.Program</StartupObject>
     <ApplicationIcon>xt3.ico</ApplicationIcon>
