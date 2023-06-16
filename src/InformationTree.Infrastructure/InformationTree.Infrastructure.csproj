@@ -7,6 +7,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <OutputType>WinExe</OutputType>
     <StartupObject>InformationTree.Infrastructure.Program</StartupObject>
+    <RuntimeIdentifier>win</RuntimeIdentifier>
     <ApplicationIcon>xt3.ico</ApplicationIcon>
     <UseWindowsForms>True</UseWindowsForms>
   </PropertyGroup>
