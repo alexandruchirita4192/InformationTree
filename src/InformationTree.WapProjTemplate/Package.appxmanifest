@@ -28,7 +28,7 @@
 
   <Applications>
     <Application Id="App"
-      Executable="$targetnametoken$.exe"
+      Executable="InformationTree.Infrastructure.exe"
       EntryPoint="InformationTree.Infrastructure">
       <uap:VisualElements
         DisplayName="InformationTree"
