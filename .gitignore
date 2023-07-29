@@ -14,3 +14,4 @@ Debug/
 packages/
 InformationTree.userprefs
 *.user
+/src/InformationTree.WapProjTemplate/InformationTree.WapProjTemplate.assets.cache

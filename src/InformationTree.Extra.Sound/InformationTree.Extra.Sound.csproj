@@ -1,14 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <Platform>AnyCPU;x86;x64</Platform>
+	<TargetFrameworks>net7.0-windows</TargetFrameworks>
+	<RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+	<PlatformTarget>AnyCPU</PlatformTarget>
+    <UseWindowsForms>True</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Windows.Extensions" Version="6.0.0" />
+    <PackageReference Include="System.Windows.Extensions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

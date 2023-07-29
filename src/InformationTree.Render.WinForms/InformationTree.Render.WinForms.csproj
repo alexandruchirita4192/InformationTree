@@ -1,12 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <Platform>AnyCPU;x86;x64</Platform>
+	<TargetFrameworks>net7.0-windows</TargetFrameworks>
+	<RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+	<UseWindowsForms>True</UseWindowsForms>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-	<RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-	<UseWindowsForms>True</UseWindowsForms>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -26,14 +27,11 @@
     <Content Include="xt3.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.15" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.2.2" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.310801">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.6" />
   </ItemGroup>
   <ItemGroup>
