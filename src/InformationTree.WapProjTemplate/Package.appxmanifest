@@ -9,7 +9,7 @@
   <Identity
     Name="fafd1d6a-dc72-4ef0-8541-4eab8f04959e"
     Publisher="CN=LattePanda"
-    Version="1.0.0.0" />
+    Version="1.0.3.0" />
 
   <Properties>
     <DisplayName>InformationTree</DisplayName>

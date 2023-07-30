@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <Platform>AnyCPU</Platform>
-	<TargetFrameworks>net7.0-windows</TargetFrameworks>
-	<RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-	<PlatformTarget>AnyCPU</PlatformTarget>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <UseWindowsForms>True</UseWindowsForms>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
