@@ -52,6 +52,7 @@ jobs:
       matrix:
         channel: [Production_Store]
         configuration: [Debug, Release]
+        targetplatform: [x64]
         include:
           # includes the following variables for the matrix leg matching Production_Store
           - channel: Production_Store
@@ -93,7 +94,7 @@ jobs:
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
-        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+        RuntimeIdentifier: ${{ matrix.targetplatform }}
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
