@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
   <PropertyGroup>
-    <Platform>AnyCPU;x86;x64</Platform>
+    <Platform>AnyCPU</Platform>
 	<TargetFrameworks>net7.0-windows</TargetFrameworks>
 	<RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
 	<UseWindowsForms>True</UseWindowsForms>

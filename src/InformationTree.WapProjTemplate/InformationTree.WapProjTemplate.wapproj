@@ -4,7 +4,7 @@
     <VisualStudioVersion>15.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <Platform>AnyCPU;x64;x86</Platform>
+    <Platform>AnyCPU</Platform>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
