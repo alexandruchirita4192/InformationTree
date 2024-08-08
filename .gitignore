@@ -14,3 +14,8 @@ Debug/
 packages/
 InformationTree.userprefs
 *.user
+/src/InformationTree.WapProjTemplate/InformationTree.WapProjTemplate.assets.cache
+/src/InformationTree.Domain/bin/Release/net7.0-windows/win-x86
+/src/InformationTree.Extra.Graphics/bin/Release/net7.0-windows/win-x86
+/src/InformationTree.Extra.Sound/bin/Release/net7.0-windows/win-x86
+/src/RicherTextBox/bin/Release/net7.0-windows/win-x86
