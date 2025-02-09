@@ -1,4 +1,4 @@
-# InformationTree
+# Information Tree
 
 InformationTree is a program used to organize tasks into a tree (breaking a task into subtasks).
 
