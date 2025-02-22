@@ -87,7 +87,7 @@ jobs:
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v2
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
@@ -126,7 +126,7 @@ jobs:
     # Create the release:  https://github.com/actions/create-release
     - name: Create release
       id: create_release
-      uses: actions/create-release@v1
+      uses: actions/create-release@v1.1.4
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
@@ -143,6 +143,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}  # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: InformationTree.Package\AppPackages\InformationTreeAppPackage.zip
+        asset_path: ${{ env.Wap_Project_Directory }}\InformationTree.WapProjTemplate\AppPackages\InformationTreeAppPackage.zip
         asset_name: InformationTreeAppPackage.zip
         asset_content_type: application/zip
