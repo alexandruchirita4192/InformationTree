@@ -3,9 +3,24 @@
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0'">
     <VisualStudioVersion>15.0</VisualStudioVersion>
   </PropertyGroup>
+  <Target Name="Build">
+    <Message Text="Ext = $(MSBuildExtensionsPath)" />
+    <Message Text="Tools = $(MSBuildToolsVersion)" />
+    <Message Text="msb32 = $(MSBuildExtensionsPath32)" />
+    <Message Text="targ = $(TargetFrameworkIdentifier)" />
+    <Message Text="fs = $(FSharpTargetsPath)" />
+    <Message Text="vs = $(VisualStudioVersion)" />
+  </Target>  
   <PropertyGroup>
     <Platform>x64</Platform>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWindowsForms>True</UseWindowsForms>
+    <PlatformTarget>x64</PlatformTarget>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
