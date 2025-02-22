@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace RicherTextBox
 {
     public partial class ReplaceForm : FindForm
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new RichTextBox RtbInstance
         {
             set
@@ -17,6 +19,7 @@ namespace RicherTextBox
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new string InitialText
         {
             set

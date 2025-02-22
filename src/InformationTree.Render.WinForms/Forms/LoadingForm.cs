@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using InformationTree.Domain.Entities.Graphics;
 using InformationTree.Domain.Requests;
 using MediatR;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
@@ -13,7 +14,10 @@ namespace InformationTree.Forms
 
         #region Properties
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IGraphicsFile GraphicsFile { get; private set; }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public System.Timers.Timer Timer { get; protected set; }
 
         #endregion Properties
