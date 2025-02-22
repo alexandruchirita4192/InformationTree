@@ -14,6 +14,7 @@ using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using MediatR;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
@@ -190,6 +191,7 @@ namespace InformationTree.Forms
         private Stopwatch _timer = new();
         private System.Timers.Timer _randomTimer = new();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TreeNodeData TaskListRoot
         {
             get
