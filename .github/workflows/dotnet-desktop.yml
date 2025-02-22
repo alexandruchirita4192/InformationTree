@@ -131,7 +131,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
         tag_name: ${{ github.ref_name }}.${{ matrix.ChannelName }}.${{ matrix.targetplatform }}
-        elease_name: ${{ github.ref_name }}.${{ matrix.ChannelName }}.${{ matrix.targetplatform }}
+        release_name: ${{ github.ref_name }}.${{ matrix.ChannelName }}.${{ matrix.targetplatform }}
         draft: false
         prerelease: false
 
