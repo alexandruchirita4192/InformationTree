@@ -15,11 +15,20 @@ namespace RicherTextBox.Controls
     {
         #region Fields
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private readonly IPopUpService _popUpService;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private readonly IConfigurationReader _configurationReader;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private readonly IMediator _mediator;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private readonly Configuration _configuration;
 
         #endregion Fields
@@ -30,6 +39,7 @@ namespace RicherTextBox.Controls
 
         [Category("Settings")]
         [Description("Value indicating the number of characters used for indentation")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int INDENT
         {
             get { return indent; }
@@ -41,6 +51,7 @@ namespace RicherTextBox.Controls
         #region Properties for toolstrip items visibility
 
         [Category("Global visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GlobalVisibility
         {
             get { return Visible; }
@@ -67,6 +78,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupSaveAndLoadVisible
         {
             get { return tsbtnSave.Visible && tsbtnOpen.Visible && toolStripSeparator6.Visible; }
@@ -80,6 +92,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupFontNameAndSizeVisible
         {
             get { return tscmbFont.Visible && tscmbFontSize.Visible && tsbtnChooseFont.Visible && toolStripSeparator1.Visible; }
@@ -94,6 +107,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupBoldUnderlineItalicVisible
         {
             get { return tsbtnBold.Visible && tsbtnItalic.Visible && tsbtnUnderline.Visible && toolStripSeparator2.Visible; }
@@ -108,6 +122,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupAlignmentVisible
         {
             get { return tsbtnAlignLeft.Visible && tsbtnAlignRight.Visible && tsbtnAlignCenter.Visible && toolStripSeparator3.Visible; }
@@ -122,6 +137,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupFontColorVisible
         {
             get { return tsbtnFontColor.Visible && tsbtnWordWrap.Visible && toolStripSeparator4.Visible; }
@@ -135,6 +151,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupIndentationAndBulletsVisible
         {
             get { return tsbtnIndent.Visible && tsbtnOutdent.Visible && tsbtnBullets.Visible && toolStripSeparator5.Visible; }
@@ -149,6 +166,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupInsertVisible
         {
             get { return tsbtnInsertPicture.Visible && toolStripSeparator7.Visible; }
@@ -161,6 +179,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool GroupZoomVisible
         {
             get { return tsbtnZoomOut.Visible && tsbtnZoomIn.Visible && tstxtZoomFactor.Visible; }
@@ -174,6 +193,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ToolStripVisible
         {
             get { return toolStripMenu.Visible; }
@@ -181,6 +201,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstip items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool FindReplaceVisible
         {
             get { return toolStripFindReplace.Visible; }
@@ -188,6 +209,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SaveVisible
         {
             get { return tsbtnSave.Visible; }
@@ -195,6 +217,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool LoadVisible
         {
             get { return tsbtnOpen.Visible; }
@@ -202,6 +225,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorSaveLoadVisible
         {
             get { return toolStripSeparator6.Visible; }
@@ -209,6 +233,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool FontFamilyVisible
         {
             get { return tscmbFont.Visible; }
@@ -216,6 +241,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool FontSizeVisible
         {
             get { return tscmbFontSize.Visible; }
@@ -223,6 +249,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ChooseFontVisible
         {
             get { return tsbtnChooseFont.Visible; }
@@ -230,6 +257,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorFontVisible
         {
             get { return toolStripSeparator1.Visible; }
@@ -237,6 +265,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool BoldVisible
         {
             get { return tsbtnBold.Visible; }
@@ -244,6 +273,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ItalicVisible
         {
             get { return tsbtnItalic.Visible; }
@@ -251,6 +281,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool UnderlineVisible
         {
             get { return tsbtnUnderline.Visible; }
@@ -258,6 +289,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorBoldUnderlineItalicVisible
         {
             get { return toolStripSeparator2.Visible; }
@@ -265,6 +297,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool AlignLeftVisible
         {
             get { return tsbtnAlignLeft.Visible; }
@@ -272,6 +305,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool AlignRightVisible
         {
             get { return tsbtnAlignRight.Visible; }
@@ -279,6 +313,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool AlignCenterVisible
         {
             get { return tsbtnAlignCenter.Visible; }
@@ -286,6 +321,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorAlignVisible
         {
             get { return toolStripSeparator3.Visible; }
@@ -293,6 +329,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool FontColorVisible
         {
             get { return tsbtnFontColor.Visible; }
@@ -300,6 +337,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool WordWrapVisible
         {
             get { return tsbtnWordWrap.Visible; }
@@ -307,6 +345,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorFontColorVisible
         {
             get { return toolStripSeparator4.Visible; }
@@ -314,6 +353,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool IndentVisible
         {
             get { return tsbtnIndent.Visible; }
@@ -321,6 +361,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool OutdentVisible
         {
             get { return tsbtnOutdent.Visible; }
@@ -328,6 +369,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool BulletsVisible
         {
             get { return tsbtnBullets.Visible; }
@@ -335,6 +377,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorIndentAndBulletsVisible
         {
             get { return toolStripSeparator5.Visible; }
@@ -342,6 +385,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool InsertPictureVisible
         {
             get { return tsbtnInsertPicture.Visible; }
@@ -349,6 +393,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorInsertVisible
         {
             get { return toolStripSeparator7.Visible; }
@@ -356,6 +401,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ZoomInVisible
         {
             get { return tsbtnZoomIn.Visible; }
@@ -363,6 +409,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ZoomOutVisible
         {
             get { return tsbtnZoomOut.Visible; }
@@ -370,6 +417,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ZoomFactorTextVisible
         {
             get { return tstxtZoomFactor.Visible; }
@@ -377,6 +425,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool SeparatorNewButtonsVisible
         {
             get { return toolStripMenuItem5.Visible; }
@@ -384,6 +433,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool TableVisible
         {
             get { return tsbtnTable.Visible; }
@@ -391,6 +441,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool CalculateVisible
         {
             get { return tsbtnCalculate.Visible; }
@@ -398,6 +449,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool EncryptDecryptCategoryVisible
         {
             get { return encryptDecryptToolStripMenuItem.Visible; }
@@ -405,6 +457,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool EncryptVisible
         {
             get { return tsbtnEncrypt.Visible; }
@@ -412,6 +465,7 @@ namespace RicherTextBox.Controls
         }
 
         [Category("Toolstrip single items visibility")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool DecryptVisible
         {
             get { return tsbtnDecrypt.Visible; }
@@ -425,6 +479,7 @@ namespace RicherTextBox.Controls
         [Category("Text length")]
         [Description("RicherTextBox text length")]
         [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int TextLength
         {
             get { return rtbDocument.TextLength; }
@@ -433,6 +488,7 @@ namespace RicherTextBox.Controls
         [Category("Document data")]
         [Description("RicherTextBox content in plain text")]
         [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override string Text
         {
             get { return rtbDocument.Text; }
@@ -441,6 +497,7 @@ namespace RicherTextBox.Controls
 
         [Category("Document data")]
         [Description("RicherTextBox content in rich-text format")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Rtf
         {
             get
@@ -468,6 +525,7 @@ namespace RicherTextBox.Controls
 
         [Category("RichTextBox")]
         [Description("RichTextBox document")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public RichTextBox TextBox
         {
             get { return rtbDocument; }
@@ -910,6 +968,7 @@ namespace RicherTextBox.Controls
 
         #region Public methods
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Func<string, string> EncryptFunction, DecryptFunction, CalculateFunction, TableFunction;
 
         public void SetFontFamily(FontFamily family)
@@ -1002,6 +1061,7 @@ namespace RicherTextBox.Controls
 
         #region Overrides
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override Color BackColor
         {
             get
@@ -1016,6 +1076,7 @@ namespace RicherTextBox.Controls
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override Color ForeColor
         {
             get
@@ -1030,6 +1091,7 @@ namespace RicherTextBox.Controls
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override Font Font
         {
             get
@@ -1044,6 +1106,7 @@ namespace RicherTextBox.Controls
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override AnchorStyles Anchor
         {
             get
@@ -1058,6 +1121,7 @@ namespace RicherTextBox.Controls
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override bool AutoSize
         {
             get

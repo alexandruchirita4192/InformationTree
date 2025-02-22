@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using MediatR;
+using System.ComponentModel;
 
 namespace RicherTextBox
 {
@@ -11,14 +12,18 @@ namespace RicherTextBox
         private readonly IPopUpService _popUpService;
         private readonly IMediator _mediator;
         private int lastFound = 0;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private RichTextBox rtbInstance = null;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public RichTextBox RtbInstance
         {
             set { rtbInstance = value; }
             get { return rtbInstance; }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string InitialText
         {
             set { txtSearchText.Text = value; }
