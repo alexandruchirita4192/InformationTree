@@ -2,6 +2,7 @@
 using InformationTree.Domain.Extensions;
 using InformationTree.Domain.Requests;
 using MediatR;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
@@ -9,6 +10,7 @@ namespace InformationTree.Forms
     {
         private readonly IMediator _mediator;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string TextToFind
         {
             get

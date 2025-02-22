@@ -12,6 +12,7 @@ using InformationTree.Domain.Services.Graphics;
 using MediatR;
 using NLog;
 using RicherTextBox.Controls;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
@@ -45,6 +46,7 @@ namespace InformationTree.Forms
         /// <summary>
         /// Returns the data from the RicherTextBox editor of the pop up.
         /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Data
         {
             get
@@ -57,6 +59,7 @@ namespace InformationTree.Forms
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private bool DataIsPgpEncrypted
         {
             get
@@ -67,6 +70,7 @@ namespace InformationTree.Forms
 
         #endregion Data
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private bool FromFile { get { return cbFromFile.Checked; } }
 
         #endregion Properties
