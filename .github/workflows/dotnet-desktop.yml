@@ -110,7 +110,17 @@ jobs:
     # Try to add Windows SDK to path to find `MakeAppx.exe` and build properly
     - name: Add Windows SDK MakeAppx.exe to PATH
       run: |
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.14393.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.16299.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64"
         $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64"
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\x64"
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
