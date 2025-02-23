@@ -103,6 +103,11 @@ jobs:
         $certificatePath = Join-Path -Path $env:Wap_Project_Directory -ChildPath GitHubActionsWorkflow.pfx
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
 
+    # Try to add Windows SDK to path to find `makeappx.exe` and build properly
+    - name: Add Windows SDK makeappx.exe to PATH
+      run: |
+        $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64"
+
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
       run: msbuild $env:Wap_Project_Path /t:CreateAppPackage /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:Wap_Project_Directory\GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
