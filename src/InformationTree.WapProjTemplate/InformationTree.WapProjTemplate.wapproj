@@ -10,7 +10,10 @@
     <Message Text="targ = $(TargetFrameworkIdentifier)" />
     <Message Text="fs = $(FSharpTargetsPath)" />
     <Message Text="vs = $(VisualStudioVersion)" />
-  </Target>  
+  </Target>
+  <Target Name="CreateAppPackage" DependsOnTargets="Build">
+    <Exec Command="makeappx.exe pack /d $(OutDir) /p $(OutDir)MyApp.appx" />
+  </Target>
   <PropertyGroup>
     <Platform>x64</Platform>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -33,7 +36,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup>
-    <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath32)\Microsoft\DesktopBridge\</WapProjPath>
+    <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\</WapProjPath>
   </PropertyGroup>
   <PropertyGroup>
     <ProjectGuid>9a4341c0-bc44-4239-8dd6-e2141c899ff7</ProjectGuid>
