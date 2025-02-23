@@ -21,7 +21,21 @@
   <Target Name="CreateAppPackage" DependsOnTargets="Build">
     <Exec Command="makeappx.exe pack /d $(OutDir) /p $(OutDir)InformationTreeAppPackage.appx" />
   </Target>
-  
+
+  <UsingTask TaskName="GetFrameworkSdkPackages" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <TargetFrameworkVersion ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+          // Dummy implementation—set an empty result.
+          Log.LogMessage("Skipping GetFrameworkSdkPackages.");
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
   <PropertyGroup>
     <Platform>x64</Platform>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
