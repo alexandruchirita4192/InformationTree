@@ -12,7 +12,7 @@
     <Message Text="vs = $(VisualStudioVersion)" />
   </Target>
   <Target Name="CreateAppPackage" DependsOnTargets="Build">
-    <Exec Command="makeappx.exe pack /d $(OutDir) /p $(OutDir)MyApp.appx" />
+    <Exec Command="makeappx.exe pack /d $(OutDir) /p $(OutDir)InformationTreeAppPackage.appx" />
   </Target>
   <PropertyGroup>
     <Platform>x64</Platform>

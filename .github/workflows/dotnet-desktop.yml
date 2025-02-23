@@ -50,18 +50,18 @@ jobs:
 
     strategy:
       matrix:
-        channel: [Production_Store]
+        channel: [ProductionMicrosoftStore]
         configuration: [Debug, Release]
         targetplatform: [x64]
         include:
-          # includes the following variables for the matrix leg matching Production_Store
-          - channel: Production_Store
+          # includes the following variables for the matrix leg matching ProductionMicrosoftStore
+          - channel: ProductionMicrosoftStore
             Configuration: Release
-            ChannelName: Production_Store
+            ChannelName: ProductionMicrosoftStore
             DistributionUrl: https://github.com/alexandruchirita4192/InformationTree
             MsixPackageId: InformationTree.ProductionStore
             MsixPublisherId: CN=LattePanda
-            MsixPackageDisplayName: Information Tree (Production Store)
+            MsixPackageDisplayName: Information Tree (Production for Microsoft Store)
             
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -121,7 +121,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\InformationTree.WapProjTemplate\AppPackages
+        path: ${{ env.Wap_Project_Directory }}\InformationTree.WapProjTemplate
         
     # Create the release:  https://github.com/actions/create-release
     - name: Create release
@@ -143,6 +143,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}  # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ${{ env.Wap_Project_Directory }}\InformationTree.WapProjTemplate\AppPackages\InformationTreeAppPackage.zip
+        asset_path: ${{ env.Wap_Project_Directory }}\InformationTree.WapProjTemplate\InformationTreeAppPackage.appx
         asset_name: InformationTreeAppPackage.zip
         asset_content_type: application/zip
