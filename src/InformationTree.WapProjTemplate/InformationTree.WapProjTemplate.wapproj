@@ -43,7 +43,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup>
-    <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\</WapProjPath>
+    <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath32)\Microsoft\DesktopBridge\</WapProjPath>
   </PropertyGroup>
   <PropertyGroup>
     <ProjectGuid>9a4341c0-bc44-4239-8dd6-e2141c899ff7</ProjectGuid>
@@ -87,5 +87,5 @@
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
     <None Include="InformationTree.WapProjTemplate_TemporaryKey.pfx" />
   </ItemGroup>
-  <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" Condition="Exists('$(WapProjPath)\Microsoft.DesktopBridge.targets')" />
+  <!-- <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" Condition="Exists('$(WapProjPath)\Microsoft.DesktopBridge.targets')" /> -->
 </Project>
