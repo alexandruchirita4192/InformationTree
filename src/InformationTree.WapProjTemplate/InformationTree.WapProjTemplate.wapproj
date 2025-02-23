@@ -77,4 +77,5 @@
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
     <None Include="InformationTree.WapProjTemplate_TemporaryKey.pfx" />
   </ItemGroup>
+  <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" Condition="Exists('$(WapProjPath)\Microsoft.DesktopBridge.targets')" />
 </Project>
