@@ -11,9 +11,17 @@
     <Message Text="fs = $(FSharpTargetsPath)" />
     <Message Text="vs = $(VisualStudioVersion)" />
   </Target>
+
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildProjectDirectory)\bin\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+  </PropertyGroup>
+
   <Target Name="CreateAppPackage" DependsOnTargets="Build">
     <Exec Command="makeappx.exe pack /d $(OutDir) /p $(OutDir)InformationTreeAppPackage.appx" />
   </Target>
+  
   <PropertyGroup>
     <Platform>x64</Platform>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
