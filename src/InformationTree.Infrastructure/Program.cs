@@ -1,7 +1,13 @@
-﻿using Castle.Windsor;
-using InformationTree.Domain.Services;
-using InformationTree.Infrastructure.MediatR;
-using InformationTree.Infrastructure.MediatR.SelfTest;
+﻿using InformationTree.Domain.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using InformationTree.Domain.Services.Graphics;
+using InformationTree.Extra.Graphics.Computation;
+using InformationTree.Extra.Graphics.Services;
+using InformationTree.Extra.Sound;
+using InformationTree.Forms;
+using InformationTree.PgpEncryption;
+using InformationTree.Render.WinForms.Services;
 
 namespace InformationTree.Infrastructure;
 
@@ -11,42 +17,39 @@ public static class Program
     /// The main entry point for the application.
     /// </summary>
     [STAThread]
-    public static void Main(string[] args)
+    public static void Main(string[] _)
     {
-        var container = new WindsorContainer();
-        container.Install(new WindsorInstaller());
+        var host = CreateHostBuilder().Build();
+        var application = host.Services.GetRequiredService<IApplication>();
+        application.Run();
+    }
 
-        var mediatorSelfTest = container.Resolve<IConfigurationReader>()
-            ?.GetConfiguration()
-            ?.ApplicationFeatures
-            ?.MediatorSelfTest ?? false;
-
-        if (mediatorSelfTest)
-        {
-            var writer = new StringWriter();
-            try
+    private static IHostBuilder CreateHostBuilder()
+    {
+        return Host.CreateDefaultBuilder()
+            .ConfigureServices((context, services) =>
             {
-                writer.WriteLine($"Starting MediatR with Castle Windsor self-test at {DateTime.Now}");
-                var mediator = container.BuildMediatorForSelfTest(writer);
-
-                var mediatorSelfTestFunc = () => TestRunner.Run(mediator, writer, "MediatoR.CastleWindsor.SelfTest", true);
-                Task.Run(() => mediatorSelfTestFunc())
-                    .Wait();
-            }
-            catch (Exception ex)
-            {
-                writer.WriteLine($"MediatR self-test failed with exception: {ex}.");
-            }
-            finally
-            {
-                writer.WriteLine($"MediatR self-test finished at {DateTime.Now}. Press enter to exit.");
-            }
-            File.WriteAllText("MediatR.SelfTest.txt", writer.ToString());
-        }
-        else
-        {
-            var application = container.Resolve<IApplication>();
-            application.Run();
-        }
+                services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(MainForm).Assembly));
+                services.AddSingleton<IConfigurationReader, ConfigurationReader>();
+                services.AddSingleton<ISoundProvider, SoundProvider>();
+                services.AddSingleton<IPopUpService, WinFormsPopUpService>();
+                services.AddSingleton<IGraphicsFileFactory, GraphicsFileFactory>();
+                services.AddSingleton<ICompressionProvider, CompressionProvider>();
+                services.AddSingleton<IImportTreeFromXmlService, ImportTreeFromXmlService>();
+                services.AddSingleton<IExportTreeToXmlService, ExportTreeToXmlService>();
+                services.AddSingleton<ICachingService, CachingService>();
+                services.AddSingleton<ITreeNodeDataCachingService, TreeNodeDataCachingService>();
+                services.AddSingleton<ITreeNodeToTreeNodeDataAdapter, TreeNodeToTreeNodeDataAdapter>();
+                services.AddSingleton<ITreeNodeDataToTreeNodeAdapter, TreeNodeDataToTreeNodeAdapter>();
+                services.AddSingleton<IApplication, WinFormsApplication>();
+                services.AddSingleton<ICanvasFormFactory, CanvasPopUpFormFactory>();
+                services.AddSingleton<IPGPEncryptionProvider, PGPEncryptionProvider>();
+                services.AddSingleton<IPGPEncryptionAndSigningProvider, PGPEncryptionAndSigningProvider>();
+                services.AddSingleton<IExportNodeToRtfService, ExportNodeToRtfService>();
+                services.AddSingleton<IImportExportTreeXmlService, ImportExportTreeXmlService>();
+                services.AddSingleton<ITreeNodeSelectionCachingService, TreeNodeSelectionCachingService>();
+                services.AddSingleton<IProfilingService, ProfilingService>();
+                services.AddSingleton<IGraphicsParser, GraphicsParser>();
+            });
     }
 }
