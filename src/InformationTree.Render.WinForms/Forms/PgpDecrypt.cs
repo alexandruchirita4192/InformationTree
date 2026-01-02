@@ -9,6 +9,7 @@ using InformationTree.Domain.Services;
 using InformationTree.Render.WinForms.Extensions;
 using InformationTree.Render.WinForms.Services;
 using MediatR;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
@@ -32,8 +33,13 @@ namespace InformationTree.Forms
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool DecryptFromFile { get; set; }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string PgpPrivateKeyFile { get; private set; }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string PgpPrivateKeyText { get; private set; }
 
         #endregion Properties

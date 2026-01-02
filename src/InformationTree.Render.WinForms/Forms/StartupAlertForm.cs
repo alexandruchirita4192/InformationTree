@@ -4,6 +4,7 @@ using InformationTree.Domain.Entities;
 using InformationTree.Domain.Requests;
 using InformationTree.Domain.Services;
 using MediatR;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
@@ -12,6 +13,7 @@ namespace InformationTree.Forms
         private readonly ITreeNodeDataToTreeNodeAdapter _treeNodeDataToTreeNodeAdapter;
         private readonly IMediator _mediator;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TreeNode SelectedItemOrCategory
         {
             get

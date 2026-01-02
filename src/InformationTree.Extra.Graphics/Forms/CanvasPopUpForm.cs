@@ -4,17 +4,22 @@ using InformationTree.Domain.Requests;
 using InformationTree.Extra.Graphics.Computation;
 using MediatR;
 using D = System.Drawing;
+using System.ComponentModel;
 
 namespace InformationTree.Forms
 {
     public partial class CanvasPopUpForm : Form, ICanvasForm
     {
         private int op, nr, x, y, r;
+        
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public System.Timers.Timer RunTimer { get; private set; }
 
         private readonly IMediator _mediator;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IGraphicsFile GraphicsFile { get; private set; }
+
         private D.BufferedGraphicsContext context = D.BufferedGraphicsManager.Current;
         private D.BufferedGraphics grafx;
 

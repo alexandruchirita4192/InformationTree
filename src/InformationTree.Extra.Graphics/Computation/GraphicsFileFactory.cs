@@ -2,6 +2,7 @@
 using InformationTree.Domain.Services.Graphics;
 using InformationTree.Extra.Graphics.Domain;
 using InformationTree.Extra.Graphics.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InformationTree.Extra.Graphics.Computation
 {
@@ -18,18 +19,19 @@ namespace InformationTree.Extra.Graphics.Computation
 
         #endregion Constants
 
-        private readonly IGraphicsParser _graphicsParsing;
+        private readonly IServiceProvider _serviceProvider;
 
-        public GraphicsFileFactory(IGraphicsParser graphicsParsing)
+        public GraphicsFileFactory(IServiceProvider serviceProvider)
         {
-            _graphicsParsing = graphicsParsing;
+            _serviceProvider = serviceProvider;
         }
 
         #region Methods
 
-        public IGraphicsFile CreateGraphicsFile()
+        public IGraphicsFile? CreateGraphicsFile()
         {
-            var graphicsFile = new GraphicsFile(_graphicsParsing);
+            var _graphicsParsing = _serviceProvider.GetService<IGraphicsParser>();
+            var graphicsFile = _graphicsParsing != null ? new GraphicsFile(_graphicsParsing) : null;
             return graphicsFile;
         }
 
@@ -73,9 +75,9 @@ namespace InformationTree.Extra.Graphics.Computation
             return GenerateFigureLines(DefaultPoints, DefaultX, DefaultY, radius, DefaultTheta, DefaultNumber, iterations, computeType);
         }
 
-        public IGraphicsFile GetDefaultGraphicsFile(int screenBoundsHeight, int screenBoundsWidth)
+        public IGraphicsFile? GetDefaultGraphicsFile(int screenBoundsHeight, int screenBoundsWidth)
         {
-            var ret = new GraphicsFile(_graphicsParsing);
+            var ret = CreateGraphicsFile();
 
             var y = screenBoundsHeight / 2;
             var x = screenBoundsWidth / 2;
@@ -95,17 +97,17 @@ namespace InformationTree.Extra.Graphics.Computation
             lines.Add($"AllCenter 200 200 {x} {y}");
             lines.Add("Cycle 1");
 
-            ret.ParseLines(lines.ToArray());
+            ret?.ParseLines(lines.ToArray());
 
             return ret;
         }
 
-        public IGraphicsFile GetHardCodedPrettyFigures(int screenBoundsHeight, int screenBoundsWidth)
+        public IGraphicsFile? GetHardCodedPrettyFigures(int screenBoundsHeight, int screenBoundsWidth)
         {
             var y = screenBoundsHeight / 2;
             var x = screenBoundsWidth / 2;
 
-            var graphicsFile = new GraphicsFile(_graphicsParsing);
+            var graphicsFile = CreateGraphicsFile();
 
             var lines = new List<string>
             {
@@ -124,7 +126,7 @@ namespace InformationTree.Extra.Graphics.Computation
                 "Cycle 200"
             };
 
-            graphicsFile.ParseLines(lines.ToArray());
+            graphicsFile?.ParseLines(lines.ToArray());
 
             return graphicsFile;
         }

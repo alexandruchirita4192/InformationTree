@@ -9,7 +9,7 @@ using MediatR;
 
 namespace InformationTree.Render.WinForms.Handlers.RequestHandlers;
 
-public class TreeViewMoveToNextUnfinishedHandler : IRequestHandler<TreeViewCollapseAndRefreshRequest, BaseResponse>
+public class TreeViewMoveToNextUnfinishedHandler : IRequestHandler<TreeViewMoveToNextUnfinishedRequest, BaseResponse>
 {
     private readonly ITreeNodeToTreeNodeDataAdapter _treeNodeToTreeNodeDataAdapter;
     public TreeViewMoveToNextUnfinishedHandler(ITreeNodeToTreeNodeDataAdapter treeNodeToTreeNodeDataAdapter)
@@ -17,7 +17,7 @@ public class TreeViewMoveToNextUnfinishedHandler : IRequestHandler<TreeViewColla
         _treeNodeToTreeNodeDataAdapter = treeNodeToTreeNodeDataAdapter;
     }
 
-    public Task<BaseResponse> Handle(TreeViewCollapseAndRefreshRequest request, CancellationToken cancellationToken)
+    public Task<BaseResponse> Handle(TreeViewMoveToNextUnfinishedRequest request, CancellationToken cancellationToken)
     {
         if (request.TreeView is not TreeView tvTaskList)
             return Task.FromResult<BaseResponse>(null);

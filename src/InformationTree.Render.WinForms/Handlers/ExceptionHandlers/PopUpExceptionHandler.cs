@@ -2,13 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using InformationTree.Domain.Requests.Base;
-using InformationTree.Domain.Responses;
 using InformationTree.Domain.Services;
 using MediatR.Pipeline;
 
 namespace InformationTree.Render.WinForms.Handlers.ExceptionHandlers
 {
-    public class PopUpExceptionHandler : AsyncRequestExceptionHandler<BaseRequest, BaseResponse>
+    public class PopUpExceptionHandler : IRequestExceptionAction<BaseRequest, Exception>
     {
         private readonly IPopUpService _popUpService;
 
@@ -17,10 +16,9 @@ namespace InformationTree.Render.WinForms.Handlers.ExceptionHandlers
             _popUpService = popUpService;
         }
 
-        protected override Task Handle(BaseRequest request, Exception exception, RequestExceptionHandlerState<BaseResponse> state, CancellationToken cancellationToken)
+        public Task Execute(BaseRequest request, Exception exception, CancellationToken cancellationToken)
         {
             _popUpService.ShowWarning($"{exception.Message}{Environment.NewLine}{Environment.NewLine}Check log file Log.txt", "Error occured");
-            state.SetHandled(new BaseResponse());
             return Task.CompletedTask;
         }
     }
